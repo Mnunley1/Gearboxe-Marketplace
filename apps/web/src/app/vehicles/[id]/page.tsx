@@ -42,13 +42,14 @@ interface VehiclePageProps {
 export default function VehiclePage({ params }: VehiclePageProps) {
   const { isAuthenticated } = useConvexAuth();
   const { isSignedIn } = useAuth();
-  const { user: convexUser } = useCurrentUser();
+  const { user: convexUser, isAuthenticated: isUserAuthenticated, isLoading: userLoading } = useCurrentUser();
   const unwrappedParams = use(params);
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
   const [isPhotoModalOpen, setIsPhotoModalOpen] = useState(false);
   const [isFavorited, setIsFavorited] = useState(false);
   const [isFavoriteLoading, setIsFavoriteLoading] = useState(false);
   const [showShareMenu, setShowShareMenu] = useState(false);
+  const [showAuthDialog, setShowAuthDialog] = useState(false);
   const { toast } = useToast();
 
   const vehicle = useQuery(api.vehicles.getVehicleById, {
@@ -92,6 +93,26 @@ export default function VehiclePage({ params }: VehiclePageProps) {
       setIsFavorited(isFavoritedQuery);
     }
   }, [isFavoritedQuery]);
+
+  // Handle Escape key to close dialog
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && showAuthDialog) {
+        setShowAuthDialog(false);
+      }
+    };
+
+    if (showAuthDialog) {
+      document.addEventListener("keydown", handleEscape);
+      // Prevent body scroll when dialog is open
+      document.body.style.overflow = "hidden";
+    }
+
+    return () => {
+      document.removeEventListener("keydown", handleEscape);
+      document.body.style.overflow = "unset";
+    };
+  }, [showAuthDialog]);
 
   const nextPhoto = useCallback(() => {
     if (!vehicle) return;
@@ -222,7 +243,16 @@ export default function VehiclePage({ params }: VehiclePageProps) {
   };
 
   const handleFavoriteToggle = async () => {
-    if (!(convexUser && vehicle) || isFavoriteLoading) return;
+    // Wait for user loading to complete
+    if (userLoading) return;
+
+    // If user is not logged in, show auth dialog
+    if (!isUserAuthenticated || !convexUser) {
+      setShowAuthDialog(true);
+      return;
+    }
+
+    if (!vehicle || isFavoriteLoading) return;
 
     setIsFavoriteLoading(true);
     try {
@@ -434,22 +464,20 @@ export default function VehiclePage({ params }: VehiclePageProps) {
                         </div>
                       )}
                     </div>
-                    {convexUser && (
-                      <Button
-                        className="flex items-center"
-                        disabled={isFavoriteLoading}
-                        onClick={handleFavoriteToggle}
-                        size="sm"
-                        variant="outline"
-                      >
-                        <Heart
-                          className={`mr-2 h-4 w-4 transition-colors ${
-                            isFavorited ? "fill-red-500 text-red-500" : ""
-                          } ${isFavoriteLoading ? "opacity-50" : ""}`}
-                        />
-                        {isFavorited ? "Saved" : "Save"}
-                      </Button>
-                    )}
+                    <Button
+                      className="flex items-center"
+                      disabled={isFavoriteLoading}
+                      onClick={handleFavoriteToggle}
+                      size="sm"
+                      variant="outline"
+                    >
+                      <Heart
+                        className={`mr-2 h-4 w-4 transition-colors ${
+                          isFavorited ? "fill-red-500 text-red-500" : ""
+                        } ${isFavoriteLoading ? "opacity-50" : ""}`}
+                      />
+                      {isFavorited ? "Saved" : "Save"}
+                    </Button>
                   </div>
                 </div>
 
@@ -849,6 +877,75 @@ export default function VehiclePage({ params }: VehiclePageProps) {
                 <p className="text-sm">
                   {currentPhotoIndex + 1} of {vehicle.photos.length}
                 </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Auth Dialog */}
+        {showAuthDialog && (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm animate-in fade-in-0"
+            onClick={() => setShowAuthDialog(false)}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="auth-dialog-title"
+            aria-describedby="auth-dialog-description"
+          >
+            <div
+              className="relative w-full max-w-md rounded-xl border border-gray-200 bg-white shadow-2xl animate-in zoom-in-95 fade-in-0 slide-in-from-bottom-4"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Close button */}
+              <button
+                onClick={() => setShowAuthDialog(false)}
+                className="absolute right-4 top-4 rounded-sm opacity-70 transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-gray-950 focus:ring-offset-2 disabled:pointer-events-none"
+                aria-label="Close dialog"
+              >
+                <X className="h-4 w-4 text-gray-500" />
+                <span className="sr-only">Close</span>
+              </button>
+
+              {/* Content */}
+              <div className="p-6">
+                {/* Icon */}
+                <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
+                  <Heart className="h-6 w-6 text-primary" fill="currentColor" />
+                </div>
+
+                <div className="mb-6 text-center">
+                  <h2
+                    id="auth-dialog-title"
+                    className="mb-2 font-semibold text-gray-900 text-xl"
+                  >
+                    Sign in to favorite vehicles
+                  </h2>
+                  <p
+                    id="auth-dialog-description"
+                    className="text-gray-600 text-sm"
+                  >
+                    Create an account or sign in to save vehicles to your
+                    favorites list and get notified about price changes.
+                  </p>
+                </div>
+
+                <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
+                  <Button
+                    asChild
+                    variant="outline"
+                    className="w-full sm:w-auto"
+                    onClick={() => setShowAuthDialog(false)}
+                  >
+                    <Link href="/sign-in">Sign In</Link>
+                  </Button>
+                  <Button
+                    asChild
+                    className="w-full text-white sm:w-auto"
+                    onClick={() => setShowAuthDialog(false)}
+                  >
+                    <Link href="/sign-up">Create Account</Link>
+                  </Button>
+                </div>
               </div>
             </div>
           </div>

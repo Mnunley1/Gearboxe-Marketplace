@@ -163,12 +163,7 @@ export default function HomePage() {
             ) : displayVehicles.length > 0 ? (
               <div className="mb-12 grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
                 {displayVehicles.map((vehicle) => (
-                  <div
-                    className="transform transition-all duration-300 hover:scale-105"
-                    key={vehicle._id}
-                  >
-                    <VehicleCard vehicle={vehicle} />
-                  </div>
+                  <VehicleCard key={vehicle._id} vehicle={vehicle} />
                 ))}
               </div>
             ) : (

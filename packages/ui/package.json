@@ -6,6 +6,7 @@
     "./theme": "./src/theme.css",
     "./button": "./src/button.tsx",
     "./card": "./src/card.tsx",
+    "./dialog": "./src/dialog.tsx",
     "./input": "./src/input.tsx",
     "./label": "./src/label.tsx",
     "./textarea": "./src/textarea.tsx",

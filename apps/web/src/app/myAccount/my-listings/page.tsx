@@ -17,8 +17,10 @@ import {
   Clock,
   Edit,
   Eye,
+  Heart,
   Plus,
   QrCode,
+  Share2,
   Trash2,
   XCircle,
 } from "lucide-react";
@@ -28,6 +30,37 @@ import { useState } from "react";
 import { Footer } from "../../../../components/footer";
 import { Navbar } from "../../../../components/navbar";
 import { QRDisplay } from "../../../../components/qr-display";
+
+type VehicleAnalyticsProps = {
+  vehicleId: string;
+  formatNumber: (num: number) => string;
+};
+
+function VehicleAnalytics({ vehicleId, formatNumber }: VehicleAnalyticsProps) {
+  const analytics = useQuery(
+    api.analytics.getVehicleAnalytics,
+    vehicleId ? { vehicleId: vehicleId as any } : "skip"
+  );
+
+  if (!analytics) return null;
+
+  return (
+    <div className="flex items-center gap-4 text-gray-600 text-sm">
+      <div className="flex items-center gap-1">
+        <Eye className="h-4 w-4" />
+        <span>{formatNumber(analytics.views)}</span>
+      </div>
+      <div className="flex items-center gap-1">
+        <Share2 className="h-4 w-4" />
+        <span>{formatNumber(analytics.shares)}</span>
+      </div>
+      <div className="flex items-center gap-1">
+        <Heart className="h-4 w-4" />
+        <span>{formatNumber(analytics.favorites)}</span>
+      </div>
+    </div>
+  );
+}
 
 export default function MyListingsPage() {
   const router = useRouter();
@@ -116,6 +149,16 @@ export default function MyListingsPage() {
       default:
         return "bg-gray-100 text-gray-800";
     }
+  };
+
+  const formatNumber = (num: number): string => {
+    if (num >= 1000000) {
+      return `${(num / 1000000).toFixed(1)}M`;
+    }
+    if (num >= 1000) {
+      return `${(num / 1000).toFixed(1)}K`;
+    }
+    return num.toString();
   };
 
   return (
@@ -274,6 +317,12 @@ export default function MyListingsPage() {
                         <p className="font-semibold text-2xl text-primary">
                           ${vehicle.price.toLocaleString()}
                         </p>
+                        
+                        {/* Analytics Stats */}
+                        <VehicleAnalytics
+                          formatNumber={formatNumber}
+                          vehicleId={vehicle._id}
+                        />
                         
                         {/* Event Location */}
                         {vehicle.event && (

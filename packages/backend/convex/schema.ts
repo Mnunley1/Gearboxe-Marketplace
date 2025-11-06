@@ -125,4 +125,11 @@ export default defineSchema({
     .index("by_user", ["userId"])
     .index("by_vehicle", ["vehicleId"])
     .index("by_user_vehicle", ["userId", "vehicleId"]),
+
+  vehicleAnalytics: defineTable({
+    vehicleId: v.id("vehicles"),
+    views: v.number(),
+    shares: v.number(),
+  })
+    .index("by_vehicle", ["vehicleId"]),
 });

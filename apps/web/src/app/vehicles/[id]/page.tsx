@@ -69,6 +69,8 @@ export default function VehiclePage({ params }: VehiclePageProps) {
   });
   const addFavorite = useMutation(api.favorites.addFavorite);
   const removeFavorite = useMutation(api.favorites.removeFavorite);
+  const trackView = useMutation(api.analytics.trackView);
+  const trackShare = useMutation(api.analytics.trackShare);
   const isFavoritedQuery = useQuery(
     api.favorites.isFavorited,
     convexUser?._id && vehicle?._id
@@ -86,6 +88,16 @@ export default function VehiclePage({ params }: VehiclePageProps) {
       document.title = `${vehicle.title} - Car Market`;
     }
   }, [vehicle]);
+
+  // Track view when vehicle loads
+  useEffect(() => {
+    if (vehicle?._id) {
+      trackView({ vehicleId: vehicle._id as any }).catch((error) => {
+        // Silently fail - don't block page render
+        console.error("Error tracking view:", error);
+      });
+    }
+  }, [vehicle?._id, trackView]);
 
   // Update favorite state when query result changes
   useEffect(() => {
@@ -224,6 +236,12 @@ export default function VehiclePage({ params }: VehiclePageProps) {
         description: "Vehicle link has been copied to your clipboard",
       });
       setShowShareMenu(false);
+      // Track share
+      if (vehicle?._id) {
+        trackShare({ vehicleId: vehicle._id as any }).catch((error) => {
+          console.error("Error tracking share:", error);
+        });
+      }
     } catch (error) {
       console.error("Error copying link:", error);
       toast({
@@ -240,6 +258,12 @@ export default function VehiclePage({ params }: VehiclePageProps) {
     const mailtoLink = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     window.open(mailtoLink);
     setShowShareMenu(false);
+    // Track share
+    if (vehicle?._id) {
+      trackShare({ vehicleId: vehicle._id as any }).catch((error) => {
+        console.error("Error tracking share:", error);
+      });
+    }
   };
 
   const handleFavoriteToggle = async () => {

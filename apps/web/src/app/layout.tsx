@@ -17,8 +17,8 @@ export default function RootLayout({
 }>) {
   return (
     <ClerkProvider
-      signInFallbackRedirectUrl="/myAccount"
-      signUpFallbackRedirectUrl="/myAccount"
+      signInFallbackRedirectUrl="/myAccount/my-listings"
+      signUpFallbackRedirectUrl="/myAccount/my-listings"
     >
       <html lang="en">
         <body className="antialiased">

@@ -506,6 +506,25 @@ export default function VehiclePage({ params }: VehiclePageProps) {
                       width={800}
                     />
 
+                    {/* Sale Status Overlay */}
+                    {vehicle.saleStatus && vehicle.saleStatus !== "available" && (
+                      <div
+                        className={`absolute bottom-0 left-0 right-0 z-10 flex items-center justify-center py-4 font-bold text-xl shadow-lg ${
+                          vehicle.saleStatus === "sold"
+                            ? "bg-red-200/80 text-red-900"
+                            : vehicle.saleStatus === "salePending"
+                              ? "bg-yellow-200/80 text-yellow-900"
+                              : ""
+                        }`}
+                      >
+                        {vehicle.saleStatus === "sold"
+                          ? "SOLD"
+                          : vehicle.saleStatus === "salePending"
+                            ? "SALE PENDING"
+                            : ""}
+                      </div>
+                    )}
+
                     {/* Photo Navigation */}
                     {vehicle.photos.length > 1 && (
                       <>
@@ -529,7 +548,7 @@ export default function VehiclePage({ params }: VehiclePageProps) {
                     )}
 
                     {/* Photo Counter */}
-                    <div className="absolute right-4 bottom-4 rounded-full bg-black/70 px-3 py-1 text-sm text-white">
+                    <div className="absolute right-4 top-4 rounded-full bg-black/70 px-3 py-1 text-sm text-white">
                       {currentPhotoIndex + 1} / {vehicle.photos.length}
                     </div>
                   </div>

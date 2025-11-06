@@ -44,7 +44,7 @@ export default function AdminCheckinPage() {
   );
 
   if (isAdmin === false) {
-    redirect("/myAccount");
+    redirect("/myAccount/my-listings");
   }
 
   if (isAdmin === undefined || !upcomingEvents) {

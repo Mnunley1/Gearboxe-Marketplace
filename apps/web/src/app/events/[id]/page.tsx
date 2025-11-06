@@ -148,7 +148,11 @@ export default function EventPage({ params }: EventPageProps) {
           {registeredVehicles.length > 0 ? (
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
               {registeredVehicles.map((vehicle) => (
-                <VehicleCard key={vehicle._id} vehicle={vehicle} />
+                <VehicleCard
+                  key={vehicle._id}
+                  vehicle={vehicle}
+                  event={event}
+                />
               ))}
             </div>
           ) : (

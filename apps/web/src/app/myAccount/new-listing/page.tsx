@@ -78,6 +78,7 @@ export default function NewListingPage() {
     description: "",
     contactInfo: "",
     photos: [] as string[],
+    eventId: "",
   });
 
   if (isLoading) {
@@ -130,12 +131,13 @@ export default function NewListingPage() {
   };
 
   const handleSubmit = async () => {
-    if (!currentUser) return;
+    if (!currentUser || !formData.eventId) return;
 
     setIsSubmitting(true);
     try {
       const vehicleId = await createVehicle({
         userId: currentUser._id,
+        eventId: formData.eventId as any,
         title: formData.title,
         make: formData.make,
         model: formData.model,
@@ -433,6 +435,40 @@ export default function NewListingPage() {
 
             {step === 3 && (
               <div className="space-y-6">
+                <div className="space-y-2">
+                  <Label htmlFor="event">Select Event *</Label>
+                  <Select
+                    onValueChange={(value) =>
+                      handleInputChange("eventId", value)
+                    }
+                    value={formData.eventId}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select an upcoming event" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {upcomingEvents && upcomingEvents.length > 0 ? (
+                        upcomingEvents.map((event) => (
+                          <SelectItem key={event._id} value={event._id}>
+                            {event.name} -{" "}
+                            {new Date(event.date).toLocaleDateString()}
+                          </SelectItem>
+                        ))
+                      ) : (
+                        <SelectItem disabled value="no-events">
+                          No upcoming events available
+                        </SelectItem>
+                      )}
+                    </SelectContent>
+                  </Select>
+                  {upcomingEvents && upcomingEvents.length === 0 && (
+                    <p className="text-gray-500 text-sm">
+                      Please contact an administrator to create an upcoming
+                      event before listing your vehicle.
+                    </p>
+                  )}
+                </div>
+
                 <div className="py-8 text-center">
                   <Car className="mx-auto mb-4 h-16 w-16 text-primary" />
                   <h3 className="mb-2 font-semibold text-gray-900 text-xl">
@@ -440,8 +476,8 @@ export default function NewListingPage() {
                   </h3>
                   <p className="mb-6 text-gray-600">
                     Your vehicle listing will be reviewed by our team before
-                    being published. Once approved, you can register for
-                    upcoming events.
+                    being published. Your vehicle will be associated with the
+                    selected event.
                   </p>
 
                   <div className="mb-6 rounded-lg bg-gray-50 p-6">
@@ -466,6 +502,16 @@ export default function NewListingPage() {
                         <strong>Photos:</strong> {formData.photos.length}{" "}
                         uploaded
                       </p>
+                      {formData.eventId && upcomingEvents && (
+                        <p>
+                          <strong>Event:</strong>{" "}
+                          {
+                            upcomingEvents.find(
+                              (e) => e._id === formData.eventId
+                            )?.name
+                          }
+                        </p>
+                      )}
                     </div>
                   </div>
 
@@ -473,7 +519,10 @@ export default function NewListingPage() {
                     <Button onClick={() => setStep(2)} variant="outline">
                       Previous Step
                     </Button>
-                    <Button disabled={isSubmitting} onClick={handleSubmit}>
+                    <Button
+                      disabled={isSubmitting || !formData.eventId}
+                      onClick={handleSubmit}
+                    >
                       {isSubmitting ? "Creating Listing..." : "Create Listing"}
                     </Button>
                   </div>

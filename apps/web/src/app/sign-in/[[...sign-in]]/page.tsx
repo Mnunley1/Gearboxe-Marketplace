@@ -26,11 +26,11 @@ export default function SignInPage() {
       // Use setTimeout to avoid race conditions with Next.js router
       const timer = setTimeout(() => {
         try {
-          router.replace("/myAccount");
+          router.replace("/myAccount/my-listings");
         } catch (error) {
           console.warn("Router navigation failed:", error);
           // Fallback to window.location if router fails
-          window.location.href = "/myAccount";
+          window.location.href = "/myAccount/my-listings";
         }
       }, 100);
 
@@ -44,7 +44,7 @@ export default function SignInPage() {
 
     // Check if user is already signed in
     if (isSignedIn) {
-      router.push("/myAccount");
+      router.push("/myAccount/my-listings");
       return;
     }
 
@@ -60,10 +60,10 @@ export default function SignInPage() {
       if (result.status === "complete") {
         await setActive({ session: result.createdSessionId });
         try {
-          router.push("/myAccount");
+          router.push("/myAccount/my-listings");
         } catch (error) {
           console.warn("Router navigation failed:", error);
-          window.location.href = "/myAccount";
+          window.location.href = "/myAccount/my-listings";
         }
       } else {
         setError("Sign in failed. Please check your credentials.");
@@ -78,10 +78,10 @@ export default function SignInPage() {
         errorMessage.includes("already signed in")
       ) {
         try {
-          router.push("/myAccount");
+          router.push("/myAccount/my-listings");
         } catch (error) {
           console.warn("Router navigation failed:", error);
-          window.location.href = "/myAccount";
+          window.location.href = "/myAccount/my-listings";
         }
         return;
       }
@@ -110,7 +110,7 @@ export default function SignInPage() {
       <div className="flex min-h-screen items-center justify-center bg-white">
         <div className="text-center">
           <div className="mx-auto h-32 w-32 animate-spin rounded-full border-primary border-b-2" />
-          <p className="mt-4 text-gray-600">Redirecting to dashboard...</p>
+          <p className="mt-4 text-gray-600">Redirecting to my listings...</p>
         </div>
       </div>
     );
@@ -243,8 +243,8 @@ export default function SignInPage() {
                   // Handle Google sign-in
                   signIn?.authenticateWithRedirect({
                     strategy: "oauth_google",
-                    redirectUrl: "/myAccount",
-                    redirectUrlComplete: "/myAccount",
+                    redirectUrl: "/myAccount/my-listings",
+                    redirectUrlComplete: "/myAccount/my-listings",
                   });
                 }}
                 variant="outline"
@@ -275,8 +275,8 @@ export default function SignInPage() {
                   // Handle GitHub sign-in
                   signIn?.authenticateWithRedirect({
                     strategy: "oauth_github",
-                    redirectUrl: "/myAccount",
-                    redirectUrlComplete: "/myAccount",
+                    redirectUrl: "/myAccount/my-listings",
+                    redirectUrlComplete: "/myAccount/my-listings",
                   });
                 }}
                 variant="outline"

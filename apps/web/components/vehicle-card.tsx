@@ -21,15 +21,26 @@ type Vehicle = {
   price: number;
   photos: string[];
   status: "pending" | "approved" | "rejected";
+  saleStatus?: "available" | "salePending" | "sold";
+};
+
+type Event = {
+  _id: string;
+  name: string;
+  location: string;
+  address: string;
+  date: number;
 };
 
 type VehicleCardProps = {
   vehicle: Vehicle;
+  event?: Event | null;
   showFavorite?: boolean;
 };
 
 export function VehicleCard({
   vehicle,
+  event,
   showFavorite = true,
 }: VehicleCardProps) {
   const { user: convexUser, isAuthenticated, isLoading: userLoading } = useCurrentUser();
@@ -158,9 +169,28 @@ export function VehicleCard({
             </div>
           )}
 
+          {/* Sale Status Overlay */}
+          {vehicle.saleStatus && vehicle.saleStatus !== "available" && (
+            <div
+              className={`absolute bottom-0 left-0 right-0 z-10 flex items-center justify-center py-3 font-bold shadow-lg ${
+                vehicle.saleStatus === "sold"
+                  ? "bg-red-200/80 text-red-900"
+                  : vehicle.saleStatus === "salePending"
+                    ? "bg-yellow-200/80 text-yellow-900"
+                    : ""
+              }`}
+            >
+              {vehicle.saleStatus === "sold"
+                ? "SOLD"
+                : vehicle.saleStatus === "salePending"
+                  ? "SALE PENDING"
+                  : ""}
+            </div>
+          )}
+
           {showFavorite && (
             <Button
-              className="absolute top-2 right-2 bg-white/80 hover:bg-white"
+              className="absolute top-2 right-2 z-20 bg-white/80 hover:bg-white"
               disabled={isLoading || userLoading}
               onClick={handleFavoriteToggle}
               size="icon"
@@ -189,6 +219,11 @@ export function VehicleCard({
                 {formatPrice(vehicle.price)}
               </span>
             </div>
+            {event && (
+              <p className="text-gray-500 text-xs">
+                {event.location}
+              </p>
+            )}
           </div>
         </CardContent>
 

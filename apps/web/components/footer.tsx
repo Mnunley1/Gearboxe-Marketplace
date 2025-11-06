@@ -47,9 +47,9 @@ export function Footer() {
               <li>
                 <Link
                   className="text-gray-600 text-sm transition-colors hover:text-primary"
-                  href="/myAccount"
+                  href="/myAccount/my-listings"
                 >
-                  Seller Dashboard
+                  My Listings
                 </Link>
               </li>
             </ul>

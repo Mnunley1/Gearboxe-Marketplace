@@ -39,7 +39,7 @@ export default function AdminListingsPage() {
   const rejectVehicle = useMutation(api.vehicles.rejectVehicle);
 
   if (isAdmin === false) {
-    redirect("/myAccount");
+    redirect("/myAccount/my-listings");
   }
 
   if (isAdmin === undefined || !allVehicles) {

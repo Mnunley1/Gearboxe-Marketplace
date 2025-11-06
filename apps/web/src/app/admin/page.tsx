@@ -46,7 +46,7 @@ export default function AdminDashboardPage() {
   }
 
   if (isAdmin === false) {
-    redirect("/myAccount");
+    redirect("/myAccount/my-listings");
   }
 
   if (

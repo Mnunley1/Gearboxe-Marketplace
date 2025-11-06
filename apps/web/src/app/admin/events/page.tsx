@@ -37,7 +37,7 @@ export default function AdminEventsPage() {
   const deleteEvent = useMutation(api.events.deleteEvent);
 
   if (isAdmin === false) {
-    redirect("/myAccount");
+    redirect("/myAccount/my-listings");
   }
 
   if (isAdmin === undefined || !allEvents || !cities) {

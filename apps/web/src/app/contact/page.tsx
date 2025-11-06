@@ -19,7 +19,7 @@ const faqData: FAQItem[] = [
   {
     question: "How do I list my vehicle for sale?",
     answer:
-      "To list your vehicle, sign up for an account and navigate to your dashboard. Click 'New Listing' and fill out the vehicle information form. Once submitted, our team will review and approve your listing within 24-48 hours.",
+      "To list your vehicle, sign up for an account and navigate to your My Listings page. Click 'New Listing' and fill out the vehicle information form. Once submitted, our team will review and approve your listing within 24-48 hours.",
   },
   {
     question: "What are the fees for selling a vehicle?",
@@ -44,7 +44,7 @@ const faqData: FAQItem[] = [
   {
     question: "Can I edit my vehicle listing after it's approved?",
     answer:
-      "Yes, you can edit your listing at any time through your dashboard. Changes to price, description, or photos will be reviewed and updated within 24 hours.",
+      "Yes, you can edit your listing at any time through your My Listings page. Changes to price, description, or photos will be reviewed and updated within 24 hours.",
   },
   {
     question: "What happens if my vehicle doesn't sell?",

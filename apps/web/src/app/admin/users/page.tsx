@@ -38,7 +38,7 @@ export default function AdminUsersPage() {
   const updateUserRole = useMutation(api.admin.updateUserRole);
 
   if (isAdmin === false) {
-    redirect("/myAccount");
+    redirect("/myAccount/my-listings");
   }
 
   if (isAdmin === undefined || !allUsers) {

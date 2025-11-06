@@ -3,11 +3,19 @@
 import { api } from "@car-market/convex/_generated/api";
 import { Button } from "@car-market/ui/button";
 import { Card, CardContent } from "@car-market/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@car-market/ui/select";
 import { useUser } from "@clerk/nextjs";
 import { useConvexAuth, useMutation, useQuery } from "convex/react";
 import {
   CheckCircle,
   Clock,
+  Edit,
   Eye,
   Plus,
   QrCode,
@@ -42,6 +50,7 @@ export default function MyListingsPage() {
     currentUser?._id ? { userId: currentUser._id } : "skip"
   );
   const deleteVehicle = useMutation(api.vehicles.deleteVehicle);
+  const updateSaleStatus = useMutation(api.vehicles.updateSaleStatus);
 
   if (isLoading) {
     return (
@@ -68,6 +77,18 @@ export default function MyListingsPage() {
       } catch (error) {
         console.error("Error deleting vehicle:", error);
       }
+    }
+  };
+
+  const handleSaleStatusChange = async (
+    vehicleId: string,
+    saleStatus: "available" | "salePending" | "sold"
+  ) => {
+    try {
+      await updateSaleStatus({ id: vehicleId as any, saleStatus });
+      router.refresh();
+    } catch (error) {
+      console.error("Error updating sale status:", error);
     }
   };
 
@@ -135,7 +156,7 @@ export default function MyListingsPage() {
 
         {/* Listings Grid */}
         {userVehicles && userVehicles.length > 0 ? (
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          <div className="space-y-4">
             {userVehicles.map((vehicle) => {
               const registration = userRegistrations?.find(
                 (reg) => reg.vehicleId === vehicle._id
@@ -146,116 +167,206 @@ export default function MyListingsPage() {
                   className="overflow-hidden transition-shadow hover:shadow-lg"
                   key={vehicle._id}
                 >
-                  <div className="relative">
-                    {vehicle.photos.length > 0 ? (
-                      <img
-                        alt={vehicle.title}
-                        className="h-48 w-full object-cover"
-                        src={vehicle.photos[0]}
-                      />
-                    ) : (
-                      <div className="flex h-48 w-full items-center justify-center bg-gray-200">
-                        <span className="text-gray-500">No Image</span>
+                  <div className="flex flex-col sm:flex-row">
+                    {/* Image Section - Larger */}
+                    <div className="relative h-48 w-full flex-shrink-0 sm:h-auto sm:w-80">
+                      {vehicle.photos.length > 0 ? (
+                        <img
+                          alt={vehicle.title}
+                          className="h-full w-full object-cover"
+                          src={vehicle.photos[0]}
+                        />
+                      ) : (
+                        <div className="flex h-full w-full items-center justify-center bg-gray-200">
+                          <span className="text-gray-500">No Image</span>
+                        </div>
+                      )}
+
+                      {/* Status Badge */}
+                      <div className="absolute top-2 left-2">
+                        <span
+                          className={`flex items-center space-x-1 rounded-full px-2 py-1 text-xs ${getStatusColor(vehicle.status)}`}
+                        >
+                          {getStatusIcon(vehicle.status)}
+                          <span className="capitalize">{vehicle.status}</span>
+                        </span>
                       </div>
-                    )}
 
-                    {/* Status Badge */}
-                    <div className="absolute top-2 left-2">
-                      <span
-                        className={`flex items-center space-x-1 rounded-full px-2 py-1 text-xs ${getStatusColor(vehicle.status)}`}
-                      >
-                        {getStatusIcon(vehicle.status)}
-                        <span className="capitalize">{vehicle.status}</span>
-                      </span>
-                    </div>
+                      {/* Sale Status Overlay */}
+                      {vehicle.saleStatus && vehicle.saleStatus !== "available" && (
+                        <div
+                          className={`absolute bottom-0 left-0 right-0 z-10 flex items-center justify-center py-2 font-bold text-sm shadow-lg ${
+                            vehicle.saleStatus === "sold"
+                              ? "bg-red-200/80 text-red-900"
+                              : vehicle.saleStatus === "salePending"
+                                ? "bg-yellow-200/80 text-yellow-900"
+                                : ""
+                          }`}
+                        >
+                          {vehicle.saleStatus === "sold"
+                            ? "SOLD"
+                            : vehicle.saleStatus === "salePending"
+                              ? "SALE PENDING"
+                              : ""}
+                        </div>
+                      )}
 
-                    {/* Registration Status */}
-                    {registration && (
-                      <div className="absolute top-2 right-2">
-                        <div className="flex items-center space-x-2">
-                          <span
-                            className={`rounded-full px-2 py-1 text-xs ${
-                              registration.checkedIn
-                                ? "bg-green-100 text-green-800"
-                                : "bg-gray-100 text-gray-800"
-                            }`}
-                          >
-                            {registration.checkedIn
-                              ? "Checked In"
-                              : "Not Checked In"}
-                          </span>
-                          {registration.qrCodeData && (
-                            <Button
-                              className="bg-white/80 hover:bg-white"
-                              onClick={() =>
-                                setSelectedQR(registration.qrCodeData!)
-                              }
-                              size="sm"
-                              variant="ghost"
+                      {/* Registration Status */}
+                      {registration && (
+                        <div className="absolute top-2 right-2">
+                          <div className="flex items-center space-x-2">
+                            <span
+                              className={`rounded-full px-2 py-1 text-xs ${
+                                registration.checkedIn
+                                  ? "bg-green-100 text-green-800"
+                                  : "bg-gray-100 text-gray-800"
+                              }`}
                             >
-                              <QrCode className="h-4 w-4" />
-                            </Button>
-                          )}
+                              {registration.checkedIn
+                                ? "Checked In"
+                                : "Not Checked In"}
+                            </span>
+                            {registration.qrCodeData && (
+                              <Button
+                                className="bg-white/80 hover:bg-white"
+                                onClick={() =>
+                                  setSelectedQR(registration.qrCodeData!)
+                                }
+                                size="sm"
+                                variant="ghost"
+                              >
+                                <QrCode className="h-4 w-4" />
+                              </Button>
+                            )}
+                          </div>
                         </div>
-                      </div>
-                    )}
-                  </div>
-
-                  <CardContent className="p-4">
-                    <h3 className="mb-2 line-clamp-1 font-semibold text-lg">
-                      {vehicle.title}
-                    </h3>
-                    <p className="mb-2 text-gray-600 text-sm">
-                      {vehicle.year} {vehicle.make} {vehicle.model}
-                    </p>
-                    <div className="mb-4 flex items-center justify-between text-gray-600 text-sm">
-                      <span>{vehicle.mileage.toLocaleString()} miles</span>
-                      <span className="font-semibold text-lg text-primary">
-                        ${vehicle.price.toLocaleString()}
-                      </span>
+                      )}
                     </div>
 
-                    {/* Registration Info */}
-                    {registration && (
-                      <div className="mb-4 rounded-lg bg-gray-50 p-3">
-                        <div className="text-center">
-                          <p className="font-medium text-gray-900 text-sm">
-                            {registration.event?.name}
-                          </p>
-                          <p className="text-gray-600 text-xs">
-                            {registration.event?.date
-                              ? new Date(
+                    {/* Content Section - Middle */}
+                    <CardContent className="flex flex-1 flex-col justify-center p-6">
+                      <div className="space-y-3">
+                        <p className="font-semibold text-xl text-gray-900">
+                          {vehicle.year} {vehicle.make} {vehicle.model}
+                        </p>
+                        
+                        {/* Registration Info */}
+                        {registration && (
+                          <div>
+                            <p className="font-medium text-gray-900 text-sm">
+                              {registration.event?.name}
+                            </p>
+                            {registration.event?.date && (
+                              <p className="text-gray-600 text-xs">
+                                {new Date(
                                   registration.event.date
-                                ).toLocaleDateString()
-                              : "TBD"}
-                          </p>
-                        </div>
-                      </div>
-                    )}
+                                ).toLocaleDateString("en-US", {
+                                  weekday: "long",
+                                  year: "numeric",
+                                  month: "long",
+                                  day: "numeric",
+                                })}
+                              </p>
+                            )}
+                          </div>
+                        )}
+                        
+                        <p className="font-semibold text-2xl text-primary">
+                          ${vehicle.price.toLocaleString()}
+                        </p>
+                        
+                        {/* Event Location */}
+                        {vehicle.event && (
+                          <div>
+                            <p className="font-medium text-gray-900 text-sm">
+                              {vehicle.event.name}
+                            </p>
+                            <p className="text-gray-600 text-xs">
+                              {vehicle.event.location}
+                            </p>
+                            {vehicle.event.date && (
+                              <p className="text-gray-600 text-xs">
+                                {new Date(
+                                  vehicle.event.date
+                                ).toLocaleDateString("en-US", {
+                                  weekday: "long",
+                                  year: "numeric",
+                                  month: "long",
+                                  day: "numeric",
+                                })}
+                              </p>
+                            )}
+                          </div>
+                        )}
 
-                    {/* Actions */}
-                    <div className="flex space-x-2">
+                        {/* Sale Status Selector */}
+                        {vehicle.status === "approved" && (
+                          <div>
+                            <label className="mb-1 block text-gray-700 text-xs font-medium">
+                              Sale Status
+                            </label>
+                            <Select
+                              value={vehicle.saleStatus || "available"}
+                              onValueChange={(value) =>
+                                handleSaleStatusChange(
+                                  vehicle._id,
+                                  value as "available" | "salePending" | "sold"
+                                )
+                              }
+                            >
+                              <SelectTrigger className="h-8 w-40 text-xs">
+                                <SelectValue />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="available">
+                                  Available
+                                </SelectItem>
+                                <SelectItem value="salePending">
+                                  Sale Pending
+                                </SelectItem>
+                                <SelectItem value="sold">Sold</SelectItem>
+                              </SelectContent>
+                            </Select>
+                          </div>
+                        )}
+                      </div>
+                    </CardContent>
+
+                    {/* Actions Section - Right Side */}
+                    <div className="flex flex-col justify-center gap-2 border-gray-200 border-l p-6 sm:w-48">
                       <Button
                         asChild
-                        className="flex-1"
+                        className="w-full"
                         size="sm"
                         variant="outline"
                       >
                         <Link href={`/vehicles/${vehicle._id}`}>
-                          <Eye className="mr-1 h-4 w-4" />
-                          View
+                          <Eye className="mr-2 h-4 w-4" />
+                          View Live
                         </Link>
                       </Button>
                       <Button
-                        className="text-red-600 hover:bg-red-50 hover:text-red-700"
+                        asChild
+                        className="w-full"
+                        size="sm"
+                        variant="outline"
+                      >
+                        <Link href={`/myAccount/edit-listing/${vehicle._id}`}>
+                          <Edit className="mr-2 h-4 w-4" />
+                          Edit
+                        </Link>
+                      </Button>
+                      <Button
+                        className="w-full text-red-600 hover:bg-red-50 hover:text-red-700"
                         onClick={() => handleDeleteVehicle(vehicle._id)}
                         size="sm"
                         variant="outline"
                       >
-                        <Trash2 className="h-4 w-4" />
+                        <Trash2 className="mr-2 h-4 w-4" />
+                        Delete
                       </Button>
                     </div>
-                  </CardContent>
+                  </div>
                 </Card>
               );
             })}

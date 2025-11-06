@@ -138,7 +138,7 @@ export function AdminNavbar() {
               size="sm"
               variant="ghost"
             >
-              <Link href="/myAccount">
+              <Link href="/myAccount/my-listings">
                 <ArrowLeft className="mr-2 h-4 w-4" />
                 Back to Site
               </Link>
@@ -198,7 +198,7 @@ export function AdminNavbar() {
               <div className="mt-2 border-gray-700 border-t pt-2">
                 <Link
                   className="flex items-center space-x-2 px-3 py-2 font-medium text-gray-300 text-sm hover:text-primary"
-                  href="/myAccount"
+                  href="/myAccount/my-listings"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   <ArrowLeft className="h-4 w-4" />

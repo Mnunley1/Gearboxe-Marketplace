@@ -59,7 +59,7 @@ export async function POST(request: NextRequest) {
         },
       ],
       mode: "payment",
-      success_url: `${process.env.NEXT_PUBLIC_APP_URL}/myAccount?payment=success`,
+      success_url: `${process.env.NEXT_PUBLIC_APP_URL}/myAccount/my-listings?payment=success`,
       cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/myAccount/new-listing`,
       metadata: {
         userId: user._id,

@@ -95,164 +95,7 @@ export const seedDatabase = mutation({
       cityIds.push(cityId);
     }
 
-    // Create fake vehicles
-    const vehicles = [
-      {
-        userId: userIds[0], // John Smith
-        title: "2019 BMW M3 Competition Package",
-        make: "BMW",
-        model: "M3",
-        year: 2019,
-        mileage: 25_000,
-        price: 65_000,
-        vin: "WBS8M9C50JA123456",
-        photos: [
-          "https://images.unsplash.com/photo-1555215695-3004980ad54e?w=800&h=600&fit=crop",
-          "https://images.unsplash.com/photo-1544636331-e26879cd4d9b?w=800&h=600&fit=crop",
-        ],
-        description:
-          "Immaculate BMW M3 with Competition Package. Single owner, garage kept, all service records available. Perfect condition with no accidents. Includes extended warranty.",
-        contactInfo: "john.smith@example.com",
-        status: "approved" as const,
-      },
-      {
-        userId: userIds[1], // Sarah Johnson
-        title: "2020 Tesla Model S Performance",
-        make: "Tesla",
-        model: "Model S",
-        year: 2020,
-        mileage: 18_000,
-        price: 85_000,
-        vin: "5YJSA1E28LF123456",
-        photos: [
-          "https://images.unsplash.com/photo-1560958089-b8a1929cea89?w=800&h=600&fit=crop",
-          "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&h=600&fit=crop",
-        ],
-        description:
-          'Tesla Model S Performance with Ludicrous Mode. FSD capability, premium interior, 21" wheels. Always charged at home, excellent battery health.',
-        contactInfo: "sarah.johnson@example.com",
-        status: "approved" as const,
-      },
-      {
-        userId: userIds[0], // John Smith
-        title: "2018 Porsche 911 Carrera S",
-        make: "Porsche",
-        model: "911",
-        year: 2018,
-        mileage: 32_000,
-        price: 95_000,
-        vin: "WP0AB2A99JS123456",
-        photos: [
-          "https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=800&h=600&fit=crop",
-          "https://images.unsplash.com/photo-1549924231-f129b911e442?w=800&h=600&fit=crop",
-        ],
-        description:
-          "Iconic Porsche 911 Carrera S. Sport Chrono package, premium audio, leather interior. Well maintained with Porsche service history.",
-        contactInfo: "john.smith@example.com",
-        status: "approved" as const,
-      },
-      {
-        userId: userIds[2], // Mike Davis
-        title: "2021 Ford Mustang GT Premium",
-        make: "Ford",
-        model: "Mustang",
-        year: 2021,
-        mileage: 15_000,
-        price: 45_000,
-        vin: "1FA6P8TH2M5123456",
-        photos: [
-          "https://images.unsplash.com/photo-1583121274602-3e2820c69888?w=800&h=600&fit=crop",
-          "https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=800&h=600&fit=crop",
-        ],
-        description:
-          "Ford Mustang GT Premium with 10-speed automatic. Recaro seats, MagneRide suspension, premium sound system. Like new condition.",
-        contactInfo: "mike.davis@example.com",
-        status: "approved" as const,
-      },
-      {
-        userId: userIds[1], // Sarah Johnson
-        title: "2017 Audi RS6 Avant",
-        make: "Audi",
-        model: "RS6",
-        year: 2017,
-        mileage: 45_000,
-        price: 75_000,
-        vin: "WAUZZZ4G8HN123456",
-        photos: [
-          "https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?w=800&h=600&fit=crop",
-          "https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?w=800&h=600&fit=crop",
-        ],
-        description:
-          "Rare Audi RS6 Avant wagon. Twin-turbo V8, Quattro AWD, sport exhaust. Perfect family car with incredible performance.",
-        contactInfo: "sarah.johnson@example.com",
-        status: "approved" as const,
-      },
-      {
-        userId: userIds[2], // Mike Davis
-        title: "2019 Mercedes-AMG C63 S",
-        make: "Mercedes-Benz",
-        model: "C63 AMG",
-        year: 2019,
-        mileage: 28_000,
-        price: 68_000,
-        vin: "WDD2050491A123456",
-        photos: [
-          "https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?w=800&h=600&fit=crop",
-          "https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?w=800&h=600&fit=crop",
-        ],
-        description:
-          "Mercedes-AMG C63 S with AMG Performance Package. Handcrafted V8, AMG exhaust, carbon fiber trim. One owner, full service history.",
-        contactInfo: "mike.davis@example.com",
-        status: "approved" as const,
-      },
-      {
-        userId: userIds[0], // John Smith
-        title: "2020 Lamborghini Huracán EVO",
-        make: "Lamborghini",
-        model: "Huracán",
-        year: 2020,
-        mileage: 5000,
-        price: 220_000,
-        vin: "ZHWGU4ZF6LLA12345",
-        photos: [
-          "https://images.unsplash.com/photo-1544636331-e26879cd4d9b?w=800&h=600&fit=crop",
-          "https://images.unsplash.com/photo-1555215695-3004980ad54e?w=800&h=600&fit=crop",
-        ],
-        description:
-          "Lamborghini Huracán EVO with Ad Personam customization. Carbon fiber package, sport exhaust, ceramic brakes. Museum quality condition.",
-        contactInfo: "john.smith@example.com",
-        status: "approved" as const,
-      },
-      {
-        userId: userIds[1], // Sarah Johnson
-        title: "2016 McLaren 570S",
-        make: "McLaren",
-        model: "570S",
-        year: 2016,
-        mileage: 12_000,
-        price: 180_000,
-        vin: "SBM12ABG6GW123456",
-        photos: [
-          "https://images.unsplash.com/photo-1544636331-e26879cd4d9b?w=800&h=600&fit=crop",
-          "https://images.unsplash.com/photo-1555215695-3004980ad54e?w=800&h=600&fit=crop",
-        ],
-        description:
-          "McLaren 570S Spider with carbon fiber package. Track-focused supercar with incredible performance. Well maintained by McLaren specialists.",
-        contactInfo: "sarah.johnson@example.com",
-        status: "approved" as const,
-      },
-    ];
-
-    const vehicleIds = [];
-    for (const vehicle of vehicles) {
-      const vehicleId = await ctx.db.insert("vehicles", {
-        ...vehicle,
-        createdAt: Date.now(),
-      });
-      vehicleIds.push(vehicleId);
-    }
-
-    // Create fake events
+    // Create fake events first (vehicles require eventId)
     const events = [
       {
         cityId: cityIds[0], // San Francisco
@@ -296,6 +139,171 @@ export const seedDatabase = mutation({
         createdAt: Date.now(),
       });
       eventIds.push(eventId);
+    }
+
+    // Create fake vehicles (now with eventId)
+    const vehicles = [
+      {
+        userId: userIds[0], // John Smith
+        eventId: eventIds[0], // San Francisco event
+        title: "2019 BMW M3 Competition Package",
+        make: "BMW",
+        model: "M3",
+        year: 2019,
+        mileage: 25_000,
+        price: 65_000,
+        vin: "WBS8M9C50JA123456",
+        photos: [
+          "https://images.unsplash.com/photo-1555215695-3004980ad54e?w=800&h=600&fit=crop",
+          "https://images.unsplash.com/photo-1544636331-e26879cd4d9b?w=800&h=600&fit=crop",
+        ],
+        description:
+          "Immaculate BMW M3 with Competition Package. Single owner, garage kept, all service records available. Perfect condition with no accidents. Includes extended warranty.",
+        contactInfo: "john.smith@example.com",
+        status: "approved" as const,
+      },
+      {
+        userId: userIds[1], // Sarah Johnson
+        eventId: eventIds[0], // San Francisco event
+        title: "2020 Tesla Model S Performance",
+        make: "Tesla",
+        model: "Model S",
+        year: 2020,
+        mileage: 18_000,
+        price: 85_000,
+        vin: "5YJSA1E28LF123456",
+        photos: [
+          "https://images.unsplash.com/photo-1560958089-b8a1929cea89?w=800&h=600&fit=crop",
+          "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&h=600&fit=crop",
+        ],
+        description:
+          'Tesla Model S Performance with Ludicrous Mode. FSD capability, premium interior, 21" wheels. Always charged at home, excellent battery health.',
+        contactInfo: "sarah.johnson@example.com",
+        status: "approved" as const,
+      },
+      {
+        userId: userIds[0], // John Smith
+        eventId: eventIds[1], // LA event
+        title: "2018 Porsche 911 Carrera S",
+        make: "Porsche",
+        model: "911",
+        year: 2018,
+        mileage: 32_000,
+        price: 95_000,
+        vin: "WP0AB2A99JS123456",
+        photos: [
+          "https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=800&h=600&fit=crop",
+          "https://images.unsplash.com/photo-1549924231-f129b911e442?w=800&h=600&fit=crop",
+        ],
+        description:
+          "Iconic Porsche 911 Carrera S. Sport Chrono package, premium audio, leather interior. Well maintained with Porsche service history.",
+        contactInfo: "john.smith@example.com",
+        status: "approved" as const,
+      },
+      {
+        userId: userIds[2], // Mike Davis
+        eventId: eventIds[1], // LA event
+        title: "2021 Ford Mustang GT Premium",
+        make: "Ford",
+        model: "Mustang",
+        year: 2021,
+        mileage: 15_000,
+        price: 45_000,
+        vin: "1FA6P8TH2M5123456",
+        photos: [
+          "https://images.unsplash.com/photo-1583121274602-3e2820c69888?w=800&h=600&fit=crop",
+          "https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=800&h=600&fit=crop",
+        ],
+        description:
+          "Ford Mustang GT Premium with 10-speed automatic. Recaro seats, MagneRide suspension, premium sound system. Like new condition.",
+        contactInfo: "mike.davis@example.com",
+        status: "approved" as const,
+      },
+      {
+        userId: userIds[1], // Sarah Johnson
+        eventId: eventIds[2], // Seattle event
+        title: "2017 Audi RS6 Avant",
+        make: "Audi",
+        model: "RS6",
+        year: 2017,
+        mileage: 45_000,
+        price: 75_000,
+        vin: "WAUZZZ4G8HN123456",
+        photos: [
+          "https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?w=800&h=600&fit=crop",
+          "https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?w=800&h=600&fit=crop",
+        ],
+        description:
+          "Rare Audi RS6 Avant wagon. Twin-turbo V8, Quattro AWD, sport exhaust. Perfect family car with incredible performance.",
+        contactInfo: "sarah.johnson@example.com",
+        status: "approved" as const,
+      },
+      {
+        userId: userIds[2], // Mike Davis
+        eventId: eventIds[2], // Seattle event
+        title: "2019 Mercedes-AMG C63 S",
+        make: "Mercedes-Benz",
+        model: "C63 AMG",
+        year: 2019,
+        mileage: 28_000,
+        price: 68_000,
+        vin: "WDD2050491A123456",
+        photos: [
+          "https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?w=800&h=600&fit=crop",
+          "https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?w=800&h=600&fit=crop",
+        ],
+        description:
+          "Mercedes-AMG C63 S with AMG Performance Package. Handcrafted V8, AMG exhaust, carbon fiber trim. One owner, full service history.",
+        contactInfo: "mike.davis@example.com",
+        status: "approved" as const,
+      },
+      {
+        userId: userIds[0], // John Smith
+        eventId: eventIds[1], // LA event
+        title: "2020 Lamborghini Huracán EVO",
+        make: "Lamborghini",
+        model: "Huracán",
+        year: 2020,
+        mileage: 5000,
+        price: 220_000,
+        vin: "ZHWGU4ZF6LLA12345",
+        photos: [
+          "https://images.unsplash.com/photo-1544636331-e26879cd4d9b?w=800&h=600&fit=crop",
+          "https://images.unsplash.com/photo-1555215695-3004980ad54e?w=800&h=600&fit=crop",
+        ],
+        description:
+          "Lamborghini Huracán EVO with Ad Personam customization. Carbon fiber package, sport exhaust, ceramic brakes. Museum quality condition.",
+        contactInfo: "john.smith@example.com",
+        status: "approved" as const,
+      },
+      {
+        userId: userIds[1], // Sarah Johnson
+        eventId: eventIds[0], // San Francisco event
+        title: "2016 McLaren 570S",
+        make: "McLaren",
+        model: "570S",
+        year: 2016,
+        mileage: 12_000,
+        price: 180_000,
+        vin: "SBM12ABG6GW123456",
+        photos: [
+          "https://images.unsplash.com/photo-1544636331-e26879cd4d9b?w=800&h=600&fit=crop",
+          "https://images.unsplash.com/photo-1555215695-3004980ad54e?w=800&h=600&fit=crop",
+        ],
+        description:
+          "McLaren 570S Spider with carbon fiber package. Track-focused supercar with incredible performance. Well maintained by McLaren specialists.",
+        contactInfo: "sarah.johnson@example.com",
+        status: "approved" as const,
+      },
+    ];
+
+    const vehicleIds = [];
+    for (const vehicle of vehicles) {
+      const vehicleId = await ctx.db.insert("vehicles", {
+        ...vehicle,
+        createdAt: Date.now(),
+      });
+      vehicleIds.push(vehicleId);
     }
 
     // Create some fake registrations

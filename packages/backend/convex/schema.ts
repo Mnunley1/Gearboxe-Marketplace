@@ -25,6 +25,7 @@ export default defineSchema({
 
   vehicles: defineTable({
     userId: v.id("users"),
+    eventId: v.optional(v.id("events")),
     title: v.string(),
     make: v.string(),
     model: v.string(),
@@ -40,12 +41,20 @@ export default defineSchema({
       v.literal("approved"),
       v.literal("rejected")
     ),
+    saleStatus: v.optional(
+      v.union(
+        v.literal("available"),
+        v.literal("salePending"),
+        v.literal("sold")
+      )
+    ),
     createdAt: v.number(),
   })
     .index("by_user", ["userId"])
     .index("by_status", ["status"])
     .index("by_make_model", ["make", "model"])
-    .index("by_price_range", ["price"]),
+    .index("by_price_range", ["price"])
+    .index("by_event", ["eventId"]),
 
   events: defineTable({
     cityId: v.id("cities"),

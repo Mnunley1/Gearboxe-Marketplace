@@ -4,6 +4,7 @@ import { mutation, query } from "./_generated/server";
 export const createVehicle = mutation({
   args: {
     userId: v.id("users"),
+    eventId: v.id("events"),
     title: v.string(),
     make: v.string(),
     model: v.string(),
@@ -15,12 +16,24 @@ export const createVehicle = mutation({
     description: v.string(),
     contactInfo: v.string(),
   },
-  handler: async (ctx, args) =>
-    await ctx.db.insert("vehicles", {
+  handler: async (ctx, args) => {
+    // Validate that the event exists and is upcoming
+    const event = await ctx.db.get(args.eventId);
+    if (!event) {
+      throw new Error("Event not found");
+    }
+    const now = Date.now();
+    if (event.date <= now) {
+      throw new Error("Vehicle must be associated with an upcoming event");
+    }
+
+    return await ctx.db.insert("vehicles", {
       ...args,
       status: "pending",
+      saleStatus: "available",
       createdAt: Date.now(),
-    }),
+    });
+  },
 });
 
 export const getVehicles = query({
@@ -82,16 +95,40 @@ export const getVehicleById = query({
 
 export const getVehiclesByUser = query({
   args: { userId: v.id("users") },
+  handler: async (ctx, args) => {
+    const vehicles = await ctx.db
+      .query("vehicles")
+      .withIndex("by_user", (q) => q.eq("userId", args.userId))
+      .collect();
+
+    // Fetch event data for each vehicle
+    const vehiclesWithEvents = await Promise.all(
+      vehicles.map(async (vehicle) => {
+        const event = await ctx.db.get(vehicle.eventId);
+        return {
+          ...vehicle,
+          event,
+        };
+      })
+    );
+
+    return vehiclesWithEvents;
+  },
+});
+
+export const getVehiclesByEvent = query({
+  args: { eventId: v.id("events") },
   handler: async (ctx, args) =>
     await ctx.db
       .query("vehicles")
-      .withIndex("by_user", (q) => q.eq("userId", args.userId))
+      .withIndex("by_event", (q) => q.eq("eventId", args.eventId))
       .collect(),
 });
 
 export const updateVehicle = mutation({
   args: {
     id: v.id("vehicles"),
+    eventId: v.optional(v.id("events")),
     title: v.optional(v.string()),
     make: v.optional(v.string()),
     model: v.optional(v.string()),
@@ -109,10 +146,45 @@ export const updateVehicle = mutation({
         v.literal("rejected")
       )
     ),
+    saleStatus: v.optional(
+      v.union(
+        v.literal("available"),
+        v.literal("salePending"),
+        v.literal("sold")
+      )
+    ),
   },
   handler: async (ctx, args) => {
-    const { id, ...updates } = args;
+    const { id, eventId, ...updates } = args;
+
+    // If eventId is being updated, validate it's an upcoming event
+    if (eventId !== undefined) {
+      const event = await ctx.db.get(eventId);
+      if (!event) {
+        throw new Error("Event not found");
+      }
+      const now = Date.now();
+      if (event.date <= now) {
+        throw new Error("Vehicle must be associated with an upcoming event");
+      }
+      updates.eventId = eventId;
+    }
+
     await ctx.db.patch(id, updates);
+  },
+});
+
+export const updateSaleStatus = mutation({
+  args: {
+    id: v.id("vehicles"),
+    saleStatus: v.union(
+      v.literal("available"),
+      v.literal("salePending"),
+      v.literal("sold")
+    ),
+  },
+  handler: async (ctx, args) => {
+    await ctx.db.patch(args.id, { saleStatus: args.saleStatus });
   },
 });
 

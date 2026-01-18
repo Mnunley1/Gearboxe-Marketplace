@@ -18,6 +18,7 @@ import {
   Edit,
   Eye,
   Heart,
+  Mail,
   Plus,
   QrCode,
   Share2,
@@ -27,6 +28,7 @@ import {
 import Link from "next/link";
 import { redirect, useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
+import { useToast } from "@/hooks/useToast";
 import { Footer } from "../../../../components/footer";
 import { Navbar } from "../../../../components/navbar";
 import { QRDisplay } from "../../../../components/qr-display";
@@ -67,7 +69,14 @@ export default function MyListingsPage() {
   const searchParams = useSearchParams();
   const { isAuthenticated, isLoading } = useConvexAuth();
   const { user } = useUser();
+  const { toast } = useToast();
   const [selectedQR, setSelectedQR] = useState<string | null>(null);
+  const [vehicleToDelete, setVehicleToDelete] = useState<{
+    id: string;
+    title: string;
+  } | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [updatingStatus, setUpdatingStatus] = useState<string | null>(null);
 
   // Always call hooks to maintain hook order
   const currentUser = useQuery(
@@ -84,6 +93,8 @@ export default function MyListingsPage() {
   );
   const deleteVehicle = useMutation(api.vehicles.deleteVehicle);
   const updateSaleStatus = useMutation(api.vehicles.updateSaleStatus);
+  const resendConfirmationEmail = useMutation(api.registrations.resendConfirmationEmail);
+  const [resendingEmail, setResendingEmail] = useState<string | null>(null);
 
   if (isLoading) {
     return (
@@ -102,14 +113,31 @@ export default function MyListingsPage() {
 
   const createdVehicleId = searchParams.get("created");
 
-  const handleDeleteVehicle = async (vehicleId: string) => {
-    if (confirm("Are you sure you want to delete this listing?")) {
-      try {
-        await deleteVehicle({ id: vehicleId as any });
-        router.refresh();
-      } catch (error) {
-        console.error("Error deleting vehicle:", error);
-      }
+  const handleDeleteVehicle = async () => {
+    if (!vehicleToDelete) {
+      return;
+    }
+
+    try {
+      setIsDeleting(true);
+      await deleteVehicle({ id: vehicleToDelete.id as any });
+      toast({
+        title: "Listing Deleted",
+        description: `${vehicleToDelete.title} has been deleted successfully.`,
+      });
+      router.refresh();
+    } catch (error: any) {
+      console.error("Error deleting vehicle:", error);
+      const errorMessage =
+        error?.message || "Failed to delete listing. Please try again.";
+      toast({
+        title: "Error Deleting Listing",
+        description: errorMessage,
+        variant: "destructive",
+      });
+    } finally {
+      setIsDeleting(false);
+      setVehicleToDelete(null);
     }
   };
 
@@ -118,10 +146,24 @@ export default function MyListingsPage() {
     saleStatus: "available" | "salePending" | "sold"
   ) => {
     try {
+      setUpdatingStatus(vehicleId);
       await updateSaleStatus({ id: vehicleId as any, saleStatus });
+      toast({
+        title: "Status Updated",
+        description: "Sale status has been updated successfully.",
+      });
       router.refresh();
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error updating sale status:", error);
+      const errorMessage =
+        error?.message || "Failed to update sale status. Please try again.";
+      toast({
+        title: "Error Updating Status",
+        description: errorMessage,
+        variant: "destructive",
+      });
+    } finally {
+      setUpdatingStatus(null);
     }
   };
 
@@ -311,6 +353,48 @@ export default function MyListingsPage() {
                                 })}
                               </p>
                             )}
+                            {registration.paymentStatus === "completed" && registration.qrCodeData && (
+                              <Button
+                                className="mt-2 text-white"
+                                disabled={resendingEmail === registration._id}
+                                onClick={async () => {
+                                  try {
+                                    setResendingEmail(registration._id);
+                                    await resendConfirmationEmail({
+                                      registrationId: registration._id as any,
+                                    });
+                                    toast({
+                                      title: "Email Sent",
+                                      description: "Confirmation email with QR code has been resent.",
+                                    });
+                                  } catch (error: any) {
+                                    toast({
+                                      title: "Error",
+                                      description: error?.message || "Failed to resend email.",
+                                      variant: "destructive",
+                                    });
+                                  } finally {
+                                    setResendingEmail(null);
+                                  }
+                                }}
+                                size="sm"
+                                variant="outline"
+                              >
+                                <Mail className="mr-2 h-4 w-4" />
+                                {resendingEmail === registration._id ? "Sending..." : "Resend QR Code Email"}
+                              </Button>
+                            )}
+                            {registration.paymentStatus === "pending" && (
+                              <Button
+                                asChild
+                                className="mt-2 text-white"
+                                size="sm"
+                              >
+                                <Link href={`/myAccount/payment?registrationId=${registration._id}&vehicleId=${vehicle._id}&eventId=${registration.eventId}`}>
+                                  Complete Payment
+                                </Link>
+                              </Button>
+                            )}
                           </div>
                         )}
                         
@@ -362,6 +446,7 @@ export default function MyListingsPage() {
                                   value as "available" | "salePending" | "sold"
                                 )
                               }
+                              disabled={updatingStatus === vehicle._id}
                             >
                               <SelectTrigger className="h-8 w-40 text-xs">
                                 <SelectValue />
@@ -376,6 +461,11 @@ export default function MyListingsPage() {
                                 <SelectItem value="sold">Sold</SelectItem>
                               </SelectContent>
                             </Select>
+                            {updatingStatus === vehicle._id && (
+                              <p className="mt-1 text-gray-500 text-xs">
+                                Updating...
+                              </p>
+                            )}
                           </div>
                         )}
                       </div>
@@ -385,9 +475,9 @@ export default function MyListingsPage() {
                     <div className="flex flex-col justify-center gap-2 border-gray-200 border-l p-6 sm:w-48">
                       <Button
                         asChild
-                        className="w-full"
+                        className="w-full text-white"
                         size="sm"
-                        variant="outline"
+                        variant="default"
                       >
                         <Link href={`/vehicles/${vehicle._id}`}>
                           <Eye className="mr-2 h-4 w-4" />
@@ -396,9 +486,9 @@ export default function MyListingsPage() {
                       </Button>
                       <Button
                         asChild
-                        className="w-full"
+                        className="w-full text-white"
                         size="sm"
-                        variant="outline"
+                        variant="default"
                       >
                         <Link href={`/myAccount/edit-listing/${vehicle._id}`}>
                           <Edit className="mr-2 h-4 w-4" />
@@ -406,10 +496,15 @@ export default function MyListingsPage() {
                         </Link>
                       </Button>
                       <Button
-                        className="w-full text-red-600 hover:bg-red-50 hover:text-red-700"
-                        onClick={() => handleDeleteVehicle(vehicle._id)}
+                        className="w-full text-white"
+                        onClick={() =>
+                          setVehicleToDelete({
+                            id: vehicle._id,
+                            title: `${vehicle.year} ${vehicle.make} ${vehicle.model}`,
+                          })
+                        }
                         size="sm"
-                        variant="outline"
+                        variant="destructive"
                       >
                         <Trash2 className="mr-2 h-4 w-4" />
                         Delete
@@ -462,6 +557,50 @@ export default function MyListingsPage() {
           </div>
         )}
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {vehicleToDelete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-xl">
+            <div className="flex items-start justify-between">
+              <div>
+                <h3 className="font-semibold text-lg text-gray-900">
+                  Delete vehicle?
+                </h3>
+                <p className="mt-1 text-sm text-gray-600">
+                  This will permanently remove {vehicleToDelete.title} from your
+                  listings. This action cannot be undone.
+                </p>
+              </div>
+              <Button
+                onClick={() => setVehicleToDelete(null)}
+                size="icon"
+                variant="ghost"
+              >
+                X
+              </Button>
+            </div>
+            <div className="mt-6 flex justify-end gap-3">
+              <Button
+                onClick={() => setVehicleToDelete(null)}
+                size="sm"
+                variant="outline"
+              >
+                Cancel
+              </Button>
+              <Button
+                className="text-white"
+                disabled={isDeleting}
+                onClick={handleDeleteVehicle}
+                size="sm"
+                variant="destructive"
+              >
+                {isDeleting ? "Deleting..." : "Delete"}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* QR Code Modal */}
       {selectedQR && (

@@ -1,6 +1,7 @@
 import { ToastContainer } from "@car-market/ui/toast-container";
 import { ClerkProvider } from "@clerk/nextjs";
 import type { Metadata } from "next";
+import { ErrorBoundary } from "@/components/error-boundary";
 import { ConvexClientProvider } from "@/lib/convex-provider";
 import "./global.css";
 
@@ -22,10 +23,12 @@ export default function RootLayout({
     >
       <html lang="en">
         <body className="antialiased">
-          <ConvexClientProvider>
-            {children}
-            <ToastContainer />
-          </ConvexClientProvider>
+          <ErrorBoundary>
+            <ConvexClientProvider>
+              {children}
+              <ToastContainer />
+            </ConvexClientProvider>
+          </ErrorBoundary>
         </body>
       </html>
     </ClerkProvider>

@@ -1,0 +1,58 @@
+import { MutationCtx } from "./_generated/server.js";
+import { Options } from "./schema.js";
+export declare function startRun(ctx: MutationCtx, functionHandle: string, functionArgs: any, options: Options): Promise<import("convex/values").GenericId<"runs">>;
+export declare const execute: import("convex/server").RegisteredAction<"internal", {
+    runId: import("convex/values").GenericId<"runs">;
+}, Promise<void>>;
+export declare const heartbeat: import("convex/server").RegisteredMutation<"internal", {
+    runId: import("convex/values").GenericId<"runs">;
+}, Promise<void>>;
+export declare const load: import("convex/server").RegisteredQuery<"internal", {
+    runId: import("convex/values").GenericId<"runs">;
+}, Promise<{
+    _id: import("convex/values").GenericId<"runs">;
+    _creationTime: number;
+    state: {
+        schedulerId?: import("convex/values").GenericId<"_scheduled_functions"> | undefined;
+        type: "inProgress";
+        startTime: number;
+    } | {
+        type: "completed";
+        completedAt: number;
+        result: {
+            type: "success";
+            returnValue: any;
+        } | {
+            type: "failed";
+            error: string;
+        } | {
+            type: "canceled";
+        };
+    };
+    functionHandle: string;
+    functionArgs: any;
+    options: {
+        runAt?: number | undefined;
+        runAfter?: number | undefined;
+        onComplete?: string | undefined;
+        initialBackoffMs: number;
+        base: number;
+        maxFailures: number;
+        logLevel: "DEBUG" | "INFO" | "WARN" | "ERROR";
+    };
+    numFailures: number;
+}>>;
+export declare const finishExecution: import("convex/server").RegisteredMutation<"internal", {
+    result: {
+        type: "success";
+        returnValue: any;
+    } | {
+        type: "failed";
+        error: string;
+    } | {
+        type: "canceled";
+    };
+    runId: import("convex/values").GenericId<"runs">;
+}, Promise<void>>;
+export declare const cleanupExpiredRuns: import("convex/server").RegisteredMutation<"internal", {}, Promise<void>>;
+//# sourceMappingURL=run.d.ts.map

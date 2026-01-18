@@ -78,7 +78,7 @@ export async function POST(request: NextRequest) {
     );
   }
 }
-
 function formatAmountForStripe(amount: number): number {
   return Math.round(amount * 100);
 }
+

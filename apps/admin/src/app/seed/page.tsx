@@ -8,6 +8,7 @@ import {
   Database,
   Loader2,
   MessageSquare,
+  RefreshCw,
   Users,
 } from "lucide-react";
 import { useState } from "react";
@@ -23,7 +24,10 @@ import {
 export default function SeedPage() {
   const [isSeeding, setIsSeeding] = useState(false);
   const [seedResult, setSeedResult] = useState<any>(null);
+  const [isMigrating, setIsMigrating] = useState(false);
+  const [migrationResult, setMigrationResult] = useState<any>(null);
   const seedDatabase = useMutation(api.seed.seedDatabase);
+  const migrateVehiclePhotos = useMutation(api.vehicles.migrateVehiclePhotos);
 
   const handleSeed = async () => {
     setIsSeeding(true);
@@ -34,6 +38,18 @@ export default function SeedPage() {
       console.error("Error seeding database:", error);
     } finally {
       setIsSeeding(false);
+    }
+  };
+
+  const handleMigrate = async () => {
+    setIsMigrating(true);
+    try {
+      const result = await migrateVehiclePhotos();
+      setMigrationResult(result);
+    } catch (error) {
+      console.error("Error migrating vehicle photos:", error);
+    } finally {
+      setIsMigrating(false);
     }
   };
 
@@ -53,6 +69,50 @@ export default function SeedPage() {
           Populate the database with fake data for testing and development.
         </p>
       </div>
+
+      {/* Migration Button */}
+      <Card className="mb-8">
+        <CardHeader>
+          <CardTitle className="flex items-center">
+            <RefreshCw className="mr-2 h-5 w-5" />
+            Migrate Vehicle Photos
+          </CardTitle>
+          <CardDescription>
+            Fix vehicles that have URL strings in their photos array. This will
+            remove invalid URLs and keep only valid storage IDs.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Button
+            variant="outline"
+            disabled={isMigrating}
+            onClick={handleMigrate}
+          >
+            {isMigrating ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Migrating...
+              </>
+            ) : (
+              <>
+                <RefreshCw className="mr-2 h-4 w-4" />
+                Run Migration
+              </>
+            )}
+          </Button>
+          {migrationResult && (
+            <div className="mt-4 rounded-lg bg-green-50 p-4">
+              <p className="font-semibold text-green-800">
+                Migration Complete!
+              </p>
+              <p className="text-green-700 text-sm">
+                Fixed {migrationResult.fixed} out of {migrationResult.total}{" "}
+                vehicles.
+              </p>
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Seed Button */}
       <Card className="mb-8">

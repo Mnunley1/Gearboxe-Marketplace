@@ -1,0 +1,37 @@
+export declare const start: import("convex/server").RegisteredMutation<"public", {
+    functionHandle: string;
+    functionArgs: any;
+    options: {
+        runAt?: number | undefined;
+        runAfter?: number | undefined;
+        onComplete?: string | undefined;
+        initialBackoffMs: number;
+        base: number;
+        maxFailures: number;
+        logLevel: "DEBUG" | "INFO" | "WARN" | "ERROR";
+    };
+}, Promise<import("convex/values").GenericId<"runs">>>;
+export declare const status: import("convex/server").RegisteredQuery<"public", {
+    runId: string;
+}, Promise<{
+    type: "inProgress";
+    result?: undefined;
+} | {
+    type: "completed";
+    result: {
+        type: "success";
+        returnValue: any;
+    } | {
+        type: "failed";
+        error: string;
+    } | {
+        type: "canceled";
+    };
+}>>;
+export declare const cancel: import("convex/server").RegisteredMutation<"public", {
+    runId: string;
+}, Promise<boolean>>;
+export declare const cleanup: import("convex/server").RegisteredMutation<"public", {
+    runId: string;
+}, Promise<void>>;
+//# sourceMappingURL=public.d.ts.map

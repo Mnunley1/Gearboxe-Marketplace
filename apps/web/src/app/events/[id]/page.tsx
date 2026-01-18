@@ -8,22 +8,24 @@ import { useConvexAuth, useQuery } from "convex/react";
 import { Calendar, Clock, MapPin, Users } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { use } from "react";
 import { Footer } from "../../../../components/footer";
 import { Navbar } from "../../../../components/navbar";
 import { VehicleCard } from "../../../../components/vehicle-card";
 
 interface EventPageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 export default function EventPage({ params }: EventPageProps) {
   const { isAuthenticated } = useConvexAuth();
   const { isSignedIn } = useAuth();
-  const event = useQuery(api.events.getEventById, { id: params.id as any });
+  const { id } = use(params);
+  const event = useQuery(api.events.getEventById, { id: id as any });
   const registrations = useQuery(api.registrations.getRegistrationsByEvent, {
-    eventId: params.id as any,
+    eventId: id as any,
   });
 
   if (!event) {

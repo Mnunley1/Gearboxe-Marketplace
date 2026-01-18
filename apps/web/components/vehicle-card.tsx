@@ -4,7 +4,7 @@ import { api } from "@car-market/convex/_generated/api";
 import { Button } from "@car-market/ui/button";
 import { Card, CardContent, CardFooter } from "@car-market/ui/card";
 import { useMutation, useQuery } from "convex/react";
-import { Heart } from "lucide-react";
+import { Car, Heart } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -19,7 +19,8 @@ type Vehicle = {
   year: number;
   mileage: number;
   price: number;
-  photos: string[];
+  photos?: string[]; // Storage IDs - for backward compatibility
+  photoUrls?: string[]; // Resolved URLs from R2
   status: "pending" | "approved" | "rejected";
   saleStatus?: "available" | "salePending" | "sold";
 };
@@ -153,30 +154,30 @@ export function VehicleCard({
 
   return (
     <>
-      <Card className="overflow-hidden border-gray-200 bg-white transition-shadow hover:shadow-lg">
-        <div className="relative">
-          {vehicle.photos.length > 0 ? (
+      <Card className="group overflow-hidden border-gray-200 bg-white transition-all duration-200 hover:border-gray-300 hover:shadow-xl">
+        <div className="relative aspect-[4/3] overflow-hidden bg-gray-100">
+          {(vehicle.photoUrls?.length ?? vehicle.photos?.length ?? 0) > 0 ? (
             <Image
               alt={vehicle.title}
-              className="h-48 w-full object-cover"
+              className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
               height={300}
-              src={vehicle.photos[0]}
+              src={vehicle.photoUrls?.[0] ?? vehicle.photos?.[0] ?? ""}
               width={400}
             />
           ) : (
-            <div className="flex h-48 w-full items-center justify-center bg-gray-100">
-              <span className="text-gray-500">No Image</span>
+            <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200">
+              <Car className="h-16 w-16 text-gray-400" />
             </div>
           )}
 
-          {/* Sale Status Overlay */}
+          {/* Sale Status Badge */}
           {vehicle.saleStatus && vehicle.saleStatus !== "available" && (
             <div
-              className={`absolute bottom-0 left-0 right-0 z-10 flex items-center justify-center py-3 font-bold shadow-lg ${
+              className={`absolute top-3 left-3 z-10 rounded-full px-3 py-1 text-xs font-bold shadow-md ${
                 vehicle.saleStatus === "sold"
-                  ? "bg-red-200/80 text-red-900"
+                  ? "bg-red-600 text-white"
                   : vehicle.saleStatus === "salePending"
-                    ? "bg-yellow-200/80 text-yellow-900"
+                    ? "bg-yellow-500 text-white"
                     : ""
               }`}
             >
@@ -188,48 +189,117 @@ export function VehicleCard({
             </div>
           )}
 
+          {/* Photo count badge */}
+          {(vehicle.photoUrls?.length ?? vehicle.photos?.length ?? 0) > 1 && (
+            <div className="absolute bottom-3 right-3 z-10 rounded-full bg-black/60 px-2 py-1 text-xs font-medium text-white backdrop-blur-sm">
+              {(vehicle.photoUrls?.length ?? vehicle.photos?.length ?? 0)} photos
+            </div>
+          )}
+
           {showFavorite && (
             <Button
-              className="absolute top-2 right-2 z-20 bg-white/80 hover:bg-white"
+              className="absolute top-3 right-3 z-20 h-9 w-9 rounded-full bg-white/90 shadow-md backdrop-blur-sm transition-all hover:bg-white hover:scale-110"
               disabled={isLoading || userLoading}
               onClick={handleFavoriteToggle}
               size="icon"
               variant="ghost"
             >
               <Heart
-                className={`h-4 w-4 transition-colors ${
-                  isFavorited ? "fill-red-500 text-red-500" : "text-gray-600"
+                className={`h-4 w-4 transition-all ${
+                  isFavorited ? "fill-red-500 text-red-500" : "text-gray-700"
                 } ${isLoading || userLoading ? "opacity-50" : ""}`}
               />
             </Button>
           )}
         </div>
 
-        <CardContent className="p-4">
-          <div className="space-y-2">
-            <h3 className="line-clamp-1 font-semibold text-gray-900 text-lg">
-              {vehicle.title}
-            </h3>
-            <p className="text-gray-600 text-sm">
-              {vehicle.year} {vehicle.make} {vehicle.model}
-            </p>
-            <div className="flex items-center justify-between text-gray-600 text-sm">
-              <span>{formatMileage(vehicle.mileage)} miles</span>
-              <span className="font-semibold text-lg text-primary">
-                {formatPrice(vehicle.price)}
-              </span>
+        <CardContent className="p-5">
+          <div className="space-y-3">
+            {/* Price - Prominent */}
+            <div className="flex items-start justify-between">
+              <div className="flex-1">
+                <h3 className="line-clamp-2 font-bold text-gray-900 text-lg leading-tight">
+                  {vehicle.title}
+                </h3>
+                <p className="mt-1 text-gray-600 text-sm">
+                  {vehicle.year} {vehicle.make} {vehicle.model}
+                </p>
+              </div>
+              <div className="ml-3 text-right">
+                <div className="font-bold text-primary text-xl">
+                  {formatPrice(vehicle.price)}
+                </div>
+              </div>
             </div>
-            {event && (
-              <p className="text-gray-500 text-xs">
-                {event.location}
-              </p>
-            )}
+
+            {/* Key Details */}
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-gray-100 pt-3">
+              <div className="flex items-center text-gray-600 text-sm">
+                <svg
+                  className="mr-1.5 h-4 w-4 text-gray-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                  />
+                </svg>
+                {formatMileage(vehicle.mileage)} mi
+              </div>
+              {event && (
+                <div className="flex items-center text-gray-600 text-sm">
+                  <svg
+                    className="mr-1.5 h-4 w-4 text-gray-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                    />
+                    <path
+                      d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                    />
+                  </svg>
+                  {event.location}
+                </div>
+              )}
+            </div>
           </div>
         </CardContent>
 
-        <CardFooter className="p-4 pt-0">
-          <Button asChild className="w-full text-white">
-            <Link href={`/vehicles/${vehicle._id}`}>View Details</Link>
+        <CardFooter className="border-t border-gray-100 p-0">
+          <Button
+            asChild
+            className="w-full rounded-none border-0 bg-transparent font-semibold text-primary hover:bg-gray-50"
+            variant="ghost"
+          >
+            <Link href={`/vehicles/${vehicle._id}`}>
+              View Details
+              <svg
+                className="ml-2 h-4 w-4"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  d="M9 5l7 7-7 7"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                />
+              </svg>
+            </Link>
           </Button>
         </CardFooter>
       </Card>

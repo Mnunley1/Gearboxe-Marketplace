@@ -1,0 +1,29 @@
+export function createLogger(level) {
+    const levelIndex = ["DEBUG", "INFO", "WARN", "ERROR"].indexOf(level);
+    if (levelIndex === -1) {
+        throw new Error(`Invalid log level: ${level}`);
+    }
+    return {
+        debug: (...args) => {
+            if (levelIndex <= 0) {
+                console.debug(...args);
+            }
+        },
+        info: (...args) => {
+            if (levelIndex <= 1) {
+                console.info(...args);
+            }
+        },
+        warn: (...args) => {
+            if (levelIndex <= 2) {
+                console.warn(...args);
+            }
+        },
+        error: (...args) => {
+            if (levelIndex <= 3) {
+                console.error(...args);
+            }
+        },
+    };
+}
+//# sourceMappingURL=utils.js.map

@@ -10,6 +10,7 @@ export const createEvent = mutation({
     address: v.string(),
     capacity: v.number(),
     description: v.string(),
+    vendorPrice: v.number(),
   },
   handler: async (ctx, args) =>
     await ctx.db.insert("events", {
@@ -49,10 +50,51 @@ export const getEventById = query({
 export const getUpcomingEvents = query({
   handler: async (ctx) => {
     const now = Date.now();
-    return await ctx.db
+    const events = await ctx.db
       .query("events")
       .withIndex("by_date", (q) => q.gt("date", now))
       .collect();
+    
+    // Get capacity info for each event (count completed + non-expired pending)
+    const now = Date.now();
+    const PENDING_EXPIRY_MS = 15 * 60 * 1000; // 15 minutes
+    
+    return await Promise.all(
+      events.map(async (event) => {
+        const allRegistrations = await ctx.db
+          .query("registrations")
+          .withIndex("by_event", (q) => q.eq("eventId", event._id))
+          .collect();
+        
+        // Count active registrations (completed + non-expired pending)
+        const activeRegistrations = allRegistrations.filter((reg) => {
+          if (reg.paymentStatus === "completed") {
+            return true;
+          }
+          if (reg.paymentStatus === "pending") {
+            if (reg.expiresAt && reg.expiresAt > now) {
+              return true;
+            }
+            if (!reg.expiresAt && reg.createdAt > now - PENDING_EXPIRY_MS) {
+              return true;
+            }
+          }
+          return false;
+        });
+        
+        const completedCount = allRegistrations.filter(
+          (reg) => reg.paymentStatus === "completed"
+        ).length;
+        
+        return {
+          ...event,
+          registered: completedCount,
+          reserved: activeRegistrations.length - completedCount, // Pending reservations
+          available: event.capacity - activeRegistrations.length,
+          isFull: activeRegistrations.length >= event.capacity,
+        };
+      })
+    );
   },
 });
 
@@ -65,10 +107,55 @@ export const updateEvent = mutation({
     address: v.optional(v.string()),
     capacity: v.optional(v.number()),
     description: v.optional(v.string()),
+    vendorPrice: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
     const { id, ...updates } = args;
     await ctx.db.patch(id, updates);
+  },
+});
+
+export const getEventCapacity = query({
+  args: { eventId: v.id("events") },
+  handler: async (ctx, args) => {
+    const event = await ctx.db.get(args.eventId);
+    if (!event) return null;
+    
+    const now = Date.now();
+    const PENDING_EXPIRY_MS = 15 * 60 * 1000; // 15 minutes
+    
+    const allRegistrations = await ctx.db
+      .query("registrations")
+      .withIndex("by_event", (q) => q.eq("eventId", args.eventId))
+      .collect();
+    
+    // Count active registrations (completed + non-expired pending)
+    const activeRegistrations = allRegistrations.filter((reg) => {
+      if (reg.paymentStatus === "completed") {
+        return true;
+      }
+      if (reg.paymentStatus === "pending") {
+        if (reg.expiresAt && reg.expiresAt > now) {
+          return true;
+        }
+        if (!reg.expiresAt && reg.createdAt > now - PENDING_EXPIRY_MS) {
+          return true;
+        }
+      }
+      return false;
+    });
+    
+    const completedCount = allRegistrations.filter(
+      (reg) => reg.paymentStatus === "completed"
+    ).length;
+    
+    return {
+      capacity: event.capacity,
+      registered: completedCount,
+      reserved: activeRegistrations.length - completedCount, // Pending reservations
+      available: event.capacity - activeRegistrations.length,
+      isFull: activeRegistrations.length >= event.capacity,
+    };
   },
 });
 

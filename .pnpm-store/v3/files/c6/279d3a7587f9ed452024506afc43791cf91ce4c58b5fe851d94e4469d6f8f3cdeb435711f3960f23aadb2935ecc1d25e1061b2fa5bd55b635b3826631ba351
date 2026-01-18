@@ -1,0 +1,236 @@
+import { Infer } from "convex/values";
+declare const logLevel: import("convex/values").VUnion<"DEBUG" | "INFO" | "WARN" | "ERROR", [import("convex/values").VLiteral<"DEBUG", "required">, import("convex/values").VLiteral<"INFO", "required">, import("convex/values").VLiteral<"WARN", "required">, import("convex/values").VLiteral<"ERROR", "required">], "required", never>;
+export type LogLevel = Infer<typeof logLevel>;
+export declare const options: import("convex/values").VObject<{
+    runAt?: number | undefined;
+    runAfter?: number | undefined;
+    onComplete?: string | undefined;
+    initialBackoffMs: number;
+    base: number;
+    maxFailures: number;
+    logLevel: "DEBUG" | "INFO" | "WARN" | "ERROR";
+}, {
+    initialBackoffMs: import("convex/values").VFloat64<number, "required">;
+    base: import("convex/values").VFloat64<number, "required">;
+    maxFailures: import("convex/values").VFloat64<number, "required">;
+    logLevel: import("convex/values").VUnion<"DEBUG" | "INFO" | "WARN" | "ERROR", [import("convex/values").VLiteral<"DEBUG", "required">, import("convex/values").VLiteral<"INFO", "required">, import("convex/values").VLiteral<"WARN", "required">, import("convex/values").VLiteral<"ERROR", "required">], "required", never>;
+    runAt: import("convex/values").VFloat64<number | undefined, "optional">;
+    runAfter: import("convex/values").VFloat64<number | undefined, "optional">;
+    onComplete: import("convex/values").VString<string | undefined, "optional">;
+}, "required", "initialBackoffMs" | "base" | "maxFailures" | "logLevel" | "runAt" | "runAfter" | "onComplete">;
+export type Options = Infer<typeof options>;
+export declare const runResult: import("convex/values").VUnion<{
+    type: "success";
+    returnValue: any;
+} | {
+    type: "failed";
+    error: string;
+} | {
+    type: "canceled";
+}, [import("convex/values").VObject<{
+    type: "success";
+    returnValue: any;
+}, {
+    type: import("convex/values").VLiteral<"success", "required">;
+    returnValue: import("convex/values").VAny<any, "required", string>;
+}, "required", "type" | "returnValue" | `returnValue.${string}`>, import("convex/values").VObject<{
+    type: "failed";
+    error: string;
+}, {
+    type: import("convex/values").VLiteral<"failed", "required">;
+    error: import("convex/values").VString<string, "required">;
+}, "required", "type" | "error">, import("convex/values").VObject<{
+    type: "canceled";
+}, {
+    type: import("convex/values").VLiteral<"canceled", "required">;
+}, "required", "type">], "required", "type" | "returnValue" | `returnValue.${string}` | "error">;
+export type RunResult = Infer<typeof runResult>;
+export declare const runState: import("convex/values").VUnion<{
+    schedulerId?: import("convex/values").GenericId<"_scheduled_functions"> | undefined;
+    type: "inProgress";
+    startTime: number;
+} | {
+    type: "completed";
+    completedAt: number;
+    result: {
+        type: "success";
+        returnValue: any;
+    } | {
+        type: "failed";
+        error: string;
+    } | {
+        type: "canceled";
+    };
+}, [import("convex/values").VObject<{
+    schedulerId?: import("convex/values").GenericId<"_scheduled_functions"> | undefined;
+    type: "inProgress";
+    startTime: number;
+}, {
+    type: import("convex/values").VLiteral<"inProgress", "required">;
+    schedulerId: import("convex/values").VId<import("convex/values").GenericId<"_scheduled_functions"> | undefined, "optional">;
+    startTime: import("convex/values").VFloat64<number, "required">;
+}, "required", "type" | "schedulerId" | "startTime">, import("convex/values").VObject<{
+    type: "completed";
+    completedAt: number;
+    result: {
+        type: "success";
+        returnValue: any;
+    } | {
+        type: "failed";
+        error: string;
+    } | {
+        type: "canceled";
+    };
+}, {
+    type: import("convex/values").VLiteral<"completed", "required">;
+    completedAt: import("convex/values").VFloat64<number, "required">;
+    result: import("convex/values").VUnion<{
+        type: "success";
+        returnValue: any;
+    } | {
+        type: "failed";
+        error: string;
+    } | {
+        type: "canceled";
+    }, [import("convex/values").VObject<{
+        type: "success";
+        returnValue: any;
+    }, {
+        type: import("convex/values").VLiteral<"success", "required">;
+        returnValue: import("convex/values").VAny<any, "required", string>;
+    }, "required", "type" | "returnValue" | `returnValue.${string}`>, import("convex/values").VObject<{
+        type: "failed";
+        error: string;
+    }, {
+        type: import("convex/values").VLiteral<"failed", "required">;
+        error: import("convex/values").VString<string, "required">;
+    }, "required", "type" | "error">, import("convex/values").VObject<{
+        type: "canceled";
+    }, {
+        type: import("convex/values").VLiteral<"canceled", "required">;
+    }, "required", "type">], "required", "type" | "returnValue" | `returnValue.${string}` | "error">;
+}, "required", "type" | "completedAt" | "result" | "result.type" | "result.returnValue" | `result.returnValue.${string}` | "result.error">], "required", "type" | "schedulerId" | "startTime" | "completedAt" | "result" | "result.type" | "result.returnValue" | `result.returnValue.${string}` | "result.error">;
+export type RunState = Infer<typeof runState>;
+declare const _default: import("convex/server").SchemaDefinition<{
+    runs: import("convex/server").TableDefinition<import("convex/values").VObject<{
+        state: {
+            schedulerId?: import("convex/values").GenericId<"_scheduled_functions"> | undefined;
+            type: "inProgress";
+            startTime: number;
+        } | {
+            type: "completed";
+            completedAt: number;
+            result: {
+                type: "success";
+                returnValue: any;
+            } | {
+                type: "failed";
+                error: string;
+            } | {
+                type: "canceled";
+            };
+        };
+        functionHandle: string;
+        functionArgs: any;
+        options: {
+            runAt?: number | undefined;
+            runAfter?: number | undefined;
+            onComplete?: string | undefined;
+            initialBackoffMs: number;
+            base: number;
+            maxFailures: number;
+            logLevel: "DEBUG" | "INFO" | "WARN" | "ERROR";
+        };
+        numFailures: number;
+    }, {
+        functionHandle: import("convex/values").VString<string, "required">;
+        functionArgs: import("convex/values").VAny<any, "required", string>;
+        options: import("convex/values").VObject<{
+            runAt?: number | undefined;
+            runAfter?: number | undefined;
+            onComplete?: string | undefined;
+            initialBackoffMs: number;
+            base: number;
+            maxFailures: number;
+            logLevel: "DEBUG" | "INFO" | "WARN" | "ERROR";
+        }, {
+            initialBackoffMs: import("convex/values").VFloat64<number, "required">;
+            base: import("convex/values").VFloat64<number, "required">;
+            maxFailures: import("convex/values").VFloat64<number, "required">;
+            logLevel: import("convex/values").VUnion<"DEBUG" | "INFO" | "WARN" | "ERROR", [import("convex/values").VLiteral<"DEBUG", "required">, import("convex/values").VLiteral<"INFO", "required">, import("convex/values").VLiteral<"WARN", "required">, import("convex/values").VLiteral<"ERROR", "required">], "required", never>;
+            runAt: import("convex/values").VFloat64<number | undefined, "optional">;
+            runAfter: import("convex/values").VFloat64<number | undefined, "optional">;
+            onComplete: import("convex/values").VString<string | undefined, "optional">;
+        }, "required", "initialBackoffMs" | "base" | "maxFailures" | "logLevel" | "runAt" | "runAfter" | "onComplete">;
+        state: import("convex/values").VUnion<{
+            schedulerId?: import("convex/values").GenericId<"_scheduled_functions"> | undefined;
+            type: "inProgress";
+            startTime: number;
+        } | {
+            type: "completed";
+            completedAt: number;
+            result: {
+                type: "success";
+                returnValue: any;
+            } | {
+                type: "failed";
+                error: string;
+            } | {
+                type: "canceled";
+            };
+        }, [import("convex/values").VObject<{
+            schedulerId?: import("convex/values").GenericId<"_scheduled_functions"> | undefined;
+            type: "inProgress";
+            startTime: number;
+        }, {
+            type: import("convex/values").VLiteral<"inProgress", "required">;
+            schedulerId: import("convex/values").VId<import("convex/values").GenericId<"_scheduled_functions"> | undefined, "optional">;
+            startTime: import("convex/values").VFloat64<number, "required">;
+        }, "required", "type" | "schedulerId" | "startTime">, import("convex/values").VObject<{
+            type: "completed";
+            completedAt: number;
+            result: {
+                type: "success";
+                returnValue: any;
+            } | {
+                type: "failed";
+                error: string;
+            } | {
+                type: "canceled";
+            };
+        }, {
+            type: import("convex/values").VLiteral<"completed", "required">;
+            completedAt: import("convex/values").VFloat64<number, "required">;
+            result: import("convex/values").VUnion<{
+                type: "success";
+                returnValue: any;
+            } | {
+                type: "failed";
+                error: string;
+            } | {
+                type: "canceled";
+            }, [import("convex/values").VObject<{
+                type: "success";
+                returnValue: any;
+            }, {
+                type: import("convex/values").VLiteral<"success", "required">;
+                returnValue: import("convex/values").VAny<any, "required", string>;
+            }, "required", "type" | "returnValue" | `returnValue.${string}`>, import("convex/values").VObject<{
+                type: "failed";
+                error: string;
+            }, {
+                type: import("convex/values").VLiteral<"failed", "required">;
+                error: import("convex/values").VString<string, "required">;
+            }, "required", "type" | "error">, import("convex/values").VObject<{
+                type: "canceled";
+            }, {
+                type: import("convex/values").VLiteral<"canceled", "required">;
+            }, "required", "type">], "required", "type" | "returnValue" | `returnValue.${string}` | "error">;
+        }, "required", "type" | "completedAt" | "result" | "result.type" | "result.returnValue" | `result.returnValue.${string}` | "result.error">], "required", "type" | "schedulerId" | "startTime" | "completedAt" | "result" | "result.type" | "result.returnValue" | `result.returnValue.${string}` | "result.error">;
+        numFailures: import("convex/values").VFloat64<number, "required">;
+    }, "required", "state" | "functionHandle" | "functionArgs" | "options" | "numFailures" | "state.type" | "state.schedulerId" | "state.startTime" | "state.completedAt" | "state.result" | "state.result.type" | "state.result.returnValue" | `state.result.returnValue.${string}` | "state.result.error" | `functionArgs.${string}` | "options.initialBackoffMs" | "options.base" | "options.maxFailures" | "options.logLevel" | "options.runAt" | "options.runAfter" | "options.onComplete">, {
+        by_state: ["state.type", "state.completedAt", "_creationTime"];
+    }, {}, {}>;
+}, true>;
+export default _default;
+//# sourceMappingURL=schema.d.ts.map

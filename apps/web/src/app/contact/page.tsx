@@ -7,6 +7,7 @@ import { Label } from "@car-market/ui/label";
 import { Textarea } from "@car-market/ui/textarea";
 import { ChevronDown, ChevronUp, Clock, Mail, Phone } from "lucide-react";
 import { useState } from "react";
+import { useToast } from "@/hooks/useToast";
 import { Footer } from "../../../components/footer";
 import { Navbar } from "../../../components/navbar";
 
@@ -59,6 +60,7 @@ const faqData: FAQItem[] = [
 ];
 
 export default function ContactPage() {
+  const { toast } = useToast();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -69,6 +71,7 @@ export default function ContactPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [expandedFAQ, setExpandedFAQ] = useState<number | null>(null);
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -80,27 +83,82 @@ export default function ContactPage() {
     }));
   };
 
+  const validateForm = (): boolean => {
+    const newErrors: Record<string, string> = {};
+
+    if (!formData.name.trim()) {
+      newErrors.name = "Name is required";
+    }
+    if (!formData.email.trim()) {
+      newErrors.email = "Email is required";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      newErrors.email = "Please enter a valid email address";
+    }
+    if (formData.phone && !/^[\d\s()+-]+$/.test(formData.phone)) {
+      newErrors.phone = "Please enter a valid phone number";
+    }
+    if (!formData.subject.trim()) {
+      newErrors.subject = "Subject is required";
+    }
+    if (!formData.message.trim()) {
+      newErrors.message = "Message is required";
+    } else if (formData.message.trim().length < 10) {
+      newErrors.message = "Message must be at least 10 characters";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
 
-    // Simulate form submission
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-
-    setIsSubmitting(false);
-    setSubmitted(true);
-
-    // Reset form after 3 seconds
-    setTimeout(() => {
-      setSubmitted(false);
-      setFormData({
-        name: "",
-        email: "",
-        phone: "",
-        subject: "",
-        message: "",
+    if (!validateForm()) {
+      toast({
+        title: "Validation Error",
+        description: "Please fix the errors in the form before submitting.",
+        variant: "destructive",
       });
-    }, 3000);
+      return;
+    }
+
+    setIsSubmitting(true);
+    setErrors({});
+
+    try {
+      // Simulate form submission
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+
+      toast({
+        title: "Message Sent",
+        description: "Thank you for contacting us. We'll get back to you within 24 hours.",
+      });
+
+      setIsSubmitting(false);
+      setSubmitted(true);
+
+      // Reset form after 3 seconds
+      setTimeout(() => {
+        setSubmitted(false);
+        setFormData({
+          name: "",
+          email: "",
+          phone: "",
+          subject: "",
+          message: "",
+        });
+      }, 3000);
+    } catch (error: any) {
+      console.error("Error submitting contact form:", error);
+      const errorMessage =
+        error?.message || "Failed to send message. Please try again.";
+      toast({
+        title: "Error Sending Message",
+        description: errorMessage,
+        variant: "destructive",
+      });
+      setIsSubmitting(false);
+    }
   };
 
   const toggleFAQ = (index: number) => {
@@ -197,14 +255,24 @@ export default function ContactPage() {
                             Full Name *
                           </Label>
                           <Input
-                            className="border-gray-300 bg-white text-gray-900 placeholder:text-gray-500 focus:border-primary focus:ring-primary"
+                            className={`border-gray-300 bg-white text-gray-900 placeholder:text-gray-500 focus:border-primary focus:ring-primary ${
+                              errors.name ? "border-red-500" : ""
+                            }`}
                             id="name"
                             name="name"
-                            onChange={handleInputChange}
+                            onChange={(e) => {
+                              handleInputChange(e);
+                              if (errors.name) {
+                                setErrors((prev) => ({ ...prev, name: "" }));
+                              }
+                            }}
                             placeholder="Enter your full name"
                             required
                             value={formData.name}
                           />
+                          {errors.name && (
+                            <p className="text-red-600 text-sm">{errors.name}</p>
+                          )}
                         </div>
                         <div className="space-y-2">
                           <Label
@@ -214,15 +282,25 @@ export default function ContactPage() {
                             Email Address *
                           </Label>
                           <Input
-                            className="border-gray-300 bg-white text-gray-900 placeholder:text-gray-500 focus:border-primary focus:ring-primary"
+                            className={`border-gray-300 bg-white text-gray-900 placeholder:text-gray-500 focus:border-primary focus:ring-primary ${
+                              errors.email ? "border-red-500" : ""
+                            }`}
                             id="email"
                             name="email"
-                            onChange={handleInputChange}
+                            onChange={(e) => {
+                              handleInputChange(e);
+                              if (errors.email) {
+                                setErrors((prev) => ({ ...prev, email: "" }));
+                              }
+                            }}
                             placeholder="Enter your email"
                             required
                             type="email"
                             value={formData.email}
                           />
+                          {errors.email && (
+                            <p className="text-red-600 text-sm">{errors.email}</p>
+                          )}
                         </div>
                       </div>
 
@@ -235,14 +313,24 @@ export default function ContactPage() {
                             Phone Number
                           </Label>
                           <Input
-                            className="border-gray-300 bg-white text-gray-900 placeholder:text-gray-500 focus:border-primary focus:ring-primary"
+                            className={`border-gray-300 bg-white text-gray-900 placeholder:text-gray-500 focus:border-primary focus:ring-primary ${
+                              errors.phone ? "border-red-500" : ""
+                            }`}
                             id="phone"
                             name="phone"
-                            onChange={handleInputChange}
+                            onChange={(e) => {
+                              handleInputChange(e);
+                              if (errors.phone) {
+                                setErrors((prev) => ({ ...prev, phone: "" }));
+                              }
+                            }}
                             placeholder="Enter your phone number"
                             type="tel"
                             value={formData.phone}
                           />
+                          {errors.phone && (
+                            <p className="text-red-600 text-sm">{errors.phone}</p>
+                          )}
                         </div>
                         <div className="space-y-2">
                           <Label
@@ -252,14 +340,24 @@ export default function ContactPage() {
                             Subject *
                           </Label>
                           <Input
-                            className="border-gray-300 bg-white text-gray-900 placeholder:text-gray-500 focus:border-primary focus:ring-primary"
+                            className={`border-gray-300 bg-white text-gray-900 placeholder:text-gray-500 focus:border-primary focus:ring-primary ${
+                              errors.subject ? "border-red-500" : ""
+                            }`}
                             id="subject"
                             name="subject"
-                            onChange={handleInputChange}
+                            onChange={(e) => {
+                              handleInputChange(e);
+                              if (errors.subject) {
+                                setErrors((prev) => ({ ...prev, subject: "" }));
+                              }
+                            }}
                             placeholder="What's this about?"
                             required
                             value={formData.subject}
                           />
+                          {errors.subject && (
+                            <p className="text-red-600 text-sm">{errors.subject}</p>
+                          )}
                         </div>
                       </div>
 
@@ -271,14 +369,29 @@ export default function ContactPage() {
                           Message *
                         </Label>
                         <Textarea
-                          className="min-h-[120px] border-gray-300 bg-white text-gray-900 placeholder:text-gray-500 focus:border-primary focus:ring-primary"
+                          className={`min-h-[120px] border-gray-300 bg-white text-gray-900 placeholder:text-gray-500 focus:border-primary focus:ring-primary ${
+                            errors.message ? "border-red-500" : ""
+                          }`}
                           id="message"
                           name="message"
-                          onChange={handleInputChange}
+                          onChange={(e) => {
+                            handleInputChange(e);
+                            if (errors.message) {
+                              setErrors((prev) => ({ ...prev, message: "" }));
+                            }
+                          }}
                           placeholder="Tell us how we can help you..."
                           required
                           value={formData.message}
                         />
+                        {errors.message && (
+                          <p className="text-red-600 text-sm">{errors.message}</p>
+                        )}
+                        {!errors.message && formData.message && (
+                          <p className="text-gray-500 text-sm">
+                            {formData.message.length}/10 characters minimum
+                          </p>
+                        )}
                       </div>
 
                       <Button

@@ -34,9 +34,9 @@ import { Footer } from "../../../../components/footer";
 import { Navbar } from "../../../../components/navbar";
 
 interface VehiclePageProps {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 export default function VehiclePage({ params }: VehiclePageProps) {
@@ -80,7 +80,7 @@ export default function VehiclePage({ params }: VehiclePageProps) {
 
   // Filter out current vehicle from related vehicles
   const filteredRelatedVehicles =
-    relatedVehicles?.filter((v) => v._id !== vehicle?._id).slice(0, 3) || [];
+    relatedVehicles?.vehicles?.filter((v) => v._id !== vehicle?._id).slice(0, 3) || [];
 
   useEffect(() => {
     // Set page title

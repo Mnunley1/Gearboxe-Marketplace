@@ -22,8 +22,12 @@ type VehicleFiltersProps = {
     maxPrice?: number;
     minYear?: number;
     maxYear?: number;
+    minMileage?: number;
+    maxMileage?: number;
   }) => void;
   className?: string;
+  isMobileOpen?: boolean;
+  onMobileClose?: () => void;
 };
 
 const makes = [
@@ -67,6 +71,8 @@ const years = Array.from({ length: 30 }, (_, i) => currentYear - i);
 export function VehicleFilters({
   onFiltersChange,
   className,
+  isMobileOpen = false,
+  onMobileClose,
 }: VehicleFiltersProps) {
   const [filters, setFilters] = useState({
     make: "all",
@@ -75,6 +81,8 @@ export function VehicleFilters({
     maxPrice: "",
     minYear: "any",
     maxYear: "any",
+    minMileage: "",
+    maxMileage: "",
   });
 
   const [isExpanded, setIsExpanded] = useState(false);
@@ -104,6 +112,12 @@ export function VehicleFilters({
         newFilters.maxYear && newFilters.maxYear !== "any"
           ? Number.parseInt(newFilters.maxYear, 10)
           : undefined,
+      minMileage: newFilters.minMileage
+        ? Number.parseInt(newFilters.minMileage, 10)
+        : undefined,
+      maxMileage: newFilters.maxMileage
+        ? Number.parseInt(newFilters.maxMileage, 10)
+        : undefined,
     };
 
     onFiltersChange(processedFilters);
@@ -117,6 +131,8 @@ export function VehicleFilters({
       maxPrice: "",
       minYear: "any",
       maxYear: "any",
+      minMileage: "",
+      maxMileage: "",
     };
     setFilters(clearedFilters);
     onFiltersChange({});
@@ -130,7 +146,22 @@ export function VehicleFilters({
   });
 
   return (
-    <Card className={className}>
+    <>
+      {/* Mobile overlay */}
+      {isMobileOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-black/50 lg:hidden"
+          onClick={onMobileClose}
+        />
+      )}
+
+      <Card
+        className={`${className} ${
+          isMobileOpen
+            ? "fixed inset-y-0 left-0 z-50 w-80 overflow-y-auto lg:relative lg:z-auto lg:w-auto"
+            : "hidden lg:block"
+        }`}
+      >
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center space-x-2 text-lg">
@@ -148,9 +179,20 @@ export function VehicleFilters({
               onClick={() => setIsExpanded(!isExpanded)}
               size="sm"
               variant="ghost"
+              className="lg:inline-flex hidden"
             >
               {isExpanded ? "Collapse" : "Expand"}
             </Button>
+            {onMobileClose && (
+              <Button
+                onClick={onMobileClose}
+                size="sm"
+                variant="ghost"
+                className="lg:hidden"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            )}
           </div>
         </div>
       </CardHeader>
@@ -265,9 +307,38 @@ export function VehicleFilters({
                 </Select>
               </div>
             </div>
+
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <div className="space-y-2">
+                <Label htmlFor="minMileage">Min Mileage</Label>
+                <Input
+                  id="minMileage"
+                  onChange={(e) =>
+                    handleFilterChange("minMileage", e.target.value)
+                  }
+                  placeholder="0"
+                  type="number"
+                  value={filters.minMileage}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="maxMileage">Max Mileage</Label>
+                <Input
+                  id="maxMileage"
+                  onChange={(e) =>
+                    handleFilterChange("maxMileage", e.target.value)
+                  }
+                  placeholder="200000"
+                  type="number"
+                  value={filters.maxMileage}
+                />
+              </div>
+            </div>
           </div>
         )}
       </CardContent>
     </Card>
+    </>
   );
 }

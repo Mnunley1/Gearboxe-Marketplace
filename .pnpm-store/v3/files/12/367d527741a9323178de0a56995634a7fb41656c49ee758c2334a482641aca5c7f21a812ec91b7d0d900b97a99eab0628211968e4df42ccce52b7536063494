@@ -1,0 +1,39 @@
+import { GenericValidator, Infer } from "convex/values";
+import { S3Client } from "@aws-sdk/client-s3";
+export declare const r2ConfigValidator: import("convex/values").VObject<{
+    bucket: string;
+    endpoint: string;
+    accessKeyId: string;
+    secretAccessKey: string;
+}, {
+    bucket: import("convex/values").VString<string, "required">;
+    endpoint: import("convex/values").VString<string, "required">;
+    accessKeyId: import("convex/values").VString<string, "required">;
+    secretAccessKey: import("convex/values").VString<string, "required">;
+}, "required", "bucket" | "endpoint" | "accessKeyId" | "secretAccessKey">;
+export declare const createR2Client: (args: Infer<typeof r2ConfigValidator>) => S3Client;
+export declare const withoutSystemFields: <T extends {
+    _id: import("convex/values").GenericId<"metadata">;
+    _creationTime: number;
+    sha256?: string | undefined;
+    contentType?: string | undefined;
+    size?: number | undefined;
+    key: string;
+    bucket: string;
+    lastModified: string;
+    link: string;
+}>(fields: T) => Omit<T, "_creationTime" | "_id">;
+export declare const paginationReturnValidator: (docValidator: GenericValidator) => import("convex/values").VObject<{
+    splitCursor?: string | null | undefined;
+    pageStatus?: "SplitRecommended" | "SplitRequired" | null | undefined;
+    page: any[];
+    isDone: boolean;
+    continueCursor: string;
+}, {
+    page: import("convex/values").VArray<any[], GenericValidator, "required">;
+    isDone: import("convex/values").VBoolean<boolean, "required">;
+    continueCursor: import("convex/values").VString<string, "required">;
+    splitCursor: import("convex/values").VUnion<string | null | undefined, [import("convex/values").VNull<null, "required">, import("convex/values").VString<string, "required">], "optional", never>;
+    pageStatus: import("convex/values").VUnion<"SplitRecommended" | "SplitRequired" | null | undefined, [import("convex/values").VNull<null, "required">, import("convex/values").VLiteral<"SplitRecommended", "required">, import("convex/values").VLiteral<"SplitRequired", "required">], "optional", never>;
+}, "required", "page" | "isDone" | "continueCursor" | "splitCursor" | "pageStatus">;
+//# sourceMappingURL=shared.d.ts.map

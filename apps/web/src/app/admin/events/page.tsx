@@ -9,6 +9,7 @@ import { ArrowLeft, Calendar, MapPin, Plus, Trash2, Users } from "lucide-react";
 import Link from "next/link";
 import { redirect, useSearchParams } from "next/navigation";
 import { useState } from "react";
+import { toast } from "sonner";
 
 export default function AdminEventsPage() {
   const searchParams = useSearchParams();
@@ -228,6 +229,9 @@ function EventCreateForm({
         formData.capacity
       )
     ) {
+      toast.error("Validation Error", {
+        description: "Please fill in all required fields.",
+      });
       return;
     }
 
@@ -242,9 +246,17 @@ function EventCreateForm({
         capacity: Number.parseInt(formData.capacity, 10),
         description: formData.description,
       });
+      toast.success("Event Created", {
+        description: "The event has been created successfully.",
+      });
       onSuccess();
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error creating event:", error);
+      const errorMessage =
+        error?.message || "Failed to create event. Please try again.";
+      toast.error("Error Creating Event", {
+        description: errorMessage,
+      });
     } finally {
       setIsSubmitting(false);
     }

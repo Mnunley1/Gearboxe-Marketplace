@@ -21,7 +21,7 @@ export default function HomePage() {
   const nextEvent = upcomingEvents?.[0];
 
   // Get featured vehicles (first 6 approved vehicles)
-  const displayVehicles = featuredVehicles?.slice(0, 6) || [];
+  const displayVehicles = featuredVehicles?.vehicles?.slice(0, 6) || [];
 
   return (
     <div className="flex min-h-screen flex-col bg-white">
@@ -147,7 +147,7 @@ export default function HomePage() {
               </p>
             </div>
 
-            {featuredVehicles === undefined ? (
+            {featuredVehicles === undefined || featuredVehicles.vehicles === undefined ? (
               <div className="mb-12 grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
                 {[...Array(6)].map((_, i) => (
                   <div className="animate-pulse" key={i}>

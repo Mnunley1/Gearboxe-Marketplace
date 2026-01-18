@@ -1,5 +1,6 @@
 import { ClerkProvider } from "@clerk/nextjs";
 import type { Metadata } from "next";
+import { ErrorBoundary } from "../../components/ui/error-boundary";
 import { ConvexClientProvider } from "../../lib/convex-provider";
 import { AdminLayout } from "./admin-layout";
 import "./global.css";
@@ -18,9 +19,11 @@ export default function RootLayout({
     <ClerkProvider signInFallbackRedirectUrl="/" signUpFallbackRedirectUrl="/">
       <html lang="en">
         <body className="antialiased">
-          <ConvexClientProvider>
-            <AdminLayout>{children}</AdminLayout>
-          </ConvexClientProvider>
+          <ErrorBoundary>
+            <ConvexClientProvider>
+              <AdminLayout>{children}</AdminLayout>
+            </ConvexClientProvider>
+          </ErrorBoundary>
         </body>
       </html>
     </ClerkProvider>

@@ -1,0 +1,24 @@
+declare const _default: import("convex/server").SchemaDefinition<{
+    metadata: import("convex/server").TableDefinition<import("convex/values").VObject<{
+        sha256?: string | undefined;
+        contentType?: string | undefined;
+        size?: number | undefined;
+        key: string;
+        bucket: string;
+        lastModified: string;
+        link: string;
+    }, {
+        key: import("convex/values").VString<string, "required">;
+        sha256: import("convex/values").VString<string | undefined, "optional">;
+        contentType: import("convex/values").VString<string | undefined, "optional">;
+        size: import("convex/values").VFloat64<number | undefined, "optional">;
+        bucket: import("convex/values").VString<string, "required">;
+        lastModified: import("convex/values").VString<string, "required">;
+        link: import("convex/values").VString<string, "required">;
+    }, "required", "key" | "sha256" | "contentType" | "size" | "bucket" | "lastModified" | "link">, {
+        bucket: ["bucket", "_creationTime"];
+        bucket_key: ["bucket", "key", "_creationTime"];
+    }, {}, {}>;
+}, true>;
+export default _default;
+//# sourceMappingURL=schema.d.ts.map

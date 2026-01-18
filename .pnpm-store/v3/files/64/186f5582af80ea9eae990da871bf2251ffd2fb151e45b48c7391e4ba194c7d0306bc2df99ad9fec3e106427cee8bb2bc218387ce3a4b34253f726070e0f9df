@@ -1,0 +1,86 @@
+export declare const store: import("convex/server").RegisteredAction<"public", {
+    bucket: string;
+    endpoint: string;
+    accessKeyId: string;
+    secretAccessKey: string;
+    url: string;
+}, Promise<`${string}-${string}-${string}-${string}-${string}`>>;
+export declare const getMetadata: import("convex/server").RegisteredQuery<"public", {
+    key: string;
+    bucket: string;
+    endpoint: string;
+    accessKeyId: string;
+    secretAccessKey: string;
+}, Promise<{
+    url: string;
+    bucketLink: string;
+    key: string;
+    sha256?: string | undefined;
+    contentType?: string | undefined;
+    size?: number | undefined;
+    bucket: string;
+    lastModified: string;
+    link: string;
+} | null>>;
+export declare const listMetadata: import("convex/server").RegisteredQuery<"public", {
+    limit?: number | undefined;
+    cursor?: string | undefined;
+    bucket: string;
+    endpoint: string;
+    accessKeyId: string;
+    secretAccessKey: string;
+}, Promise<{
+    page: {
+        url: string;
+        bucketLink: string;
+        key: string;
+        sha256?: string | undefined;
+        contentType?: string | undefined;
+        size?: number | undefined;
+        bucket: string;
+        lastModified: string;
+        link: string;
+    }[];
+    isDone: boolean;
+    continueCursor: string;
+    splitCursor?: string | null | undefined;
+    pageStatus?: "SplitRecommended" | "SplitRequired" | null | undefined;
+}>>;
+export declare const upsertMetadata: import("convex/server").RegisteredMutation<"public", {
+    sha256?: string | undefined;
+    contentType?: string | undefined;
+    size?: number | undefined;
+    key: string;
+    bucket: string;
+    lastModified: string;
+    link: string;
+}, Promise<{
+    isNew: boolean;
+}>>;
+export declare const syncMetadata: import("convex/server").RegisteredAction<"public", {
+    onComplete?: string | undefined;
+    key: string;
+    bucket: string;
+    endpoint: string;
+    accessKeyId: string;
+    secretAccessKey: string;
+}, Promise<void>>;
+export declare const deleteMetadata: import("convex/server").RegisteredMutation<"public", {
+    key: string;
+    bucket: string;
+}, Promise<void>>;
+export declare const deleteR2Object: import("convex/server").RegisteredAction<"public", {
+    key: string;
+    bucket: string;
+    endpoint: string;
+    accessKeyId: string;
+    secretAccessKey: string;
+}, Promise<void>>;
+export declare const deleteObject: import("convex/server").RegisteredMutation<"public", {
+    key: string;
+    bucket: string;
+    endpoint: string;
+    accessKeyId: string;
+    secretAccessKey: string;
+}, Promise<void>>;
+//# sourceMappingURL=lib.d.ts.map

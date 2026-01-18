@@ -153,10 +153,7 @@ export const seedDatabase = mutation({
         mileage: 25_000,
         price: 65_000,
         vin: "WBS8M9C50JA123456",
-        photos: [
-          "https://images.unsplash.com/photo-1555215695-3004980ad54e?w=800&h=600&fit=crop",
-          "https://images.unsplash.com/photo-1544636331-e26879cd4d9b?w=800&h=600&fit=crop",
-        ],
+        photos: [],
         description:
           "Immaculate BMW M3 with Competition Package. Single owner, garage kept, all service records available. Perfect condition with no accidents. Includes extended warranty.",
         contactInfo: "john.smith@example.com",
@@ -172,10 +169,7 @@ export const seedDatabase = mutation({
         mileage: 18_000,
         price: 85_000,
         vin: "5YJSA1E28LF123456",
-        photos: [
-          "https://images.unsplash.com/photo-1560958089-b8a1929cea89?w=800&h=600&fit=crop",
-          "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&h=600&fit=crop",
-        ],
+        photos: [],
         description:
           'Tesla Model S Performance with Ludicrous Mode. FSD capability, premium interior, 21" wheels. Always charged at home, excellent battery health.',
         contactInfo: "sarah.johnson@example.com",
@@ -191,10 +185,7 @@ export const seedDatabase = mutation({
         mileage: 32_000,
         price: 95_000,
         vin: "WP0AB2A99JS123456",
-        photos: [
-          "https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=800&h=600&fit=crop",
-          "https://images.unsplash.com/photo-1549924231-f129b911e442?w=800&h=600&fit=crop",
-        ],
+        photos: [],
         description:
           "Iconic Porsche 911 Carrera S. Sport Chrono package, premium audio, leather interior. Well maintained with Porsche service history.",
         contactInfo: "john.smith@example.com",
@@ -210,10 +201,7 @@ export const seedDatabase = mutation({
         mileage: 15_000,
         price: 45_000,
         vin: "1FA6P8TH2M5123456",
-        photos: [
-          "https://images.unsplash.com/photo-1583121274602-3e2820c69888?w=800&h=600&fit=crop",
-          "https://images.unsplash.com/photo-1558618047-3c8c76ca7d13?w=800&h=600&fit=crop",
-        ],
+        photos: [],
         description:
           "Ford Mustang GT Premium with 10-speed automatic. Recaro seats, MagneRide suspension, premium sound system. Like new condition.",
         contactInfo: "mike.davis@example.com",
@@ -229,10 +217,7 @@ export const seedDatabase = mutation({
         mileage: 45_000,
         price: 75_000,
         vin: "WAUZZZ4G8HN123456",
-        photos: [
-          "https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?w=800&h=600&fit=crop",
-          "https://images.unsplash.com/photo-1606664515524-ed2f786a0bd6?w=800&h=600&fit=crop",
-        ],
+        photos: [],
         description:
           "Rare Audi RS6 Avant wagon. Twin-turbo V8, Quattro AWD, sport exhaust. Perfect family car with incredible performance.",
         contactInfo: "sarah.johnson@example.com",
@@ -248,10 +233,7 @@ export const seedDatabase = mutation({
         mileage: 28_000,
         price: 68_000,
         vin: "WDD2050491A123456",
-        photos: [
-          "https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?w=800&h=600&fit=crop",
-          "https://images.unsplash.com/photo-1618843479313-40f8afb4b4d8?w=800&h=600&fit=crop",
-        ],
+        photos: [],
         description:
           "Mercedes-AMG C63 S with AMG Performance Package. Handcrafted V8, AMG exhaust, carbon fiber trim. One owner, full service history.",
         contactInfo: "mike.davis@example.com",

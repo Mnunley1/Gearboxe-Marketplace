@@ -15,12 +15,15 @@ import {
 import { Textarea } from "@car-market/ui/textarea";
 import { useUser } from "@clerk/nextjs";
 import { useMutation, useQuery } from "convex/react";
-import { Car, Upload } from "lucide-react";
+import { Car } from "lucide-react";
 import { redirect, useRouter } from "next/navigation";
 import { useState } from "react";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
+import { useToast } from "@/hooks/useToast";
 import { Footer } from "../../../../components/footer";
 import { Navbar } from "../../../../components/navbar";
+import { ImageUpload } from "../../../../components/image-upload";
+import { Id } from "@car-market/convex/_generated/dataModel";
 
 const makes = [
   "Acura",
@@ -64,9 +67,11 @@ export default function NewListingPage() {
   const router = useRouter();
   const { isLoading, isAuthenticated, user: currentUser } = useCurrentUser();
   const { user } = useUser();
+  const { toast } = useToast();
 
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [formData, setFormData] = useState({
     title: "",
     make: "",
@@ -95,6 +100,7 @@ export default function NewListingPage() {
   // Always call hooks to maintain hook order
   const upcomingEvents = useQuery(api.events.getUpcomingEvents);
   const createVehicle = useMutation(api.vehicles.createVehicle);
+  const createPendingRegistration = useMutation(api.registrations.createPendingRegistration);
 
   if (!isAuthenticated) {
     redirect("/sign-in");
@@ -115,44 +121,150 @@ export default function NewListingPage() {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handlePhotoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files;
-    if (files) {
-      // In a real app, you'd upload to Convex file storage
-      // For now, we'll simulate with placeholder URLs
-      const newPhotos = Array.from(files).map((file) =>
-        URL.createObjectURL(file)
-      );
-      setFormData((prev) => ({
-        ...prev,
-        photos: [...prev.photos, ...newPhotos],
-      }));
+  const validateForm = (): boolean => {
+    const newErrors: Record<string, string> = {};
+
+    if (!formData.title.trim()) {
+      newErrors.title = "Listing title is required";
     }
+    if (!formData.make) {
+      newErrors.make = "Make is required";
+    }
+    if (!formData.model.trim()) {
+      newErrors.model = "Model is required";
+    }
+    if (!formData.year) {
+      newErrors.year = "Year is required";
+    } else {
+      const yearNum = Number.parseInt(formData.year);
+      if (isNaN(yearNum) || yearNum < 1900 || yearNum > new Date().getFullYear() + 1) {
+        newErrors.year = "Please enter a valid year";
+      }
+    }
+    if (!formData.mileage.trim()) {
+      newErrors.mileage = "Mileage is required";
+    } else {
+      const mileageNum = Number.parseInt(formData.mileage);
+      if (isNaN(mileageNum) || mileageNum < 0) {
+        newErrors.mileage = "Please enter a valid mileage";
+      }
+    }
+    if (!formData.price.trim()) {
+      newErrors.price = "Price is required";
+    } else {
+      const priceNum = Number.parseFloat(formData.price);
+      if (isNaN(priceNum) || priceNum <= 0) {
+        newErrors.price = "Please enter a valid price";
+      }
+    }
+    if (formData.vin && formData.vin.length !== 17) {
+      newErrors.vin = "VIN must be exactly 17 characters";
+    }
+    if (!formData.description.trim()) {
+      newErrors.description = "Description is required";
+    } else if (formData.description.trim().length < 50) {
+      newErrors.description = "Description must be at least 50 characters";
+    }
+    if (!formData.contactInfo.trim()) {
+      newErrors.contactInfo = "Contact information is required";
+    }
+    if (!formData.eventId) {
+      newErrors.eventId = "Please select an event";
+    } else {
+      // Check if selected event is full
+      const selectedEvent = upcomingEvents?.find((e) => e._id === formData.eventId);
+      if (selectedEvent?.isFull) {
+        newErrors.eventId = "This event is full. Please select a different event.";
+      }
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async () => {
     if (!currentUser || !formData.eventId) return;
 
+    // Validate form before submission
+    if (!validateForm()) {
+      toast({
+        title: "Validation Error",
+        description: "Please fix the errors in the form before submitting.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Check capacity BEFORE creating vehicle
+    const event = upcomingEvents?.find((e) => e._id === formData.eventId);
+    if (event && event.isFull) {
+      toast({
+        title: "Event is Full",
+        description: "This event has reached its capacity. Please select a different event.",
+        variant: "destructive",
+      });
+      setErrors((prev) => ({ ...prev, eventId: "This event is full" }));
+      return;
+    }
+
     setIsSubmitting(true);
+    setErrors({});
     try {
+      // Create vehicle first
       const vehicleId = await createVehicle({
         userId: currentUser._id,
         eventId: formData.eventId as any,
-        title: formData.title,
+        title: formData.title.trim(),
         make: formData.make,
-        model: formData.model,
+        model: formData.model.trim(),
         year: Number.parseInt(formData.year),
         mileage: Number.parseInt(formData.mileage),
         price: Number.parseFloat(formData.price),
         vin: formData.vin || undefined,
         photos: formData.photos,
-        description: formData.description,
-        contactInfo: formData.contactInfo,
+        description: formData.description.trim(),
+        contactInfo: formData.contactInfo.trim(),
       });
 
-      router.push(`/myAccount/my-listings?created=${vehicleId}`);
-    } catch (error) {
+      // Get event to check if payment is required
+      if (event && event.vendorPrice > 0) {
+        // Create pending registration (will also check capacity as final validation)
+        const registrationId = await createPendingRegistration({
+          eventId: formData.eventId as any,
+          vehicleId: vehicleId as any,
+          userId: currentUser._id,
+        });
+
+        // Redirect to payment page
+        router.push(`/myAccount/payment?registrationId=${registrationId}&vehicleId=${vehicleId}&eventId=${formData.eventId}`);
+      } else {
+        // No payment required, redirect to listings
+        toast({
+          title: "Listing Created",
+          description: "Your vehicle listing has been created successfully and is pending review.",
+        });
+        router.push(`/myAccount/my-listings?created=${vehicleId}`);
+      }
+    } catch (error: any) {
       console.error("Error creating vehicle:", error);
+      const errorMessage =
+        error?.message || "Failed to create listing. Please try again.";
+      
+      // Handle specific error messages
+      if (errorMessage.includes("full") || errorMessage.includes("capacity")) {
+        setErrors((prev) => ({ ...prev, eventId: "This event is now full" }));
+        toast({
+          title: "Event is Full",
+          description: "This event has reached its capacity. Please select a different event.",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Error Creating Listing",
+          description: errorMessage,
+          variant: "destructive",
+        });
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -251,23 +363,33 @@ export default function NewListingPage() {
                     <Label htmlFor="title">Listing Title *</Label>
                     <Input
                       id="title"
-                      onChange={(e) =>
-                        handleInputChange("title", e.target.value)
-                      }
+                      onChange={(e) => {
+                        handleInputChange("title", e.target.value);
+                        if (errors.title) {
+                          setErrors((prev) => ({ ...prev, title: "" }));
+                        }
+                      }}
                       placeholder="e.g., 2020 Honda Civic - Excellent Condition"
                       value={formData.title}
+                      className={errors.title ? "border-red-500" : ""}
                     />
+                    {errors.title && (
+                      <p className="text-red-600 text-sm">{errors.title}</p>
+                    )}
                   </div>
 
                   <div className="space-y-2">
                     <Label htmlFor="make">Make *</Label>
                     <Select
-                      onValueChange={(value) =>
-                        handleInputChange("make", value)
-                      }
+                      onValueChange={(value) => {
+                        handleInputChange("make", value);
+                        if (errors.make) {
+                          setErrors((prev) => ({ ...prev, make: "" }));
+                        }
+                      }}
                       value={formData.make}
                     >
-                      <SelectTrigger>
+                      <SelectTrigger className={errors.make ? "border-red-500" : ""}>
                         <SelectValue placeholder="Select make" />
                       </SelectTrigger>
                       <SelectContent>
@@ -278,29 +400,42 @@ export default function NewListingPage() {
                         ))}
                       </SelectContent>
                     </Select>
+                    {errors.make && (
+                      <p className="text-red-600 text-sm">{errors.make}</p>
+                    )}
                   </div>
 
                   <div className="space-y-2">
                     <Label htmlFor="model">Model *</Label>
                     <Input
                       id="model"
-                      onChange={(e) =>
-                        handleInputChange("model", e.target.value)
-                      }
+                      onChange={(e) => {
+                        handleInputChange("model", e.target.value);
+                        if (errors.model) {
+                          setErrors((prev) => ({ ...prev, model: "" }));
+                        }
+                      }}
                       placeholder="e.g., Civic"
                       value={formData.model}
+                      className={errors.model ? "border-red-500" : ""}
                     />
+                    {errors.model && (
+                      <p className="text-red-600 text-sm">{errors.model}</p>
+                    )}
                   </div>
 
                   <div className="space-y-2">
                     <Label htmlFor="year">Year *</Label>
                     <Select
-                      onValueChange={(value) =>
-                        handleInputChange("year", value)
-                      }
+                      onValueChange={(value) => {
+                        handleInputChange("year", value);
+                        if (errors.year) {
+                          setErrors((prev) => ({ ...prev, year: "" }));
+                        }
+                      }}
                       value={formData.year}
                     >
-                      <SelectTrigger>
+                      <SelectTrigger className={errors.year ? "border-red-500" : ""}>
                         <SelectValue placeholder="Select year" />
                       </SelectTrigger>
                       <SelectContent>
@@ -311,42 +446,69 @@ export default function NewListingPage() {
                         ))}
                       </SelectContent>
                     </Select>
+                    {errors.year && (
+                      <p className="text-red-600 text-sm">{errors.year}</p>
+                    )}
                   </div>
 
                   <div className="space-y-2">
                     <Label htmlFor="mileage">Mileage *</Label>
                     <Input
                       id="mileage"
-                      onChange={(e) =>
-                        handleInputChange("mileage", e.target.value)
-                      }
+                      onChange={(e) => {
+                        handleInputChange("mileage", e.target.value);
+                        if (errors.mileage) {
+                          setErrors((prev) => ({ ...prev, mileage: "" }));
+                        }
+                      }}
                       placeholder="e.g., 50000"
                       type="number"
                       value={formData.mileage}
+                      className={errors.mileage ? "border-red-500" : ""}
                     />
+                    {errors.mileage && (
+                      <p className="text-red-600 text-sm">{errors.mileage}</p>
+                    )}
                   </div>
 
                   <div className="space-y-2">
                     <Label htmlFor="price">Price ($) *</Label>
                     <Input
                       id="price"
-                      onChange={(e) =>
-                        handleInputChange("price", e.target.value)
-                      }
+                      onChange={(e) => {
+                        handleInputChange("price", e.target.value);
+                        if (errors.price) {
+                          setErrors((prev) => ({ ...prev, price: "" }));
+                        }
+                      }}
                       placeholder="e.g., 25000"
                       type="number"
                       value={formData.price}
+                      className={errors.price ? "border-red-500" : ""}
                     />
+                    {errors.price && (
+                      <p className="text-red-600 text-sm">{errors.price}</p>
+                    )}
                   </div>
 
                   <div className="space-y-2">
                     <Label htmlFor="vin">VIN (Optional)</Label>
                     <Input
                       id="vin"
-                      onChange={(e) => handleInputChange("vin", e.target.value)}
+                      onChange={(e) => {
+                        handleInputChange("vin", e.target.value);
+                        if (errors.vin) {
+                          setErrors((prev) => ({ ...prev, vin: "" }));
+                        }
+                      }}
                       placeholder="17-character VIN"
                       value={formData.vin}
+                      className={errors.vin ? "border-red-500" : ""}
+                      maxLength={17}
                     />
+                    {errors.vin && (
+                      <p className="text-red-600 text-sm">{errors.vin}</p>
+                    )}
                   </div>
                 </div>
 
@@ -364,62 +526,55 @@ export default function NewListingPage() {
                   <Label htmlFor="description">Description *</Label>
                   <Textarea
                     id="description"
-                    onChange={(e) =>
-                      handleInputChange("description", e.target.value)
-                    }
+                    onChange={(e) => {
+                      handleInputChange("description", e.target.value);
+                      if (errors.description) {
+                        setErrors((prev) => ({ ...prev, description: "" }));
+                      }
+                    }}
                     placeholder="Describe your vehicle's condition, features, and any important details..."
                     rows={6}
                     value={formData.description}
+                    className={errors.description ? "border-red-500" : ""}
                   />
+                  {errors.description && (
+                    <p className="text-red-600 text-sm">{errors.description}</p>
+                  )}
+                  {!errors.description && formData.description && (
+                    <p className="text-gray-500 text-sm">
+                      {formData.description.length}/50 characters minimum
+                    </p>
+                  )}
                 </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="contactInfo">Contact Information *</Label>
                   <Input
                     id="contactInfo"
-                    onChange={(e) =>
-                      handleInputChange("contactInfo", e.target.value)
-                    }
+                    onChange={(e) => {
+                      handleInputChange("contactInfo", e.target.value);
+                      if (errors.contactInfo) {
+                        setErrors((prev) => ({ ...prev, contactInfo: "" }));
+                      }
+                    }}
                     placeholder="e.g., Phone: (555) 123-4567, Email: seller@example.com"
                     value={formData.contactInfo}
+                    className={errors.contactInfo ? "border-red-500" : ""}
                   />
+                  {errors.contactInfo && (
+                    <p className="text-red-600 text-sm">{errors.contactInfo}</p>
+                  )}
                 </div>
 
                 <div className="space-y-2">
                   <Label>Photos</Label>
-                  <div className="rounded-lg border-2 border-gray-300 border-dashed p-6 text-center">
-                    <Upload className="mx-auto mb-4 h-12 w-12 text-gray-400" />
-                    <p className="mb-4 text-gray-600">
-                      Upload photos of your vehicle
-                    </p>
-                    <input
-                      accept="image/*"
-                      className="hidden"
-                      id="photo-upload"
-                      multiple
-                      onChange={handlePhotoUpload}
-                      type="file"
-                    />
-                    <Button asChild variant="outline">
-                      <label className="cursor-pointer" htmlFor="photo-upload">
-                        Choose Photos
-                      </label>
-                    </Button>
-                  </div>
-
-                  {formData.photos.length > 0 && (
-                    <div className="mt-4 grid grid-cols-2 gap-4 md:grid-cols-4">
-                      {formData.photos.map((photo, index) => (
-                        <div className="relative" key={index}>
-                          <img
-                            alt={`Vehicle photo ${index + 1}`}
-                            className="h-24 w-full rounded-lg object-cover"
-                            src={photo}
-                          />
-                        </div>
-                      ))}
-                    </div>
-                  )}
+                  <ImageUpload
+                    maxImages={10}
+                    onChange={(keys) => {
+                      setFormData((prev) => ({ ...prev, photos: keys }));
+                    }}
+                    value={formData.photos}
+                  />
                 </div>
 
                 <div className="flex justify-between">
@@ -438,22 +593,33 @@ export default function NewListingPage() {
                 <div className="space-y-2">
                   <Label htmlFor="event">Select Event *</Label>
                   <Select
-                    onValueChange={(value) =>
-                      handleInputChange("eventId", value)
-                    }
+                    onValueChange={(value) => {
+                      handleInputChange("eventId", value);
+                      if (errors.eventId) {
+                        setErrors((prev) => ({ ...prev, eventId: "" }));
+                      }
+                    }}
                     value={formData.eventId}
                   >
-                    <SelectTrigger>
+                    <SelectTrigger className={errors.eventId ? "border-red-500" : ""}>
                       <SelectValue placeholder="Select an upcoming event" />
                     </SelectTrigger>
                     <SelectContent>
                       {upcomingEvents && upcomingEvents.length > 0 ? (
-                        upcomingEvents.map((event) => (
-                          <SelectItem key={event._id} value={event._id}>
-                            {event.name} -{" "}
-                            {new Date(event.date).toLocaleDateString()}
-                          </SelectItem>
-                        ))
+                        upcomingEvents.map((event) => {
+                          const isFull = event.isFull ?? false;
+                          const available = event.available ?? 0;
+                          return (
+                            <SelectItem
+                              key={event._id}
+                              value={event._id}
+                              disabled={isFull}
+                            >
+                              {event.name} - {new Date(event.date).toLocaleDateString()}
+                              {isFull ? " (Full)" : ` (${available} spot${available !== 1 ? "s" : ""} available)`}
+                            </SelectItem>
+                          );
+                        })
                       ) : (
                         <SelectItem disabled value="no-events">
                           No upcoming events available
@@ -461,6 +627,36 @@ export default function NewListingPage() {
                       )}
                     </SelectContent>
                   </Select>
+                  {errors.eventId && (
+                    <p className="text-red-600 text-sm">{errors.eventId}</p>
+                  )}
+                  {formData.eventId && upcomingEvents && (
+                    (() => {
+                      const selectedEvent = upcomingEvents.find(
+                        (e) => e._id === formData.eventId
+                      );
+                      if (selectedEvent?.isFull) {
+                        return (
+                          <p className="text-red-600 text-sm">
+                            This event is full. Please select a different event.
+                          </p>
+                        );
+                      }
+                      if (selectedEvent && selectedEvent.available !== undefined) {
+                        return (
+                          <p className="text-gray-600 text-sm">
+                            {selectedEvent.available} spot{selectedEvent.available !== 1 ? "s" : ""} available
+                            {selectedEvent.vendorPrice > 0 && (
+                              <span className="ml-2">
+                                • Registration fee: ${(selectedEvent.vendorPrice / 100).toFixed(2)}
+                              </span>
+                            )}
+                          </p>
+                        );
+                      }
+                      return null;
+                    })()
+                  )}
                   {upcomingEvents && upcomingEvents.length === 0 && (
                     <p className="text-gray-500 text-sm">
                       Please contact an administrator to create an upcoming
@@ -520,7 +716,11 @@ export default function NewListingPage() {
                       Previous Step
                     </Button>
                     <Button
-                      disabled={isSubmitting || !formData.eventId}
+                      disabled={
+                        isSubmitting ||
+                        !formData.eventId ||
+                        (upcomingEvents?.find((e) => e._id === formData.eventId)?.isFull ?? false)
+                      }
                       onClick={handleSubmit}
                     >
                       {isSubmitting ? "Creating Listing..." : "Create Listing"}

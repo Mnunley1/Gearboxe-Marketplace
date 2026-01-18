@@ -48,6 +48,13 @@ export default defineSchema({
         v.literal("sold")
       )
     ),
+    paymentStatus: v.optional(
+      v.union(
+        v.literal("pending"),
+        v.literal("completed"),
+        v.literal("failed")
+      )
+    ),
     createdAt: v.number(),
   })
     .index("by_user", ["userId"])
@@ -64,6 +71,7 @@ export default defineSchema({
     address: v.string(),
     capacity: v.number(),
     description: v.string(),
+    vendorPrice: v.number(), // Price to charge sellers for event registration (in cents)
     createdAt: v.number(),
   })
     .index("by_city", ["cityId"])
@@ -81,6 +89,7 @@ export default defineSchema({
     stripePaymentId: v.optional(v.string()),
     qrCodeData: v.optional(v.string()),
     checkedIn: v.boolean(),
+    expiresAt: v.optional(v.number()), // Expiration time for pending registrations
     createdAt: v.number(),
   })
     .index("by_event", ["eventId"])

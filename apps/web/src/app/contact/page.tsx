@@ -222,7 +222,7 @@ export default function ContactPage() {
         </section>
 
         {/* Contact Form and FAQ */}
-        <section className="bg-gray-50 py-16">
+        <section className="bg-white py-16">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 gap-12 lg:grid-cols-2">
               {/* Contact Form */}
@@ -395,7 +395,7 @@ export default function ContactPage() {
                       </div>
 
                       <Button
-                        className="w-full bg-primary py-3 font-medium text-base text-white hover:bg-primary/90"
+                        className="w-full py-3 font-medium text-base"
                         disabled={isSubmitting}
                         type="submit"
                       >

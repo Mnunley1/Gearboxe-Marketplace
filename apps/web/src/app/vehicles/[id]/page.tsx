@@ -349,12 +349,12 @@ export default function VehiclePage({ params }: VehiclePageProps) {
   return (
     <>
       <Head>
-        <title>{vehicle.title} - Car Market</title>
+        <title>{vehicle.title} - Gearboxe Market</title>
         <meta
           content={`${vehicle.year} ${vehicle.make} ${vehicle.model} for sale - ${formatPrice(vehicle.price)}. ${vehicle.description.substring(0, 160)}...`}
           name="description"
         />
-        <meta content={`${vehicle.title} - Car Market`} property="og:title" />
+        <meta content={`${vehicle.title} - Gearboxe Market`} property="og:title" />
         <meta
           content={`${vehicle.year} ${vehicle.make} ${vehicle.model} for sale - ${formatPrice(vehicle.price)}`}
           property="og:description"
@@ -395,46 +395,47 @@ export default function VehiclePage({ params }: VehiclePageProps) {
         />
       </Head>
 
-      <div className="flex min-h-screen flex-col bg-gradient-to-br from-gray-50 to-white">
+      <div className="flex min-h-screen flex-col bg-white">
         <Navbar />
 
         <div className="mx-auto max-w-7xl flex-1 px-4 py-8 sm:px-6 lg:px-8">
           {/* Breadcrumb */}
-          <div className="mb-6 flex items-center space-x-2 text-gray-600 text-sm">
+          <nav className="mb-6 flex items-center gap-2 text-sm" aria-label="Breadcrumb">
             <Link
-              className="flex items-center transition-colors hover:text-primary"
+              className="flex items-center gap-1 text-gray-500 transition-colors hover:text-primary"
               href="/vehicles"
             >
-              <ChevronLeft className="mr-1 h-4 w-4" />
-              Vehicles
+              <ChevronLeft className="h-4 w-4" />
+              <span>All Vehicles</span>
             </Link>
-            <span>/</span>
-            <span className="font-medium">{vehicle.title}</span>
-          </div>
+            <span className="text-gray-300">/</span>
+            <span className="font-medium text-gray-900 truncate max-w-[200px] sm:max-w-none">{vehicle.title}</span>
+          </nav>
 
           <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
             {/* Main Content */}
             <div className="space-y-8 lg:col-span-2">
               {/* Vehicle Header */}
-              <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-                <div className="mb-4 flex flex-col sm:flex-row sm:items-start sm:justify-between">
+              <div className="rounded-2xl border border-gray-200/60 bg-white p-6 shadow-sm sm:p-8">
+                <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                   <div className="flex-1">
-                    <h1 className="mb-2 font-bold text-3xl text-gray-900">
+                    <h1 className="mb-2 text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl">
                       {vehicle.title}
                     </h1>
-                    <p className="mb-4 text-gray-600 text-xl">
+                    <p className="mb-4 text-lg text-gray-600">
                       {vehicle.year} {vehicle.make} {vehicle.model}
                     </p>
-                    <div className="flex flex-wrap items-center gap-4 text-gray-600 text-sm">
-                      <div className="flex items-center space-x-1">
-                        <Gauge className="h-4 w-4" />
-                        <span>{formatMileage(vehicle.mileage)} miles</span>
+                    <div className="flex flex-wrap items-center gap-3 sm:gap-4">
+                      <div className="flex items-center gap-1.5 rounded-full bg-gray-100 px-3 py-1.5 text-sm text-gray-700">
+                        <Gauge className="h-4 w-4 text-gray-500" />
+                        <span className="tabular-nums">{formatMileage(vehicle.mileage)}</span>
+                        <span className="text-gray-500">mi</span>
                       </div>
-                      <div className="flex items-center space-x-1">
-                        <Calendar className="h-4 w-4" />
+                      <div className="flex items-center gap-1.5 rounded-full bg-gray-100 px-3 py-1.5 text-sm text-gray-700">
+                        <Calendar className="h-4 w-4 text-gray-500" />
                         <span>{vehicle.year}</span>
                       </div>
-                      <div className="flex items-center space-x-1">
+                      <div className="flex items-center gap-1.5 text-sm text-gray-500">
                         <Clock className="h-4 w-4" />
                         <span>Listed {formatDate(vehicle.createdAt)}</span>
                       </div>
@@ -445,10 +446,9 @@ export default function VehiclePage({ params }: VehiclePageProps) {
                   <div className="mt-4 flex items-center space-x-2 sm:mt-0">
                     <div className="relative" data-share-menu>
                       <Button
-                        className="flex items-center border-primary bg-primary text-white shadow-sm transition-all duration-200 hover:bg-primary/90 hover:text-white hover:shadow-md"
+                        className="flex items-center"
                         onClick={() => setShowShareMenu(!showShareMenu)}
                         size="sm"
-                        variant="outline"
                       >
                         <Share2 className="mr-2 h-4 w-4" />
                         Share
@@ -506,13 +506,16 @@ export default function VehiclePage({ params }: VehiclePageProps) {
                 </div>
 
                 {/* Price */}
-                <div className="flex items-center justify-between">
-                  <div className="font-bold text-4xl text-primary">
-                    {formatPrice(vehicle.price)}
+                <div className="flex items-center justify-between border-t border-gray-100 pt-6">
+                  <div>
+                    <div className="text-sm font-medium text-gray-500 uppercase tracking-wider">Price</div>
+                    <div className="text-3xl font-bold text-primary tabular-nums tracking-tight sm:text-4xl">
+                      {formatPrice(vehicle.price)}
+                    </div>
                   </div>
-                  <div className="flex items-center space-x-2 text-gray-600 text-sm">
+                  <div className="flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1.5 text-sm font-medium text-emerald-700">
                     <Shield className="h-4 w-4" />
-                    <span>Verified Listing</span>
+                    <span>Verified</span>
                   </div>
                 </div>
               </div>
@@ -684,7 +687,7 @@ export default function VehiclePage({ params }: VehiclePageProps) {
                       <h3 className="mb-4 font-semibold text-gray-900 text-lg">
                         Description
                       </h3>
-                      <div className="rounded-lg bg-gray-50 p-4">
+                      <div className="rounded-xl bg-gray-50/80 p-5">
                         <p className="whitespace-pre-wrap text-gray-700 leading-relaxed">
                           {vehicle.description}
                         </p>
@@ -694,20 +697,35 @@ export default function VehiclePage({ params }: VehiclePageProps) {
                     {/* Features & Highlights */}
                     <div>
                       <h3 className="mb-4 font-semibold text-gray-900 text-lg">
-                        Key Features
+                        Highlights
                       </h3>
-                      <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
-                        <div className="flex items-center space-x-2 text-gray-600 text-sm">
-                          <Shield className="h-4 w-4 text-green-500" />
-                          <span>Verified Listing</span>
+                      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                        <div className="flex items-center gap-3 rounded-xl bg-emerald-50 p-4">
+                          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-100">
+                            <Shield className="h-5 w-5 text-emerald-600" />
+                          </div>
+                          <div>
+                            <div className="font-medium text-gray-900 text-sm">Verified</div>
+                            <div className="text-xs text-gray-500">Listing checked</div>
+                          </div>
                         </div>
-                        <div className="flex items-center space-x-2 text-gray-600 text-sm">
-                          <Award className="h-4 w-4 text-blue-500" />
-                          <span>Quality Assured</span>
+                        <div className="flex items-center gap-3 rounded-xl bg-blue-50 p-4">
+                          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100">
+                            <Award className="h-5 w-5 text-blue-600" />
+                          </div>
+                          <div>
+                            <div className="font-medium text-gray-900 text-sm">Quality</div>
+                            <div className="text-xs text-gray-500">Standards met</div>
+                          </div>
                         </div>
-                        <div className="flex items-center space-x-2 text-gray-600 text-sm">
-                          <Users className="h-4 w-4 text-purple-500" />
-                          <span>Community Verified</span>
+                        <div className="flex items-center gap-3 rounded-xl bg-violet-50 p-4">
+                          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-violet-100">
+                            <Users className="h-5 w-5 text-violet-600" />
+                          </div>
+                          <div>
+                            <div className="font-medium text-gray-900 text-sm">Community</div>
+                            <div className="text-xs text-gray-500">Member verified</div>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -720,35 +738,35 @@ export default function VehiclePage({ params }: VehiclePageProps) {
             <div className="space-y-6">
               {/* Seller Info */}
               {seller && (
-                <div className="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
-                  <div className="mb-4 flex items-center space-x-3">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
-                      <User className="h-6 w-6 text-primary" />
+                <div className="rounded-2xl border border-gray-200/60 bg-white p-6 shadow-sm">
+                  <div className="mb-5 flex items-center gap-4">
+                    <div className="flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-br from-primary/10 to-primary/5">
+                      <User className="h-7 w-7 text-primary" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-gray-900">
+                      <h3 className="font-semibold text-gray-900 text-lg">
                         {seller.name}
                       </h3>
-                      <div className="flex items-center space-x-1 text-gray-600 text-sm">
-                        <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                        <span>Verified Seller</span>
+                      <div className="flex items-center gap-1.5 text-sm">
+                        <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
+                        <span className="font-medium text-amber-600">Verified Seller</span>
                       </div>
                     </div>
                   </div>
 
-                  <div className="mb-6 space-y-3">
-                    <div className="flex items-center space-x-2 text-gray-600 text-sm">
-                      <Mail className="h-4 w-4" />
-                      <span>{vehicle.contactInfo}</span>
+                  <div className="mb-6 space-y-3 rounded-xl bg-gray-50 p-4">
+                    <div className="flex items-center gap-2 text-sm text-gray-700">
+                      <Mail className="h-4 w-4 text-gray-400" />
+                      <span className="truncate">{vehicle.contactInfo}</span>
                     </div>
-                    <div className="flex items-center space-x-2 text-gray-600 text-sm">
-                      <MapPin className="h-4 w-4" />
+                    <div className="flex items-center gap-2 text-sm text-gray-700">
+                      <MapPin className="h-4 w-4 text-gray-400" />
                       <span>Local Seller</span>
                     </div>
                   </div>
 
                   {isAuthenticated || isSignedIn ? (
-                    <Button asChild className="w-full text-white">
+                    <Button asChild className="w-full">
                       <Link
                         href={`/myAccount/messages/${vehicle._id}/${vehicle.userId}`}
                       >
@@ -757,7 +775,7 @@ export default function VehiclePage({ params }: VehiclePageProps) {
                       </Link>
                     </Button>
                   ) : (
-                    <Button asChild className="w-full text-white">
+                    <Button asChild className="w-full">
                       <Link href="/sign-in">Sign In to Contact Seller</Link>
                     </Button>
                   )}
@@ -983,7 +1001,7 @@ export default function VehiclePage({ params }: VehiclePageProps) {
                   </Button>
                   <Button
                     asChild
-                    className="w-full text-white sm:w-auto"
+                    className="w-full sm:w-auto"
                     onClick={() => setShowAuthDialog(false)}
                   >
                     <Link href="/sign-up">Create Account</Link>

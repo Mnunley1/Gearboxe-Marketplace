@@ -216,7 +216,7 @@ export default function SignInPage() {
             </div>
 
             <Button
-              className="w-full bg-primary py-3 font-medium text-base text-white hover:bg-primary/90"
+              className="w-full py-3 font-medium text-base"
               disabled={isLoading}
               type="submit"
             >
@@ -238,7 +238,7 @@ export default function SignInPage() {
 
             <div className="mt-6 grid grid-cols-2 gap-3">
               <Button
-                className="w-full border-gray-200 hover:bg-gray-50"
+                className="w-full"
                 onClick={() => {
                   // Handle Google sign-in
                   signIn?.authenticateWithRedirect({
@@ -270,7 +270,7 @@ export default function SignInPage() {
                 Google
               </Button>
               <Button
-                className="w-full border-gray-200 hover:bg-gray-50"
+                className="w-full"
                 onClick={() => {
                   // Handle GitHub sign-in
                   signIn?.authenticateWithRedirect({

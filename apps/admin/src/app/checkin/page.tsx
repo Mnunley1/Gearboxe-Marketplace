@@ -224,7 +224,7 @@ export default function AdminCheckinPage() {
 
                           {!registration.checkedIn && (
                             <Button
-                              className="bg-green-600 hover:bg-green-700"
+                              className="bg-green-600 hover:bg-green-700 active:bg-green-800"
                               onClick={() =>
                                 handleManualCheckIn(registration._id)
                               }

@@ -172,7 +172,7 @@ export default function FavoritesPage() {
 
                   {/* Remove from favorites button */}
                   <Button
-                    className="absolute top-2 right-2 bg-white/90 text-red-600 hover:bg-white hover:text-red-700"
+                    className="absolute top-2 right-2 bg-white/90 text-red-600"
                     onClick={() => handleRemoveFavorite(vehicle._id)}
                     size="sm"
                     variant="ghost"
@@ -198,7 +198,7 @@ export default function FavoritesPage() {
                   </div>
 
                   <div className="flex gap-2">
-                    <Button asChild className="w-full text-white">
+                    <Button asChild className="w-full">
                       <Link href={`/vehicles/${vehicle._id}`}>
                         <Eye className="mr-1 h-4 w-4" />
                         View Details
@@ -223,7 +223,7 @@ export default function FavoritesPage() {
                   Start browsing vehicles and save your favorites for easy
                   access
                 </p>
-                <Button asChild className="text-white">
+                <Button asChild>
                   <Link href="/vehicles">
                     <Eye className="mr-2 h-4 w-4" />
                     Browse Vehicles

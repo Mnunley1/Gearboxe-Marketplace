@@ -106,7 +106,7 @@ export function UserDropdown({ afterSignOutUrl = "/" }: UserDropdownProps) {
   return (
     <div className="relative" ref={dropdownRef}>
       <Button
-        className="flex h-auto items-center space-x-2 px-3 py-2 hover:bg-gray-100 hover:text-gray-900"
+        className="flex h-auto items-center space-x-2"
         onClick={() => setIsOpen(!isOpen)}
         size="sm"
         variant="ghost"

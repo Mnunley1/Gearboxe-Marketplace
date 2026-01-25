@@ -61,17 +61,20 @@ export function Pagination({
   const pageNumbers = getPageNumbers();
 
   return (
-    <div
-      className={`flex items-center justify-center gap-2 ${className ?? ""}`}
+    <nav
+      aria-label="Pagination"
+      className={`flex items-center justify-center gap-1 sm:gap-2 ${className ?? ""}`}
     >
       <Button
+        aria-label="Go to previous page"
         disabled={currentPage === 1}
         onClick={() => onPageChange(currentPage - 1)}
         size="sm"
         variant="outline"
+        className="gap-1"
       >
         <ChevronLeft className="h-4 w-4" />
-        <span className="sr-only sm:not-sr-only sm:ml-2">Previous</span>
+        <span className="sr-only sm:not-sr-only">Previous</span>
       </Button>
 
       <div className="flex items-center gap-1">
@@ -80,7 +83,8 @@ export function Pagination({
             return (
               <span
                 key={`ellipsis-${index}`}
-                className="px-2 text-gray-500 text-sm"
+                className="flex h-10 w-8 items-center justify-center text-gray-400 text-sm"
+                aria-hidden="true"
               >
                 ...
               </span>
@@ -88,12 +92,19 @@ export function Pagination({
           }
 
           const pageNum = page as number;
+          const isActive = currentPage === pageNum;
+
           return (
             <Button
               key={pageNum}
+              aria-label={`Go to page ${pageNum}`}
+              aria-current={isActive ? "page" : undefined}
               onClick={() => onPageChange(pageNum)}
               size="sm"
-              variant={currentPage === pageNum ? "default" : "outline"}
+              variant={isActive ? "default" : "ghost"}
+              className={`min-w-[2.25rem] font-medium tabular-nums ${
+                isActive ? "shadow-sm" : ""
+              }`}
             >
               {pageNum}
             </Button>
@@ -102,14 +113,16 @@ export function Pagination({
       </div>
 
       <Button
+        aria-label="Go to next page"
         disabled={currentPage === totalPages}
         onClick={() => onPageChange(currentPage + 1)}
         size="sm"
         variant="outline"
+        className="gap-1"
       >
-        <span className="sr-only sm:not-sr-only sm:mr-2">Next</span>
+        <span className="sr-only sm:not-sr-only">Next</span>
         <ChevronRight className="h-4 w-4" />
       </Button>
-    </div>
+    </nav>
   );
 }

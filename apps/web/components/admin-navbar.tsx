@@ -150,13 +150,13 @@ export function AdminNavbar() {
               <div className="flex items-center space-x-2">
                 <Button
                   asChild
-                  className="border-gray-600 text-white hover:bg-gray-800"
+                  className="border-gray-600 text-white hover:bg-gray-800 active:bg-gray-900"
                   size="sm"
                   variant="outline"
                 >
                   <Link href="/sign-in">Sign In</Link>
                 </Button>
-                <Button asChild className="text-white" size="sm">
+                <Button asChild size="sm">
                   <Link href="/sign-up">Sign Up</Link>
                 </Button>
               </div>
@@ -164,7 +164,7 @@ export function AdminNavbar() {
 
             {/* Mobile menu button */}
             <Button
-              className="text-gray-300 hover:text-white md:hidden"
+              className="text-gray-300 md:hidden"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               size="sm"
               variant="ghost"

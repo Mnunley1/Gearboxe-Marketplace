@@ -297,7 +297,7 @@ export default function MessagesPage() {
                 to begin conversations!
               </p>
               <div className="flex items-center justify-center space-x-4">
-                <Button asChild className="text-white">
+                <Button asChild>
                   <Link href="/myAccount/new-listing">
                     <Car className="mr-2 h-4 w-4" />
                     List Your Vehicle

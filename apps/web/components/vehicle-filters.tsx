@@ -11,7 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@car-market/ui/select";
-import { Filter, X } from "lucide-react";
+import { ChevronDown, ChevronUp, RotateCcw, SlidersHorizontal, X } from "lucide-react";
 import { useState } from "react";
 
 type VehicleFiltersProps = {
@@ -85,7 +85,7 @@ export function VehicleFilters({
     maxMileage: "",
   });
 
-  const [isExpanded, setIsExpanded] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(true);
 
   const handleFilterChange = (key: string, value: string) => {
     const newFilters = { ...filters, [key]: value };
@@ -145,200 +145,249 @@ export function VehicleFilters({
     return value !== "";
   });
 
-  return (
+  const filterContent = (
     <>
-      {/* Mobile overlay */}
-      {isMobileOpen && (
-        <div
-          className="fixed inset-0 z-40 bg-black/50 lg:hidden"
-          onClick={onMobileClose}
-        />
-      )}
-
-      <Card
-        className={`${className} ${
-          isMobileOpen
-            ? "fixed inset-y-0 left-0 z-50 w-80 overflow-y-auto lg:relative lg:z-auto lg:w-auto"
-            : "hidden lg:block"
-        }`}
-      >
-      <CardHeader className="pb-3">
+      <CardHeader className="pb-4">
         <div className="flex items-center justify-between">
-          <CardTitle className="flex items-center space-x-2 text-lg">
-            <Filter className="h-5 w-5" />
-            <span>Filters</span>
+          <CardTitle className="flex items-center gap-2 text-lg font-semibold text-gray-900">
+            <SlidersHorizontal className="h-5 w-5 text-primary" />
+            Filters
           </CardTitle>
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center gap-1">
             {hasActiveFilters && (
-              <Button onClick={clearFilters} size="sm" variant="ghost">
-                <X className="mr-1 h-4 w-4" />
-                Clear
+              <Button
+                onClick={clearFilters}
+                size="sm"
+                variant="ghost"
+                className="gap-1"
+              >
+                <RotateCcw className="h-3.5 w-3.5" />
+                Reset
               </Button>
             )}
-            <Button
-              onClick={() => setIsExpanded(!isExpanded)}
-              size="sm"
-              variant="ghost"
-              className="lg:inline-flex hidden"
-            >
-              {isExpanded ? "Collapse" : "Expand"}
-            </Button>
             {onMobileClose && (
               <Button
                 onClick={onMobileClose}
-                size="sm"
+                size="icon-sm"
                 variant="ghost"
                 className="lg:hidden"
               >
-                <X className="h-4 w-4" />
+                <X className="h-5 w-5" />
+                <span className="sr-only">Close filters</span>
               </Button>
             )}
           </div>
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-4">
-        {/* Basic filters - always visible */}
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-          <div className="space-y-2">
-            <Label htmlFor="make">Make</Label>
-            <Select
-              onValueChange={(value) => handleFilterChange("make", value)}
-              value={filters.make}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select make" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All Makes</SelectItem>
-                {makes.map((make) => (
-                  <SelectItem key={make} value={make}>
-                    {make}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+      <CardContent className="space-y-6">
+        {/* Make & Model */}
+        <div className="space-y-4">
+          <h3 className="text-sm font-medium text-gray-900">Make & Model</h3>
+          <div className="space-y-3">
+            <div className="space-y-1.5">
+              <Label htmlFor="make" className="text-xs text-gray-600">
+                Make
+              </Label>
+              <Select
+                onValueChange={(value) => handleFilterChange("make", value)}
+                value={filters.make}
+              >
+                <SelectTrigger className="bg-white">
+                  <SelectValue placeholder="All Makes" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Makes</SelectItem>
+                  {makes.map((make) => (
+                    <SelectItem key={make} value={make}>
+                      {make}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="model">Model</Label>
-            <Input
-              id="model"
-              onChange={(e) => handleFilterChange("model", e.target.value)}
-              placeholder="Enter model"
-              value={filters.model}
-            />
+            <div className="space-y-1.5">
+              <Label htmlFor="model" className="text-xs text-gray-600">
+                Model
+              </Label>
+              <Input
+                id="model"
+                onChange={(e) => handleFilterChange("model", e.target.value)}
+                placeholder="Any model"
+                value={filters.model}
+                className="bg-white"
+              />
+            </div>
           </div>
         </div>
 
-        {/* Advanced filters - collapsible */}
-        {isExpanded && (
-          <div className="space-y-4 border-t pt-4">
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <div className="space-y-2">
-                <Label htmlFor="minPrice">Min Price</Label>
-                <Input
-                  id="minPrice"
-                  onChange={(e) =>
-                    handleFilterChange("minPrice", e.target.value)
-                  }
-                  placeholder="0"
-                  type="number"
-                  value={filters.minPrice}
-                />
-              </div>
+        {/* Divider */}
+        <div className="border-t border-gray-100" />
 
-              <div className="space-y-2">
-                <Label htmlFor="maxPrice">Max Price</Label>
-                <Input
-                  id="maxPrice"
-                  onChange={(e) =>
-                    handleFilterChange("maxPrice", e.target.value)
-                  }
-                  placeholder="100000"
-                  type="number"
-                  value={filters.maxPrice}
-                />
-              </div>
+        {/* Price Range */}
+        <div className="space-y-4">
+          <h3 className="text-sm font-medium text-gray-900">Price Range</h3>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <Label htmlFor="minPrice" className="text-xs text-gray-600">
+                Min
+              </Label>
+              <Input
+                id="minPrice"
+                onChange={(e) => handleFilterChange("minPrice", e.target.value)}
+                placeholder="$0"
+                type="number"
+                value={filters.minPrice}
+                className="bg-white"
+              />
             </div>
-
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <div className="space-y-2">
-                <Label htmlFor="minYear">Min Year</Label>
-                <Select
-                  onValueChange={(value) =>
-                    handleFilterChange("minYear", value)
-                  }
-                  value={filters.minYear}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select year" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="any">Any Year</SelectItem>
-                    {years.map((year) => (
-                      <SelectItem key={year} value={year.toString()}>
-                        {year}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="maxYear">Max Year</Label>
-                <Select
-                  onValueChange={(value) =>
-                    handleFilterChange("maxYear", value)
-                  }
-                  value={filters.maxYear}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select year" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="any">Any Year</SelectItem>
-                    {years.map((year) => (
-                      <SelectItem key={year} value={year.toString()}>
-                        {year}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="maxPrice" className="text-xs text-gray-600">
+                Max
+              </Label>
+              <Input
+                id="maxPrice"
+                onChange={(e) => handleFilterChange("maxPrice", e.target.value)}
+                placeholder="Any"
+                type="number"
+                value={filters.maxPrice}
+                className="bg-white"
+              />
             </div>
+          </div>
+        </div>
 
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <div className="space-y-2">
-                <Label htmlFor="minMileage">Min Mileage</Label>
-                <Input
-                  id="minMileage"
-                  onChange={(e) =>
-                    handleFilterChange("minMileage", e.target.value)
-                  }
-                  placeholder="0"
-                  type="number"
-                  value={filters.minMileage}
-                />
-              </div>
+        {/* Divider */}
+        <div className="border-t border-gray-100" />
 
-              <div className="space-y-2">
-                <Label htmlFor="maxMileage">Max Mileage</Label>
-                <Input
-                  id="maxMileage"
-                  onChange={(e) =>
-                    handleFilterChange("maxMileage", e.target.value)
-                  }
-                  placeholder="200000"
-                  type="number"
-                  value={filters.maxMileage}
-                />
-              </div>
+        {/* Year Range */}
+        <div className="space-y-4">
+          <h3 className="text-sm font-medium text-gray-900">Year</h3>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <Label htmlFor="minYear" className="text-xs text-gray-600">
+                From
+              </Label>
+              <Select
+                onValueChange={(value) => handleFilterChange("minYear", value)}
+                value={filters.minYear}
+              >
+                <SelectTrigger className="bg-white">
+                  <SelectValue placeholder="Any" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="any">Any</SelectItem>
+                  {years.map((year) => (
+                    <SelectItem key={year} value={year.toString()}>
+                      {year}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="maxYear" className="text-xs text-gray-600">
+                To
+              </Label>
+              <Select
+                onValueChange={(value) => handleFilterChange("maxYear", value)}
+                value={filters.maxYear}
+              >
+                <SelectTrigger className="bg-white">
+                  <SelectValue placeholder="Any" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="any">Any</SelectItem>
+                  {years.map((year) => (
+                    <SelectItem key={year} value={year.toString()}>
+                      {year}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        </div>
+
+        {/* Divider */}
+        <div className="border-t border-gray-100" />
+
+        {/* Mileage Range */}
+        <div className="space-y-4">
+          <h3 className="text-sm font-medium text-gray-900">Mileage</h3>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <Label htmlFor="minMileage" className="text-xs text-gray-600">
+                Min
+              </Label>
+              <Input
+                id="minMileage"
+                onChange={(e) => handleFilterChange("minMileage", e.target.value)}
+                placeholder="0"
+                type="number"
+                value={filters.minMileage}
+                className="bg-white"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="maxMileage" className="text-xs text-gray-600">
+                Max
+              </Label>
+              <Input
+                id="maxMileage"
+                onChange={(e) => handleFilterChange("maxMileage", e.target.value)}
+                placeholder="Any"
+                type="number"
+                value={filters.maxMileage}
+                className="bg-white"
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Mobile Apply Button */}
+        {onMobileClose && (
+          <div className="pt-4 lg:hidden">
+            <Button
+              onClick={onMobileClose}
+              className="w-full text-white"
+            >
+              Apply Filters
+            </Button>
           </div>
         )}
       </CardContent>
-    </Card>
+    </>
+  );
+
+  return (
+    <>
+      {/* Mobile overlay */}
+      {isMobileOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm lg:hidden animate-in fade-in-0 duration-200"
+          onClick={onMobileClose}
+        />
+      )}
+
+      {/* Desktop Card */}
+      <Card
+        className={`${className} hidden lg:block border-gray-200 shadow-sm`}
+      >
+        {filterContent}
+      </Card>
+
+      {/* Mobile Slide-in Panel */}
+      <div
+        className={`fixed inset-y-0 left-0 z-50 w-80 transform bg-white shadow-2xl transition-transform duration-300 ease-in-out lg:hidden ${
+          isMobileOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
+      >
+        <div className="flex h-full flex-col overflow-y-auto">
+          {filterContent}
+        </div>
+      </div>
     </>
   );
 }

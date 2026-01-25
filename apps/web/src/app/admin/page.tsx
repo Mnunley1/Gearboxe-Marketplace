@@ -165,7 +165,7 @@ export default function AdminDashboardPage() {
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                <Button asChild className="text-white">
+                <Button asChild>
                   <Link href="/admin/listings">
                     <Car className="mr-2 h-5 w-5" />
                     Manage Listings

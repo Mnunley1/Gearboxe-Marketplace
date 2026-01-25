@@ -162,10 +162,10 @@ export default function AdminEventsPage() {
                       </Link>
                     </Button>
                     <Button
-                      className="text-red-600 hover:bg-red-50 hover:text-red-700"
+                      className="text-red-600"
                       onClick={() => handleDeleteEvent(event._id)}
                       size="sm"
-                      variant="outline"
+                      variant="destructive"
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>

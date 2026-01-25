@@ -210,7 +210,7 @@ export function MessageThread({
               value={newMessage}
             />
             <Button
-              className="rounded-lg px-4 py-2"
+              className="rounded-lg"
               disabled={!newMessage.trim() || isLoading}
               onClick={handleSendMessage}
               size="sm"

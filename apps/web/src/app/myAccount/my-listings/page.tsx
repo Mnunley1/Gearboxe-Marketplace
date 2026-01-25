@@ -217,7 +217,7 @@ export default function MyListingsPage() {
                 Manage your vehicle listings and registrations
               </p>
             </div>
-            <Button asChild className="text-white">
+            <Button asChild>
               <Link href="/myAccount/new-listing">
                 <Plus className="mr-2 h-5 w-5" />
                 New Listing
@@ -313,7 +313,7 @@ export default function MyListingsPage() {
                             </span>
                             {registration.qrCodeData && (
                               <Button
-                                className="bg-white/80 hover:bg-white"
+                                className="bg-white/80"
                                 onClick={() =>
                                   setSelectedQR(registration.qrCodeData!)
                                 }
@@ -355,7 +355,7 @@ export default function MyListingsPage() {
                             )}
                             {registration.paymentStatus === "completed" && registration.qrCodeData && (
                               <Button
-                                className="mt-2 text-white"
+                                className="mt-2"
                                 disabled={resendingEmail === registration._id}
                                 onClick={async () => {
                                   try {
@@ -387,7 +387,7 @@ export default function MyListingsPage() {
                             {registration.paymentStatus === "pending" && (
                               <Button
                                 asChild
-                                className="mt-2 text-white"
+                                className="mt-2"
                                 size="sm"
                               >
                                 <Link href={`/myAccount/payment?registrationId=${registration._id}&vehicleId=${vehicle._id}&eventId=${registration.eventId}`}>
@@ -475,7 +475,7 @@ export default function MyListingsPage() {
                     <div className="flex flex-col justify-center gap-2 border-gray-200 border-l p-6 sm:w-48">
                       <Button
                         asChild
-                        className="w-full text-white"
+                        className="w-full"
                         size="sm"
                         variant="default"
                       >
@@ -486,7 +486,7 @@ export default function MyListingsPage() {
                       </Button>
                       <Button
                         asChild
-                        className="w-full text-white"
+                        className="w-full"
                         size="sm"
                         variant="default"
                       >
@@ -496,7 +496,7 @@ export default function MyListingsPage() {
                         </Link>
                       </Button>
                       <Button
-                        className="w-full text-white"
+                        className="w-full"
                         onClick={() =>
                           setVehicleToDelete({
                             id: vehicle._id,
@@ -547,7 +547,7 @@ export default function MyListingsPage() {
                   Create your first vehicle listing to get started selling at
                   our events.
                 </p>
-                <Button asChild className="text-white">
+                <Button asChild>
                   <Link href="/myAccount/new-listing">
                     Create Your First Listing
                   </Link>
@@ -589,7 +589,6 @@ export default function MyListingsPage() {
                 Cancel
               </Button>
               <Button
-                className="text-white"
                 disabled={isDeleting}
                 onClick={handleDeleteVehicle}
                 size="sm"

@@ -24,7 +24,7 @@ export default function AdminLayout({
   // Show loading while auth is being determined
   if (!authLoaded || isLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gray-50">
+      <div className="flex min-h-screen items-center justify-center bg-white">
         <div className="text-center">
           <div className="mx-auto h-32 w-32 animate-spin rounded-full border-primary border-b-2" />
           <p className="mt-4 text-gray-600">Loading admin panel...</p>
@@ -41,7 +41,7 @@ export default function AdminLayout({
   return (
     <div className="admin-gradient flex min-h-screen flex-col">
       <AdminNavbar />
-      <main className="flex-1 bg-gray-50">{children}</main>
+      <main className="flex-1 bg-white">{children}</main>
       <Footer />
     </div>
   );

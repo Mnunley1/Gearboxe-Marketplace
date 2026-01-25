@@ -4,7 +4,7 @@ import { api } from "@car-market/convex/_generated/api";
 import { Button } from "@car-market/ui/button";
 import { Card, CardContent, CardFooter } from "@car-market/ui/card";
 import { useMutation, useQuery } from "convex/react";
-import { Car, Heart } from "lucide-react";
+import { ArrowRight, Car, Gauge, Heart, MapPin } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -152,126 +152,129 @@ export function VehicleCard({
   const formatMileage = (mileage: number) =>
     new Intl.NumberFormat("en-US").format(mileage);
 
+  const photoCount = vehicle.photoUrls?.length ?? vehicle.photos?.length ?? 0;
+  const primaryPhoto = vehicle.photoUrls?.[0] ?? vehicle.photos?.[0];
+
   return (
     <>
-      <Card className="group overflow-hidden border-gray-200 bg-white transition-all duration-200 hover:border-gray-300 hover:shadow-xl">
-        <div className="relative aspect-[4/3] overflow-hidden bg-gray-100">
-          {(vehicle.photoUrls?.length ?? vehicle.photos?.length ?? 0) > 0 ? (
+      <Card className="group relative overflow-hidden border-gray-200/60 bg-white hover:border-gray-300/80 hover:shadow-xl hover:shadow-gray-200/50">
+        {/* Image Container */}
+        <div className="relative aspect-[4/3] overflow-hidden bg-gradient-to-br from-gray-100 to-gray-50">
+          {primaryPhoto ? (
             <Image
               alt={vehicle.title}
-              className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+              className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
               height={300}
-              src={vehicle.photoUrls?.[0] ?? vehicle.photos?.[0] ?? ""}
+              src={primaryPhoto}
               width={400}
             />
           ) : (
-            <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-gray-100 to-gray-200">
-              <Car className="h-16 w-16 text-gray-400" />
+            <div className="flex h-full w-full items-center justify-center">
+              <div className="flex flex-col items-center gap-2">
+                <div className="rounded-full bg-gray-200/80 p-4">
+                  <Car className="h-8 w-8 text-gray-400" />
+                </div>
+                <span className="text-xs text-gray-400">No image</span>
+              </div>
             </div>
           )}
+
+          {/* Gradient Overlay */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
 
           {/* Sale Status Badge */}
           {vehicle.saleStatus && vehicle.saleStatus !== "available" && (
             <div
-              className={`absolute top-3 left-3 z-10 rounded-full px-3 py-1 text-xs font-bold shadow-md ${
+              className={`absolute top-3 left-3 z-10 flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-bold uppercase tracking-wide shadow-lg ${
                 vehicle.saleStatus === "sold"
-                  ? "bg-red-600 text-white"
+                  ? "bg-red-500 text-white"
                   : vehicle.saleStatus === "salePending"
-                    ? "bg-yellow-500 text-white"
+                    ? "bg-amber-500 text-white"
                     : ""
               }`}
             >
+              <span className="h-1.5 w-1.5 rounded-full bg-current opacity-75 animate-pulse" />
               {vehicle.saleStatus === "sold"
-                ? "SOLD"
+                ? "Sold"
                 : vehicle.saleStatus === "salePending"
-                  ? "SALE PENDING"
+                  ? "Sale Pending"
                   : ""}
             </div>
           )}
 
           {/* Photo count badge */}
-          {(vehicle.photoUrls?.length ?? vehicle.photos?.length ?? 0) > 1 && (
-            <div className="absolute bottom-3 right-3 z-10 rounded-full bg-black/60 px-2 py-1 text-xs font-medium text-white backdrop-blur-sm">
-              {(vehicle.photoUrls?.length ?? vehicle.photos?.length ?? 0)} photos
+          {photoCount > 1 && (
+            <div className="absolute bottom-3 left-3 z-10 flex items-center gap-1.5 rounded-full bg-black/60 px-2.5 py-1 text-xs font-medium text-white backdrop-blur-sm">
+              <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+              {photoCount}
             </div>
           )}
 
+          {/* Favorite Button */}
           {showFavorite && (
             <Button
-              className="absolute top-3 right-3 z-20 h-9 w-9 rounded-full bg-white/90 shadow-md backdrop-blur-sm transition-all hover:bg-white hover:scale-110"
+              className={`absolute top-3 right-3 z-20 rounded-full shadow-lg backdrop-blur-sm ${
+                isFavorited
+                  ? "bg-red-500 text-white border-transparent hover:bg-red-600 active:bg-red-700"
+                  : "bg-white/90 text-gray-700 border-transparent hover:bg-white active:bg-gray-100"
+              }`}
               disabled={isLoading || userLoading}
               onClick={handleFavoriteToggle}
               size="icon"
-              variant="ghost"
+              variant="outline"
             >
               <Heart
-                className={`h-4 w-4 transition-all ${
-                  isFavorited ? "fill-red-500 text-red-500" : "text-gray-700"
+                className={`h-4.5 w-4.5 transition-all duration-200 ${
+                  isFavorited ? "fill-current scale-110" : ""
                 } ${isLoading || userLoading ? "opacity-50" : ""}`}
               />
             </Button>
           )}
+
+          {/* Quick View Overlay - appears on hover */}
+          <div className="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+            <Link
+              href={`/vehicles/${vehicle._id}`}
+              className="flex items-center gap-2 rounded-full bg-white px-5 py-2.5 font-medium text-sm text-gray-900 shadow-xl transition-transform duration-200 hover:scale-105"
+            >
+              Quick View
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
         </div>
 
         <CardContent className="p-5">
           <div className="space-y-3">
-            {/* Price - Prominent */}
-            <div className="flex items-start justify-between">
-              <div className="flex-1">
-                <h3 className="line-clamp-2 font-bold text-gray-900 text-lg leading-tight">
+            {/* Title and Price Row */}
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0 flex-1">
+                <h3 className="truncate font-semibold text-gray-900 text-base leading-tight group-hover:text-primary transition-colors duration-200">
                   {vehicle.title}
                 </h3>
-                <p className="mt-1 text-gray-600 text-sm">
+                <p className="mt-0.5 text-gray-500 text-sm">
                   {vehicle.year} {vehicle.make} {vehicle.model}
                 </p>
               </div>
-              <div className="ml-3 text-right">
-                <div className="font-bold text-primary text-xl">
+              <div className="flex-shrink-0 text-right">
+                <div className="font-bold text-primary text-lg tabular-nums tracking-tight">
                   {formatPrice(vehicle.price)}
                 </div>
               </div>
             </div>
 
-            {/* Key Details */}
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 border-t border-gray-100 pt-3">
-              <div className="flex items-center text-gray-600 text-sm">
-                <svg
-                  className="mr-1.5 h-4 w-4 text-gray-400"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                  />
-                </svg>
-                {formatMileage(vehicle.mileage)} mi
+            {/* Details Row */}
+            <div className="flex items-center gap-4 border-t border-gray-100 pt-3">
+              <div className="flex items-center gap-1.5 text-gray-600 text-sm">
+                <Gauge className="h-4 w-4 text-gray-400" />
+                <span className="tabular-nums">{formatMileage(vehicle.mileage)}</span>
+                <span className="text-gray-400">mi</span>
               </div>
               {event && (
-                <div className="flex items-center text-gray-600 text-sm">
-                  <svg
-                    className="mr-1.5 h-4 w-4 text-gray-400"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                    />
-                    <path
-                      d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                    />
-                  </svg>
-                  {event.location}
+                <div className="flex items-center gap-1.5 text-gray-600 text-sm">
+                  <MapPin className="h-4 w-4 text-gray-400" />
+                  <span className="truncate">{event.location}</span>
                 </div>
               )}
             </div>
@@ -279,35 +282,20 @@ export function VehicleCard({
         </CardContent>
 
         <CardFooter className="border-t border-gray-100 p-0">
-          <Button
-            asChild
-            className="w-full rounded-none border-0 bg-transparent font-semibold text-primary hover:bg-gray-50"
-            variant="ghost"
+          <Link
+            href={`/vehicles/${vehicle._id}`}
+            className="flex w-full items-center justify-center gap-2 py-3.5 font-medium text-sm text-primary transition-all duration-200 hover:bg-primary/5 hover:gap-3"
           >
-            <Link href={`/vehicles/${vehicle._id}`}>
-              View Details
-              <svg
-                className="ml-2 h-4 w-4"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  d="M9 5l7 7-7 7"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                />
-              </svg>
-            </Link>
-          </Button>
+            View Details
+            <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5" />
+          </Link>
         </CardFooter>
       </Card>
 
       {/* Auth Dialog - render outside fragment to avoid transform issues */}
       {showAuthDialog && (
         <div
-          className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm animate-in fade-in-0"
+          className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm animate-in fade-in-0 duration-200"
           onClick={() => setShowAuthDialog(false)}
           role="dialog"
           aria-modal="true"
@@ -316,17 +304,17 @@ export function VehicleCard({
           style={{ position: "fixed" }}
         >
           <div
-            className="relative w-full max-w-md rounded-xl border border-gray-200 bg-white shadow-2xl animate-in zoom-in-95 fade-in-0 slide-in-from-bottom-4"
+            className="relative w-full max-w-md rounded-2xl border border-gray-200 bg-white p-8 shadow-2xl animate-in zoom-in-95 fade-in-0 slide-in-from-bottom-4 duration-300"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Close button */}
             <button
               onClick={() => setShowAuthDialog(false)}
-              className="absolute right-4 top-4 rounded-sm opacity-70 transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-gray-950 focus:ring-offset-2 disabled:pointer-events-none"
+              className="absolute right-4 top-4 rounded-full p-2 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
               aria-label="Close dialog"
             >
               <svg
-                className="h-4 w-4 text-gray-500"
+                className="h-5 w-5"
                 fill="none"
                 stroke="currentColor"
                 strokeWidth="2"
@@ -338,47 +326,43 @@ export function VehicleCard({
                   strokeLinejoin="round"
                 />
               </svg>
-              <span className="sr-only">Close</span>
             </button>
 
             {/* Content */}
-            <div className="p-6">
+            <div className="text-center">
               {/* Icon */}
-              <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
-                <Heart className="h-6 w-6 text-primary" fill="currentColor" />
+              <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-primary/10 to-primary/5">
+                <Heart className="h-8 w-8 text-primary" />
               </div>
 
-              <div className="mb-6 text-center">
-                  <h2
-                    id={`auth-dialog-title-${vehicle._id}`}
-                    className="mb-2 font-semibold text-gray-900 text-xl"
-                  >
-                    Sign in to favorite vehicles
-                  </h2>
-                  <p
-                    id={`auth-dialog-description-${vehicle._id}`}
-                    className="text-gray-600 text-sm"
-                  >
-                  Create an account or sign in to save vehicles to your
-                  favorites list and get notified about price changes.
-                </p>
-              </div>
+              <h2
+                id={`auth-dialog-title-${vehicle._id}`}
+                className="mb-2 font-semibold text-gray-900 text-xl"
+              >
+                Save Your Favorites
+              </h2>
+              <p
+                id={`auth-dialog-description-${vehicle._id}`}
+                className="mb-8 text-gray-600 text-sm leading-relaxed"
+              >
+                Create an account or sign in to save vehicles to your favorites and get notified about price changes.
+              </p>
 
-              <div className="flex flex-col gap-3 sm:flex-row sm:justify-end">
+              <div className="flex flex-col gap-3">
                 <Button
                   asChild
-                  variant="outline"
-                  className="w-full sm:w-auto"
-                  onClick={() => setShowAuthDialog(false)}
-                >
-                  <Link href="/sign-in">Sign In</Link>
-                </Button>
-                <Button
-                  asChild
-                  className="w-full text-white sm:w-auto"
+                  className="w-full shadow-md shadow-primary/20"
                   onClick={() => setShowAuthDialog(false)}
                 >
                   <Link href="/sign-up">Create Account</Link>
+                </Button>
+                <Button
+                  asChild
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => setShowAuthDialog(false)}
+                >
+                  <Link href="/sign-in">Sign In</Link>
                 </Button>
               </div>
             </div>

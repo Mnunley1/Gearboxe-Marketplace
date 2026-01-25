@@ -121,7 +121,7 @@ export function VehicleCard({
 
         {showFavorite && convexUser && (
           <Button
-            className="absolute top-2 right-2 bg-white/80 hover:bg-white"
+            className="absolute top-2 right-2 bg-white/80"
             disabled={isLoading}
             onClick={handleFavoriteToggle}
             size="icon"

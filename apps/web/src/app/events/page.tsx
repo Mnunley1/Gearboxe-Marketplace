@@ -46,7 +46,7 @@ export default function EventsPage() {
         )}
 
         {/* Event Info */}
-        <div className="mt-16 rounded-lg bg-gray-50 p-8">
+        <div className="mt-16 rounded-lg border border-gray-200 bg-white p-8 shadow-sm">
           <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
             <div>
               <h3 className="mb-4 font-semibold text-gray-900 text-xl">

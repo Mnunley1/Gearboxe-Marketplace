@@ -239,10 +239,10 @@ export function ImageUpload({
                 <div className="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity group-hover:opacity-100">
                   <div className="flex gap-2">
                     <Button
-                      className="h-8 w-8 rounded-full bg-white/90 p-0 hover:bg-white"
+                      className="rounded-full bg-white/90 hover:bg-white"
                       disabled={disabled}
                       onClick={() => handleRemove(index)}
-                      size="sm"
+                      size="icon-sm"
                       type="button"
                       variant="ghost"
                     >

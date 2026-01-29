@@ -60,6 +60,8 @@ export const updateUserRole = mutation({
     ),
   },
   handler: async (ctx, args) => {
+    await requireSuperAdmin(ctx);
+
     const user = await userByExternalId(ctx, args.externalId);
 
     if (!user) {
@@ -116,6 +118,22 @@ export async function getCurrentUser(ctx: QueryCtx) {
     return null;
   }
   return await userByExternalId(ctx, identity.subject);
+}
+
+export async function requireAdmin(ctx: QueryCtx) {
+  const user = await getCurrentUserOrThrow(ctx);
+  if (user.role !== "admin" && user.role !== "superAdmin") {
+    throw new Error("Unauthorized: admin access required");
+  }
+  return user;
+}
+
+export async function requireSuperAdmin(ctx: QueryCtx) {
+  const user = await getCurrentUserOrThrow(ctx);
+  if (user.role !== "superAdmin") {
+    throw new Error("Unauthorized: superAdmin access required");
+  }
+  return user;
 }
 
 async function userByExternalId(ctx: QueryCtx, externalId: string) {

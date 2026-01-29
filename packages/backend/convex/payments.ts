@@ -46,15 +46,30 @@ export const createEventRegistrationCheckout = action({
       throw new Error("User not found");
     }
     
+    // Verify current user matches args.userId
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new Error("Unauthorized: not authenticated");
+    }
+    // Look up the user by identity to confirm they match args.userId
+    if (user.externalId !== identity.subject) {
+      throw new Error("Unauthorized: user mismatch");
+    }
+
     // Get event details
     const event = await ctx.runQuery(internal.events.getEventById, {
       id: args.eventId,
     });
-    
+
     if (!event) {
       throw new Error("Event not found");
     }
-    
+
+    // Validate amount matches event vendor price
+    if (args.amount !== event.vendorPrice) {
+      throw new Error("Invalid amount: does not match event vendor price");
+    }
+
     // Get vehicle details
     const vehicle = await ctx.runQuery(internal.vehicles.getVehicleById, {
       id: args.vehicleId,

@@ -2,6 +2,7 @@ import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import { components } from "./_generated/api";
 import { R2 } from "@convex-dev/r2";
+import { getCurrentUser, getCurrentUserOrThrow, requireAdmin } from "./users";
 
 // Initialize R2 component client
 const r2 = new R2(components.r2);
@@ -34,6 +35,8 @@ export const createVehicle = mutation({
     contactInfo: v.string(),
   },
   handler: async (ctx, args) => {
+    const currentUser = await getCurrentUserOrThrow(ctx);
+
     // Validate that the event exists and is upcoming
     const event = await ctx.db.get(args.eventId);
     if (!event) {
@@ -46,6 +49,7 @@ export const createVehicle = mutation({
 
     return await ctx.db.insert("vehicles", {
       ...args,
+      userId: currentUser._id,
       status: "pending",
       saleStatus: "available",
       createdAt: Date.now(),
@@ -200,6 +204,10 @@ export const getVehicleById = query({
 export const getVehiclesByUser = query({
   args: { userId: v.id("users") },
   handler: async (ctx, args) => {
+    const currentUser = await getCurrentUserOrThrow(ctx);
+    if (currentUser._id !== args.userId && currentUser.role !== "admin" && currentUser.role !== "superAdmin") {
+      throw new Error("Unauthorized: cannot view another user's vehicles");
+    }
     const vehicles = await ctx.db
       .query("vehicles")
       .withIndex("by_user", (q) => q.eq("userId", args.userId))
@@ -225,14 +233,20 @@ export const getVehiclesByUser = query({
 export const getVehiclesByEvent = query({
   args: { eventId: v.id("events") },
   handler: async (ctx, args) => {
+    const currentUser = await getCurrentUser(ctx);
+    const isAdmin = currentUser?.role === "admin" || currentUser?.role === "superAdmin";
+
     const vehicles = await ctx.db
       .query("vehicles")
       .withIndex("by_event", (q) => q.eq("eventId", args.eventId))
       .collect();
 
+    // Non-admins only see approved vehicles
+    const filtered = isAdmin ? vehicles : vehicles.filter((v) => v.status === "approved");
+
     // Resolve photo URLs for all vehicles
     const vehiclesWithPhotos = await Promise.all(
-      vehicles.map(async (vehicle) => {
+      filtered.map(async (vehicle) => {
         const photoUrls = await getPhotoUrls(vehicle.photos);
         return {
           ...vehicle,
@@ -275,7 +289,17 @@ export const updateVehicle = mutation({
     ),
   },
   handler: async (ctx, args) => {
+    const currentUser = await getCurrentUserOrThrow(ctx);
     const { id, eventId, ...updates } = args;
+
+    // Verify ownership or admin
+    const existingVehicle = await ctx.db.get(id);
+    if (!existingVehicle) {
+      throw new Error("Vehicle not found");
+    }
+    if (existingVehicle.userId !== currentUser._id && currentUser.role !== "admin" && currentUser.role !== "superAdmin") {
+      throw new Error("Unauthorized: not vehicle owner or admin");
+    }
 
     // If photos are being updated, clean up old photos that are no longer referenced
     if (updates.photos !== undefined) {
@@ -326,6 +350,14 @@ export const updateSaleStatus = mutation({
     ),
   },
   handler: async (ctx, args) => {
+    const currentUser = await getCurrentUserOrThrow(ctx);
+    const vehicle = await ctx.db.get(args.id);
+    if (!vehicle) {
+      throw new Error("Vehicle not found");
+    }
+    if (vehicle.userId !== currentUser._id && currentUser.role !== "admin" && currentUser.role !== "superAdmin") {
+      throw new Error("Unauthorized: not vehicle owner or admin");
+    }
     await ctx.db.patch(args.id, { saleStatus: args.saleStatus });
   },
 });
@@ -333,9 +365,13 @@ export const updateSaleStatus = mutation({
 export const deleteVehicle = mutation({
   args: { id: v.id("vehicles") },
   handler: async (ctx, args) => {
+    const currentUser = await getCurrentUserOrThrow(ctx);
     const vehicle = await ctx.db.get(args.id);
     if (!vehicle) {
       throw new Error("Vehicle not found");
+    }
+    if (vehicle.userId !== currentUser._id && currentUser.role !== "admin" && currentUser.role !== "superAdmin") {
+      throw new Error("Unauthorized: not vehicle owner or admin");
     }
 
     // Delete all associated photos
@@ -355,6 +391,7 @@ export const deleteVehicle = mutation({
 export const approveVehicle = mutation({
   args: { id: v.id("vehicles") },
   handler: async (ctx, args) => {
+    await requireAdmin(ctx);
     await ctx.db.patch(args.id, { status: "approved" });
   },
 });
@@ -362,6 +399,7 @@ export const approveVehicle = mutation({
 export const rejectVehicle = mutation({
   args: { id: v.id("vehicles") },
   handler: async (ctx, args) => {
+    await requireAdmin(ctx);
     await ctx.db.patch(args.id, { status: "rejected" });
   },
 });
@@ -373,6 +411,7 @@ export const rejectVehicle = mutation({
 export const migrateVehiclePhotos = mutation({
   args: {},
   handler: async (ctx) => {
+    await requireAdmin(ctx);
     const vehicles = await ctx.db.query("vehicles").collect();
     let fixed = 0;
     

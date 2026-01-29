@@ -1,6 +1,7 @@
 import { v } from "convex/values";
 import { internalMutation, mutation, query } from "./_generated/server";
 import { internal } from "./_generated/api";
+import { getCurrentUserOrThrow, requireAdmin } from "./users";
 
 /**
  * Create a pending registration before payment
@@ -14,6 +15,11 @@ export const createPendingRegistration = mutation({
     userId: v.id("users"),
   },
   handler: async (ctx, args) => {
+    const currentUser = await getCurrentUserOrThrow(ctx);
+    if (currentUser._id !== args.userId) {
+      throw new Error("Unauthorized: cannot register on behalf of another user");
+    }
+
     // Check if event exists and is upcoming
     const event = await ctx.db.get(args.eventId);
     if (!event) {
@@ -187,9 +193,13 @@ export const resendConfirmationEmail = mutation({
     registrationId: v.id("registrations"),
   },
   handler: async (ctx, args) => {
+    const currentUser = await getCurrentUserOrThrow(ctx);
     const registration = await ctx.db.get(args.registrationId);
     if (!registration) {
       throw new Error("Registration not found");
+    }
+    if (registration.userId !== currentUser._id) {
+      throw new Error("Unauthorized: not the registration owner");
     }
     
     if (registration.paymentStatus !== "completed") {
@@ -217,6 +227,7 @@ export const resendConfirmationEmail = mutation({
 export const getRegistrationsByEvent = query({
   args: { eventId: v.id("events") },
   handler: async (ctx, args) => {
+    await requireAdmin(ctx);
     const registrations = await ctx.db
       .query("registrations")
       .withIndex("by_event", (q) => q.eq("eventId", args.eventId))
@@ -240,6 +251,10 @@ export const getRegistrationsByEvent = query({
 export const getRegistrationsByUser = query({
   args: { userId: v.id("users") },
   handler: async (ctx, args) => {
+    const currentUser = await getCurrentUserOrThrow(ctx);
+    if (currentUser._id !== args.userId) {
+      throw new Error("Unauthorized: cannot view another user's registrations");
+    }
     const registrations = await ctx.db
       .query("registrations")
       .withIndex("by_user", (q) => q.eq("userId", args.userId))
@@ -263,13 +278,18 @@ export const getRegistrationsByUser = query({
 export const getRegistrationById = query({
   args: { id: v.id("registrations") },
   handler: async (ctx, args) => {
+    const currentUser = await getCurrentUserOrThrow(ctx);
     const registration = await ctx.db.get(args.id);
     if (!registration) return null;
-    
+
+    if (registration.userId !== currentUser._id && currentUser.role !== "admin" && currentUser.role !== "superAdmin") {
+      throw new Error("Unauthorized: not the registration owner or admin");
+    }
+
     const vehicle = await ctx.db.get(registration.vehicleId);
     const event = await ctx.db.get(registration.eventId);
     const user = await ctx.db.get(registration.userId);
-    
+
     return {
       registration,
       vehicle,
@@ -282,6 +302,7 @@ export const getRegistrationById = query({
 export const getRegistrationByVehicle = query({
   args: { vehicleId: v.id("vehicles") },
   handler: async (ctx, args) => {
+    const currentUser = await getCurrentUserOrThrow(ctx);
     const registration = await ctx.db
       .query("registrations")
       .withIndex("by_vehicle", (q) => q.eq("vehicleId", args.vehicleId))
@@ -289,6 +310,10 @@ export const getRegistrationByVehicle = query({
 
     if (!registration) {
       return null;
+    }
+
+    if (registration.userId !== currentUser._id && currentUser.role !== "admin" && currentUser.role !== "superAdmin") {
+      throw new Error("Unauthorized: not the registration owner or admin");
     }
 
     const event = await ctx.db.get(registration.eventId);
@@ -305,6 +330,7 @@ export const getRegistrationByVehicle = query({
 export const checkInRegistration = mutation({
   args: { id: v.id("registrations") },
   handler: async (ctx, args) => {
+    await requireAdmin(ctx);
     const registration = await ctx.db.get(args.id);
     if (!registration) {
       throw new Error("Registration not found");
@@ -319,6 +345,7 @@ export const checkInRegistration = mutation({
 export const validateQRCode = query({
   args: { qrCodeData: v.string() },
   handler: async (ctx, args) => {
+    await requireAdmin(ctx);
     const registration = await ctx.db
       .query("registrations")
       .filter((q) => q.eq(q.field("qrCodeData"), args.qrCodeData))

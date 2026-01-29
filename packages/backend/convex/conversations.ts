@@ -1,5 +1,6 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
+import { getCurrentUserOrThrow } from "./users";
 
 export const getOrCreateConversation = mutation({
   args: {
@@ -8,6 +9,11 @@ export const getOrCreateConversation = mutation({
     participant2Id: v.id("users"),
   },
   handler: async (ctx, args) => {
+    const currentUser = await getCurrentUserOrThrow(ctx);
+    if (currentUser._id !== args.participant1Id && currentUser._id !== args.participant2Id) {
+      throw new Error("Unauthorized: must be a participant");
+    }
+
     // Ensure consistent ordering of participants
     const [participant1Id, participant2Id] =
       args.participant1Id < args.participant2Id
@@ -43,6 +49,10 @@ export const getOrCreateConversation = mutation({
 export const getConversationsByUser = query({
   args: { userId: v.id("users") },
   handler: async (ctx, args) => {
+    const currentUser = await getCurrentUserOrThrow(ctx);
+    if (currentUser._id !== args.userId) {
+      throw new Error("Unauthorized: cannot view another user's conversations");
+    }
     const conversations = await ctx.db
       .query("conversations")
       .withIndex("by_participant1", (q) => q.eq("participant1Id", args.userId))
@@ -115,12 +125,21 @@ export const getConversationsByUser = query({
 
 export const getConversationById = query({
   args: { conversationId: v.id("conversations") },
-  handler: async (ctx, args) => await ctx.db.get(args.conversationId),
+  handler: async (ctx, args) => {
+    const currentUser = await getCurrentUserOrThrow(ctx);
+    const conversation = await ctx.db.get(args.conversationId);
+    if (!conversation) return null;
+    if (conversation.participant1Id !== currentUser._id && conversation.participant2Id !== currentUser._id) {
+      throw new Error("Unauthorized: not a participant");
+    }
+    return conversation;
+  },
 });
 
 export const updateLastMessageTime = mutation({
   args: { conversationId: v.id("conversations") },
   handler: async (ctx, args) => {
+    await getCurrentUserOrThrow(ctx);
     await ctx.db.patch(args.conversationId, {
       lastMessageAt: Date.now(),
     });
@@ -134,6 +153,11 @@ export const getConversationByParticipants = query({
     participant2Id: v.id("users"),
   },
   handler: async (ctx, args) => {
+    const currentUser = await getCurrentUserOrThrow(ctx);
+    if (currentUser._id !== args.participant1Id && currentUser._id !== args.participant2Id) {
+      throw new Error("Unauthorized: must be a participant");
+    }
+
     // Ensure consistent ordering of participants
     const [participant1Id, participant2Id] =
       args.participant1Id < args.participant2Id

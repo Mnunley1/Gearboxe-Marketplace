@@ -1,5 +1,6 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
+import { requireAdmin } from "./users";
 
 export const createCity = mutation({
   args: {
@@ -7,12 +8,14 @@ export const createCity = mutation({
     state: v.string(),
     slug: v.string(),
   },
-  handler: async (ctx, args) =>
-    await ctx.db.insert("cities", {
+  handler: async (ctx, args) => {
+    await requireAdmin(ctx);
+    return await ctx.db.insert("cities", {
       ...args,
       active: true,
       createdAt: Date.now(),
-    }),
+    });
+  },
 });
 
 export const getCities = query({
@@ -41,6 +44,7 @@ export const updateCity = mutation({
     active: v.optional(v.boolean()),
   },
   handler: async (ctx, args) => {
+    await requireAdmin(ctx);
     const { id, ...updates } = args;
     await ctx.db.patch(id, updates);
   },

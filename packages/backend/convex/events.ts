@@ -1,5 +1,6 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
+import { requireAdmin } from "./users";
 
 export const createEvent = mutation({
   args: {
@@ -12,11 +13,13 @@ export const createEvent = mutation({
     description: v.string(),
     vendorPrice: v.number(),
   },
-  handler: async (ctx, args) =>
-    await ctx.db.insert("events", {
+  handler: async (ctx, args) => {
+    await requireAdmin(ctx);
+    return await ctx.db.insert("events", {
       ...args,
       createdAt: Date.now(),
-    }),
+    });
+  },
 });
 
 export const getEvents = query({
@@ -110,6 +113,7 @@ export const updateEvent = mutation({
     vendorPrice: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
+    await requireAdmin(ctx);
     const { id, ...updates } = args;
     await ctx.db.patch(id, updates);
   },
@@ -162,6 +166,7 @@ export const getEventCapacity = query({
 export const deleteEvent = mutation({
   args: { id: v.id("events") },
   handler: async (ctx, args) => {
+    await requireAdmin(ctx);
     await ctx.db.delete(args.id);
   },
 });

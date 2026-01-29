@@ -1,5 +1,6 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
+import { getCurrentUserOrThrow } from "./users";
 
 export const addFavorite = mutation({
   args: {
@@ -7,6 +8,10 @@ export const addFavorite = mutation({
     vehicleId: v.id("vehicles"),
   },
   handler: async (ctx, args) => {
+    const currentUser = await getCurrentUserOrThrow(ctx);
+    if (currentUser._id !== args.userId) {
+      throw new Error("Unauthorized: cannot favorite on behalf of another user");
+    }
     // Check if already favorited
     const existing = await ctx.db
       .query("favorites")
@@ -32,6 +37,10 @@ export const removeFavorite = mutation({
     vehicleId: v.id("vehicles"),
   },
   handler: async (ctx, args) => {
+    const currentUser = await getCurrentUserOrThrow(ctx);
+    if (currentUser._id !== args.userId) {
+      throw new Error("Unauthorized: cannot unfavorite on behalf of another user");
+    }
     const favorite = await ctx.db
       .query("favorites")
       .withIndex("by_user_vehicle", (q) =>
@@ -48,6 +57,10 @@ export const removeFavorite = mutation({
 export const getFavoritesByUser = query({
   args: { userId: v.id("users") },
   handler: async (ctx, args) => {
+    const currentUser = await getCurrentUserOrThrow(ctx);
+    if (currentUser._id !== args.userId) {
+      throw new Error("Unauthorized: cannot view another user's favorites");
+    }
     const favorites = await ctx.db
       .query("favorites")
       .withIndex("by_user", (q) => q.eq("userId", args.userId))
@@ -71,6 +84,10 @@ export const isFavorited = query({
     vehicleId: v.id("vehicles"),
   },
   handler: async (ctx, args) => {
+    const currentUser = await getCurrentUserOrThrow(ctx);
+    if (currentUser._id !== args.userId) {
+      throw new Error("Unauthorized: cannot check another user's favorites");
+    }
     const favorite = await ctx.db
       .query("favorites")
       .withIndex("by_user_vehicle", (q) =>

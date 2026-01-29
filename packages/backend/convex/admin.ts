@@ -1,8 +1,10 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
+import { requireAdmin, requireSuperAdmin } from "./users";
 
 export const getAdminStats = query({
   handler: async (ctx) => {
+    await requireAdmin(ctx);
     const vehicles = await ctx.db.query("vehicles").collect();
     const events = await ctx.db.query("events").collect();
     const registrations = await ctx.db.query("registrations").collect();
@@ -26,6 +28,7 @@ export const getAdminStats = query({
 
 export const getAllVehicles = query({
   handler: async (ctx) => {
+    await requireAdmin(ctx);
     const vehicles = await ctx.db.query("vehicles").collect();
 
     // Get user details for each vehicle
@@ -42,6 +45,7 @@ export const getAllVehicles = query({
 
 export const getAllEvents = query({
   handler: async (ctx) => {
+    await requireAdmin(ctx);
     const events = await ctx.db.query("events").collect();
 
     // Get city details for each event
@@ -58,6 +62,7 @@ export const getAllEvents = query({
 
 export const getAllUsers = query({
   handler: async (ctx) => {
+    await requireAdmin(ctx);
     const users = await ctx.db.query("users").collect();
     return users.sort((a, b) => b.createdAt - a.createdAt);
   },
@@ -73,6 +78,7 @@ export const updateUserRole = mutation({
     ),
   },
   handler: async (ctx, { userId, role }) => {
+    await requireSuperAdmin(ctx);
     const user = await ctx.db.get(userId);
     if (!user) {
       throw new Error("User not found");
@@ -86,6 +92,7 @@ export const updateUserRole = mutation({
 export const promoteToAdmin = mutation({
   args: { userId: v.id("users") },
   handler: async (ctx, { userId }) => {
+    await requireSuperAdmin(ctx);
     const user = await ctx.db.get(userId);
     if (!user) {
       throw new Error("User not found");
@@ -99,6 +106,7 @@ export const promoteToAdmin = mutation({
 export const promoteToSuperAdmin = mutation({
   args: { userId: v.id("users") },
   handler: async (ctx, { userId }) => {
+    await requireSuperAdmin(ctx);
     const user = await ctx.db.get(userId);
     if (!user) {
       throw new Error("User not found");
@@ -112,6 +120,7 @@ export const promoteToSuperAdmin = mutation({
 export const demoteToUser = mutation({
   args: { userId: v.id("users") },
   handler: async (ctx, { userId }) => {
+    await requireSuperAdmin(ctx);
     const user = await ctx.db.get(userId);
     if (!user) {
       throw new Error("User not found");
@@ -124,6 +133,7 @@ export const demoteToUser = mutation({
 
 export const getAllRegistrations = query({
   handler: async (ctx) => {
+    await requireAdmin(ctx);
     const registrations = await ctx.db.query("registrations").collect();
 
     // Get related details for each registration

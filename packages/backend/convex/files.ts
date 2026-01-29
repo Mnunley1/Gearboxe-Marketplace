@@ -2,6 +2,7 @@ import { v } from "convex/values";
 import { internalMutation, mutation, query } from "./_generated/server";
 import { components } from "./_generated/api";
 import { R2 } from "@convex-dev/r2";
+import { getCurrentUserOrThrow, requireAdmin } from "./users";
 
 /**
  * Get R2 instance - initialized lazily
@@ -32,10 +33,11 @@ function r2() {
  * This provides generateUploadUrl and syncMetadata mutations that work with the useUploadFile hook
  */
 export const { generateUploadUrl, syncMetadata } = r2().clientApi({
-  checkUpload: async (ctx) => {
-    // Optional: Add authorization check here
-    // const user = await getUser(ctx);
-    // if (!user) throw new Error("Unauthorized");
+  checkUpload: async (ctx: any) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) {
+      throw new Error("Unauthorized: must be logged in to upload files");
+    }
   },
   onUpload: async (ctx, bucket, key) => {
     // Optional: Do something after upload completes
@@ -79,6 +81,18 @@ export const getFileUrls = query({
 export const deleteFile = mutation({
   args: { key: v.string() },
   handler: async (ctx, args) => {
+    const currentUser = await getCurrentUserOrThrow(ctx);
+    // Verify the user owns a vehicle that references this file, or is admin
+    if (currentUser.role !== "admin" && currentUser.role !== "superAdmin") {
+      const vehicles = await ctx.db
+        .query("vehicles")
+        .withIndex("by_user", (q) => q.eq("userId", currentUser._id))
+        .collect();
+      const ownsFile = vehicles.some((v) => v.photos.includes(args.key));
+      if (!ownsFile) {
+        throw new Error("Unauthorized: you do not own this file");
+      }
+    }
     return await r2().deleteObject(ctx, args.key);
   },
 });
@@ -89,6 +103,19 @@ export const deleteFile = mutation({
 export const deleteFiles = mutation({
   args: { keys: v.array(v.string()) },
   handler: async (ctx, args) => {
+    const currentUser = await getCurrentUserOrThrow(ctx);
+    if (currentUser.role !== "admin" && currentUser.role !== "superAdmin") {
+      const vehicles = await ctx.db
+        .query("vehicles")
+        .withIndex("by_user", (q) => q.eq("userId", currentUser._id))
+        .collect();
+      const ownedPhotos = new Set(vehicles.flatMap((v) => v.photos));
+      for (const key of args.keys) {
+        if (!ownedPhotos.has(key)) {
+          throw new Error("Unauthorized: you do not own file " + key);
+        }
+      }
+    }
     await Promise.all(
       args.keys.map((key) => r2().deleteObject(ctx, key))
     );
@@ -111,6 +138,7 @@ export const getFileMetadata = query({
 export const listFileMetadata = query({
   args: { limit: v.optional(v.number()) },
   handler: async (ctx, args) => {
+    await requireAdmin(ctx);
     return await r2().listMetadata(ctx, args.limit);
   },
 });

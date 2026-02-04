@@ -12,6 +12,7 @@ import {
   MessageCircle,
   Plus,
   Shield,
+  User,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -64,6 +65,12 @@ export function UserDropdown({ afterSignOutUrl = "/" }: UserDropdownProps) {
   const userInitials = user?.fullName ? getInitials(user.fullName) : "U";
 
   const menuItems = [
+    {
+      label: "My Profile",
+      href: "/myAccount/profile",
+      icon: User,
+      active: pathname === "/myAccount/profile",
+    },
     {
       label: "My Listings",
       href: "/myAccount/my-listings",

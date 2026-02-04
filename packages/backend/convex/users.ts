@@ -136,6 +136,48 @@ export async function requireSuperAdmin(ctx: QueryCtx) {
   return user;
 }
 
+export const getPublicProfile = query({
+  args: { userId: v.id("users") },
+  handler: async (ctx, { userId }) => {
+    const user = await ctx.db.get(userId);
+    if (!user) return null;
+
+    const vehicles = await ctx.db
+      .query("vehicles")
+      .withIndex("by_user", (q) => q.eq("userId", userId))
+      .filter((q) => q.eq(q.field("status"), "approved"))
+      .collect();
+
+    return {
+      _id: user._id,
+      name: user.name,
+      bio: user.bio,
+      location: user.location,
+      profileImageUrl: user.profileImageUrl,
+      createdAt: user.createdAt,
+      vehicleCount: vehicles.length,
+    };
+  },
+});
+
+export const updateProfile = mutation({
+  args: {
+    bio: v.optional(v.string()),
+    phone: v.optional(v.string()),
+    location: v.optional(v.string()),
+    profileImageUrl: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const user = await getCurrentUserOrThrow(ctx);
+    await ctx.db.patch(user._id, {
+      bio: args.bio,
+      phone: args.phone,
+      location: args.location,
+      profileImageUrl: args.profileImageUrl,
+    });
+  },
+});
+
 async function userByExternalId(ctx: QueryCtx, externalId: string) {
   return await ctx.db
     .query("users")

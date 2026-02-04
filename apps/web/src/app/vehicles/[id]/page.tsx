@@ -744,9 +744,9 @@ export default function VehiclePage({ params }: VehiclePageProps) {
                       <User className="h-7 w-7 text-primary" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-gray-900 text-lg">
+                      <Link href={`/profile/${seller._id}`} className="font-semibold text-gray-900 text-lg hover:text-primary transition-colors">
                         {seller.name}
-                      </h3>
+                      </Link>
                       <div className="flex items-center gap-1.5 text-sm">
                         <Star className="h-4 w-4 fill-amber-400 text-amber-400" />
                         <span className="font-medium text-amber-600">Verified Seller</span>

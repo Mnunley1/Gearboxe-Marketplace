@@ -9,9 +9,9 @@ import { ArrowLeft, Car, User } from "lucide-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { use } from "react";
-import { Footer } from "../../../../components/footer";
-import { MessageThread } from "../../../../components/message-thread";
-import { Navbar } from "../../../../components/navbar";
+import { Footer } from "../../../../../../components/footer";
+import { MessageThread } from "../../../../../../components/message-thread";
+import { Navbar } from "../../../../../../components/navbar";
 
 interface ConversationPageProps {
   params: Promise<{

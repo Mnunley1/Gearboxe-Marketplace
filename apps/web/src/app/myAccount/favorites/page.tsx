@@ -211,17 +211,18 @@ export default function FavoritesPage() {
           </div>
         ) : (
           <div className="w-full">
-            <Card>
-              <CardContent className="py-16 text-center">
-                <div className="mb-4 text-gray-400">
-                  <Heart className="mx-auto h-16 w-16" />
+            <Card className="border-0 shadow-md">
+              <CardContent className="py-20 text-center">
+                <div className="mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-full bg-gradient-to-br from-primary/20 to-primary/10">
+                  <Heart className="h-12 w-12 text-primary" />
                 </div>
-                <h3 className="mb-2 font-semibold text-gray-900 text-xl">
+                <h3 className="mb-3 font-semibold text-2xl text-gray-900">
                   No favorites yet
                 </h3>
-                <p className="mb-6 text-gray-600">
+                <p className="mx-auto mb-8 max-w-md text-gray-600 leading-relaxed">
                   Start browsing vehicles and save your favorites for easy
-                  access
+                  access. Favorited vehicles will appear here so you can
+                  quickly find them later.
                 </p>
                 <Button asChild>
                   <Link href="/vehicles">

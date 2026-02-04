@@ -13,6 +13,10 @@ export default defineSchema({
       v.literal("superAdmin")
     ),
     createdAt: v.number(),
+    phone: v.optional(v.string()),
+    bio: v.optional(v.string()),
+    location: v.optional(v.string()),
+    profileImageUrl: v.optional(v.string()),
   }).index("byExternalId", ["externalId"]),
 
   cities: defineTable({

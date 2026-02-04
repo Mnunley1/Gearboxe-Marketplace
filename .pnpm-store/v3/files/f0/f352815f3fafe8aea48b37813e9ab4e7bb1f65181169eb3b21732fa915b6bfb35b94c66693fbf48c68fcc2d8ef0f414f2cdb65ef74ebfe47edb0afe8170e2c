@@ -1,5 +1,0 @@
-{
-  "main": "../dist/commonjs/./react/index.js",
-  "module": "../dist/esm/./react/index.js",
-  "types": "../dist/commonjs/./react/index.d.ts"
-}

@@ -330,7 +330,7 @@ export const getRegistrationByVehicle = query({
 export const checkInRegistration = mutation({
   args: { id: v.id("registrations") },
   handler: async (ctx, args) => {
-    await requireAdmin(ctx);
+    const admin = await requireAdmin(ctx);
     const registration = await ctx.db.get(args.id);
     if (!registration) {
       throw new Error("Registration not found");
@@ -338,7 +338,14 @@ export const checkInRegistration = mutation({
     if (registration.paymentStatus !== "completed") {
       throw new Error("Cannot check in unpaid registration");
     }
-    await ctx.db.patch(args.id, { checkedIn: true });
+    if (registration.checkedIn) {
+      throw new Error("Registration is already checked in");
+    }
+    await ctx.db.patch(args.id, {
+      checkedIn: true,
+      checkedInAt: Date.now(),
+      checkedInBy: admin._id,
+    });
   },
 });
 
@@ -348,13 +355,13 @@ export const validateQRCode = query({
     await requireAdmin(ctx);
     const registration = await ctx.db
       .query("registrations")
-      .filter((q) => q.eq(q.field("qrCodeData"), args.qrCodeData))
+      .withIndex("by_qr_code", (q) => q.eq("qrCodeData", args.qrCodeData))
       .first();
 
     if (!registration) {
       return null;
     }
-    
+
     if (registration.paymentStatus !== "completed") {
       return null;
     }
@@ -368,6 +375,52 @@ export const validateQRCode = query({
       vehicle,
       event,
       user,
+      alreadyCheckedIn: registration.checkedIn,
+    };
+  },
+});
+
+export const getCheckInSheetData = query({
+  args: { eventId: v.id("events") },
+  handler: async (ctx, args) => {
+    await requireAdmin(ctx);
+    const event = await ctx.db.get(args.eventId);
+    if (!event) {
+      throw new Error("Event not found");
+    }
+
+    const registrations = await ctx.db
+      .query("registrations")
+      .withIndex("by_event", (q) => q.eq("eventId", args.eventId))
+      .collect();
+
+    const completedRegistrations = registrations.filter(
+      (r) => r.paymentStatus === "completed"
+    );
+
+    const rows = await Promise.all(
+      completedRegistrations.map(async (reg) => {
+        const user = await ctx.db.get(reg.userId);
+        const vehicle = await ctx.db.get(reg.vehicleId);
+        return {
+          sellerName: user?.name ?? "",
+          sellerEmail: user?.email ?? "",
+          sellerPhone: user?.phone ?? "",
+          vehicleTitle: vehicle?.title ?? "",
+          vehicleYear: vehicle?.year ?? 0,
+          vehicleMake: vehicle?.make ?? "",
+          vehicleModel: vehicle?.model ?? "",
+          vin: vehicle?.vin ?? "",
+          checkedIn: reg.checkedIn,
+          qrCodeData: reg.qrCodeData ?? "",
+        };
+      })
+    );
+
+    return {
+      eventName: event.name,
+      eventDate: event.date,
+      rows,
     };
   },
 });

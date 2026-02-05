@@ -93,13 +93,16 @@ export default defineSchema({
     stripePaymentId: v.optional(v.string()),
     qrCodeData: v.optional(v.string()),
     checkedIn: v.boolean(),
+    checkedInAt: v.optional(v.number()),
+    checkedInBy: v.optional(v.id("users")),
     expiresAt: v.optional(v.number()), // Expiration time for pending registrations
     createdAt: v.number(),
   })
     .index("by_event", ["eventId"])
     .index("by_vehicle", ["vehicleId"])
     .index("by_user", ["userId"])
-    .index("by_payment_status", ["paymentStatus"]),
+    .index("by_payment_status", ["paymentStatus"])
+    .index("by_qr_code", ["qrCodeData"]),
 
   conversations: defineTable({
     vehicleId: v.id("vehicles"),

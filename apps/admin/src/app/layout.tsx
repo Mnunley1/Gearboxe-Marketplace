@@ -1,5 +1,6 @@
 import { ClerkProvider } from "@clerk/nextjs";
 import type { Metadata } from "next";
+import { Toaster } from "sonner";
 import { ErrorBoundary } from "../../components/ui/error-boundary";
 import { ConvexClientProvider } from "../../lib/convex-provider";
 import { AdminLayout } from "./admin-layout";
@@ -22,6 +23,7 @@ export default function RootLayout({
           <ErrorBoundary>
             <ConvexClientProvider>
               <AdminLayout>{children}</AdminLayout>
+              <Toaster richColors />
             </ConvexClientProvider>
           </ErrorBoundary>
         </body>

@@ -62,7 +62,7 @@ registerRoutes(http, components.stripe, {
       
       try {
         // Generate QR code data
-        const qrCodeData = `${metadata.userId}-${metadata.eventId}-${metadata.vehicleId}-${Date.now()}`;
+        const qrCodeData = crypto.randomUUID();
         
         // Complete registration
         await ctx.runMutation(internal.registrations.completeRegistration, {

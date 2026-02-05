@@ -2,20 +2,202 @@
 
 import { api } from "@car-market/convex/_generated/api";
 import { useUser } from "@clerk/nextjs";
-import { useConvexAuth, useMutation, useQuery } from "convex/react";
-import { ArrowLeft, Calendar, Car, CheckCircle, Users } from "lucide-react";
+import { useConvex, useConvexAuth, useMutation, useQuery } from "convex/react";
+import {
+  ArrowLeft,
+  Calendar,
+  Car,
+  CheckCircle,
+  Download,
+  Users,
+} from "lucide-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { useState } from "react";
+import { useCallback, useState } from "react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { QRScannerComponent } from "@/components/ui/qr-scanner";
+
+type ScanResult = {
+  status: "loading" | "not_found" | "already_checked_in" | "found";
+  data?: {
+    registrationId: string;
+    sellerName: string;
+    vehicleTitle: string;
+    vehicleYear: number;
+    vehicleMake: string;
+    vehicleModel: string;
+    eventName: string;
+  };
+};
 
 export default function AdminCheckinPage() {
   const { isAuthenticated, isLoading } = useConvexAuth();
   const { user } = useUser();
+  const convex = useConvex();
   const [selectedEvent, setSelectedEvent] = useState<string | null>(null);
-  const [scannedData, setScannedData] = useState<string | null>(null);
+  const [scanResult, setScanResult] = useState<ScanResult | null>(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [checkingIn, setCheckingIn] = useState(false);
+
+  const isAdmin = useQuery(api.users.isAdmin);
+  const upcomingEvents = useQuery(api.events.getUpcomingEvents);
+  const eventRegistrations = useQuery(
+    api.registrations.getRegistrationsByEvent,
+    selectedEvent ? { eventId: selectedEvent as any } : "skip"
+  );
+  const sheetData = useQuery(
+    api.registrations.getCheckInSheetData,
+    selectedEvent ? { eventId: selectedEvent as any } : "skip"
+  );
+  const checkInRegistration = useMutation(
+    api.registrations.checkInRegistration
+  );
+
+  const handleQRScan = useCallback(
+    async (data: string) => {
+      setScanResult({ status: "loading" });
+      setDialogOpen(true);
+
+      try {
+        const result = await convex.query(api.registrations.validateQRCode, {
+          qrCodeData: data,
+        });
+
+        if (!result) {
+          setScanResult({ status: "not_found" });
+          return;
+        }
+
+        if (result.alreadyCheckedIn) {
+          setScanResult({
+            status: "already_checked_in",
+            data: {
+              registrationId: result.registration._id,
+              sellerName: result.user?.name ?? "Unknown",
+              vehicleTitle: result.vehicle?.title ?? "Unknown Vehicle",
+              vehicleYear: result.vehicle?.year ?? 0,
+              vehicleMake: result.vehicle?.make ?? "",
+              vehicleModel: result.vehicle?.model ?? "",
+              eventName: result.event?.name ?? "Unknown Event",
+            },
+          });
+          return;
+        }
+
+        setScanResult({
+          status: "found",
+          data: {
+            registrationId: result.registration._id,
+            sellerName: result.user?.name ?? "Unknown",
+            vehicleTitle: result.vehicle?.title ?? "Unknown Vehicle",
+            vehicleYear: result.vehicle?.year ?? 0,
+            vehicleMake: result.vehicle?.make ?? "",
+            vehicleModel: result.vehicle?.model ?? "",
+            eventName: result.event?.name ?? "Unknown Event",
+          },
+        });
+      } catch (error) {
+        console.error("QR validation error:", error);
+        setScanResult({ status: "not_found" });
+      }
+    },
+    [convex]
+  );
+
+  const handleConfirmCheckIn = useCallback(async () => {
+    if (!scanResult?.data) return;
+    setCheckingIn(true);
+    try {
+      await checkInRegistration({
+        id: scanResult.data.registrationId as any,
+      });
+      toast.success("Check-in successful", {
+        description: `${scanResult.data.sellerName} — ${scanResult.data.vehicleYear} ${scanResult.data.vehicleMake} ${scanResult.data.vehicleModel}`,
+      });
+      setDialogOpen(false);
+      setScanResult(null);
+    } catch (error: any) {
+      toast.error("Check-in failed", {
+        description: error?.message ?? "An unexpected error occurred",
+      });
+    } finally {
+      setCheckingIn(false);
+    }
+  }, [scanResult, checkInRegistration]);
+
+  const handleManualCheckIn = useCallback(
+    async (registrationId: string) => {
+      try {
+        await checkInRegistration({ id: registrationId as any });
+        toast.success("Check-in successful");
+      } catch (error: any) {
+        toast.error("Check-in failed", {
+          description: error?.message ?? "An unexpected error occurred",
+        });
+      }
+    },
+    [checkInRegistration]
+  );
+
+  const handleDownloadCSV = useCallback(() => {
+    if (!sheetData) return;
+
+    const headers = [
+      "Seller Name",
+      "Email",
+      "Phone",
+      "Vehicle",
+      "Year",
+      "Make",
+      "Model",
+      "VIN",
+      "Checked In",
+      "QR Code",
+    ];
+
+    const escape = (val: string) => {
+      if (val.includes(",") || val.includes('"') || val.includes("\n")) {
+        return `"${val.replace(/"/g, '""')}"`;
+      }
+      return val;
+    };
+
+    const csvRows = [
+      headers.join(","),
+      ...sheetData.rows.map((row) =>
+        [
+          escape(row.sellerName),
+          escape(row.sellerEmail),
+          escape(row.sellerPhone),
+          escape(row.vehicleTitle),
+          String(row.vehicleYear),
+          escape(row.vehicleMake),
+          escape(row.vehicleModel),
+          escape(row.vin),
+          row.checkedIn ? "Yes" : "No",
+          escape(row.qrCodeData),
+        ].join(",")
+      ),
+    ];
+
+    const blob = new Blob([csvRows.join("\n")], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${sheetData.eventName.replace(/[^a-zA-Z0-9]/g, "_")}_checkin_sheet.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }, [sheetData]);
 
   if (isLoading) {
     return (
@@ -32,17 +214,6 @@ export default function AdminCheckinPage() {
     redirect("/sign-in");
   }
 
-  const isAdmin = useQuery(api.users.isAdmin);
-  const upcomingEvents = useQuery(api.events.getUpcomingEvents);
-  const eventRegistrations = selectedEvent
-    ? useQuery(api.registrations.getRegistrationsByEvent, {
-        eventId: selectedEvent as any,
-      })
-    : null;
-  const checkInRegistration = useMutation(
-    api.registrations.checkInRegistration
-  );
-
   if (isAdmin === false) {
     redirect("/myAccount");
   }
@@ -57,22 +228,6 @@ export default function AdminCheckinPage() {
       </div>
     );
   }
-
-  const handleQRScan = async (data: string) => {
-    setScannedData(data);
-    // In a real app, you'd validate the QR code and check in the user
-    // For now, we'll just show the scanned data
-  };
-
-  const handleManualCheckIn = async (registrationId: string) => {
-    try {
-      await checkInRegistration({ id: registrationId as any });
-      // Refresh the registrations list
-      window.location.reload();
-    } catch (error) {
-      console.error("Error checking in registration:", error);
-    }
-  };
 
   const selectedEventData = selectedEvent
     ? upcomingEvents.find((e) => e._id === selectedEvent)
@@ -150,17 +305,6 @@ export default function AdminCheckinPage() {
                   onScan={handleQRScan}
                   title="Scan Vendor QR Code"
                 />
-
-                {scannedData && (
-                  <div className="mt-4 rounded-lg bg-gray-50 p-3">
-                    <p className="mb-1 font-medium text-gray-700 text-sm">
-                      Scanned Data:
-                    </p>
-                    <p className="break-all text-gray-600 text-xs">
-                      {scannedData}
-                    </p>
-                  </div>
-                )}
               </CardContent>
             </Card>
           )}
@@ -171,14 +315,26 @@ export default function AdminCheckinPage() {
           {selectedEvent ? (
             <Card>
               <CardHeader>
-                <CardTitle>
-                  Registrations for {selectedEventData?.name}
-                  {eventRegistrations && (
-                    <span className="ml-2 font-normal text-gray-600 text-sm">
-                      ({eventRegistrations.length} total)
-                    </span>
+                <div className="flex items-center justify-between">
+                  <CardTitle>
+                    Registrations for {selectedEventData?.name}
+                    {eventRegistrations && (
+                      <span className="ml-2 font-normal text-gray-600 text-sm">
+                        ({eventRegistrations.length} total)
+                      </span>
+                    )}
+                  </CardTitle>
+                  {sheetData && sheetData.rows.length > 0 && (
+                    <Button
+                      onClick={handleDownloadCSV}
+                      size="sm"
+                      variant="outline"
+                    >
+                      <Download className="mr-1 h-4 w-4" />
+                      Download Sheet
+                    </Button>
                   )}
-                </CardTitle>
+                </div>
               </CardHeader>
               <CardContent>
                 {eventRegistrations && eventRegistrations.length > 0 ? (
@@ -263,6 +419,133 @@ export default function AdminCheckinPage() {
           )}
         </div>
       </div>
+
+      {/* QR Scan Confirmation Dialog */}
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent>
+          {scanResult?.status === "loading" && (
+            <>
+              <DialogHeader>
+                <DialogTitle>Validating QR Code...</DialogTitle>
+                <DialogDescription>
+                  Looking up registration details.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="flex justify-center py-8">
+                <div className="h-8 w-8 animate-spin rounded-full border-primary border-b-2" />
+              </div>
+            </>
+          )}
+
+          {scanResult?.status === "not_found" && (
+            <>
+              <DialogHeader>
+                <DialogTitle className="text-red-600">
+                  No Matching Registration
+                </DialogTitle>
+                <DialogDescription>
+                  This QR code does not match any paid registration. It may be
+                  invalid or belong to an unpaid registration.
+                </DialogDescription>
+              </DialogHeader>
+              <DialogFooter>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setDialogOpen(false);
+                    setScanResult(null);
+                  }}
+                >
+                  Close
+                </Button>
+              </DialogFooter>
+            </>
+          )}
+
+          {scanResult?.status === "already_checked_in" && scanResult.data && (
+            <>
+              <DialogHeader>
+                <DialogTitle className="text-amber-600">
+                  Already Checked In
+                </DialogTitle>
+                <DialogDescription>
+                  This registration has already been checked in.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="space-y-2 rounded-lg bg-amber-50 p-4 text-sm">
+                <p>
+                  <span className="font-medium">Seller:</span>{" "}
+                  {scanResult.data.sellerName}
+                </p>
+                <p>
+                  <span className="font-medium">Vehicle:</span>{" "}
+                  {scanResult.data.vehicleYear} {scanResult.data.vehicleMake}{" "}
+                  {scanResult.data.vehicleModel}
+                </p>
+                <p>
+                  <span className="font-medium">Event:</span>{" "}
+                  {scanResult.data.eventName}
+                </p>
+              </div>
+              <DialogFooter>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setDialogOpen(false);
+                    setScanResult(null);
+                  }}
+                >
+                  Close
+                </Button>
+              </DialogFooter>
+            </>
+          )}
+
+          {scanResult?.status === "found" && scanResult.data && (
+            <>
+              <DialogHeader>
+                <DialogTitle>Confirm Check-In</DialogTitle>
+                <DialogDescription>
+                  Review the registration details and confirm check-in.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="space-y-2 rounded-lg bg-green-50 p-4 text-sm">
+                <p>
+                  <span className="font-medium">Seller:</span>{" "}
+                  {scanResult.data.sellerName}
+                </p>
+                <p>
+                  <span className="font-medium">Vehicle:</span>{" "}
+                  {scanResult.data.vehicleYear} {scanResult.data.vehicleMake}{" "}
+                  {scanResult.data.vehicleModel}
+                </p>
+                <p>
+                  <span className="font-medium">Event:</span>{" "}
+                  {scanResult.data.eventName}
+                </p>
+              </div>
+              <DialogFooter>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setDialogOpen(false);
+                    setScanResult(null);
+                  }}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  className="bg-green-600 hover:bg-green-700 active:bg-green-800"
+                  disabled={checkingIn}
+                  onClick={handleConfirmCheckIn}
+                >
+                  {checkingIn ? "Checking In..." : "Confirm Check-In"}
+                </Button>
+              </DialogFooter>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { api } from "@car-market/convex/_generated/api";
-import { useAuth } from "@clerk/nextjs";
+import { useAuth, useUser } from "@clerk/nextjs";
 import { useConvexAuth, useQuery } from "convex/react";
 import {
   ArrowLeft,
@@ -18,12 +18,13 @@ import {
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@car-market/ui/button";
 import { UserDropdown } from "@/components/ui/user-dropdown";
 
 export function AdminNavbar() {
   const { isAuthenticated } = useConvexAuth();
-  const { isSignedIn, isLoaded: authLoaded, user } = useAuth();
+  const { isSignedIn, isLoaded: authLoaded } = useAuth();
+  const { user } = useUser();
   const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 

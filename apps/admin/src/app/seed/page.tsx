@@ -12,14 +12,14 @@ import {
   Users,
 } from "lucide-react";
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@car-market/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
+} from "@car-market/ui/card";
 
 export default function SeedPage() {
   const [isSeeding, setIsSeeding] = useState(false);

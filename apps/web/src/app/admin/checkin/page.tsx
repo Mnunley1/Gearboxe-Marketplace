@@ -9,7 +9,7 @@ import { ArrowLeft, Calendar, Car, CheckCircle, Users } from "lucide-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { useState } from "react";
-import { QRScannerComponent } from "../../../components/qr-scanner";
+import { QRScannerComponent } from "@/components/qr-scanner";
 
 export default function AdminCheckinPage() {
   const { isAuthenticated, isLoading } = useConvexAuth();

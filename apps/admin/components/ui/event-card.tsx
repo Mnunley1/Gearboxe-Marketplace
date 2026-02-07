@@ -2,8 +2,8 @@
 
 import { Calendar, MapPin, Users } from "lucide-react";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter } from "@/components/ui/card";
+import { Button } from "@car-market/ui/button";
+import { Card, CardContent, CardFooter } from "@car-market/ui/card";
 
 type Event = {
   _id: string;

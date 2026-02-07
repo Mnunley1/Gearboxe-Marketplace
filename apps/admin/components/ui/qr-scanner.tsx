@@ -1,10 +1,10 @@
 "use client";
 
-import { QrScanner } from "@yudiel/react-qr-scanner";
+import { Scanner } from "@yudiel/react-qr-scanner";
 import { Camera, CameraOff, CheckCircle, XCircle } from "lucide-react";
 import { useRef, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@car-market/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@car-market/ui/card";
 
 type QRScannerProps = {
   onScan: (data: string) => void;
@@ -36,9 +36,11 @@ export function QRScannerComponent({
     }, 2000);
   };
 
-  const handleError = (error: Error) => {
+  const handleError = (error: unknown) => {
     setScanStatus("error");
-    onError?.(error);
+    if (error instanceof Error) {
+      onError?.(error);
+    }
 
     setTimeout(() => {
       setScanStatus("idle");
@@ -79,20 +81,25 @@ export function QRScannerComponent({
       <CardContent className="space-y-4">
         {isScanning ? (
           <div className="relative">
-            <QrScanner
-              containerStyle={{
-                width: "100%",
-                height: "300px",
-                borderRadius: "8px",
-                overflow: "hidden",
+            <Scanner
+              onScan={(result) => {
+                if (result?.[0]?.rawValue) {
+                  handleScan(result[0].rawValue);
+                }
               }}
-              onDecode={handleScan}
               onError={handleError}
-              ref={scannerRef}
-              videoStyle={{
-                width: "100%",
-                height: "100%",
-                objectFit: "cover",
+              styles={{
+                container: {
+                  width: "100%",
+                  height: "300px",
+                  borderRadius: "8px",
+                  overflow: "hidden",
+                },
+                video: {
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                },
               }}
             />
 

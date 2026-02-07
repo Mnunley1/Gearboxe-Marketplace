@@ -4,9 +4,9 @@ import { api } from "@car-market/convex/_generated/api";
 import { useMutation, useQuery } from "convex/react";
 import { Check, CheckCheck, MessageCircle, Send } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@car-market/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@car-market/ui/card";
+import { Textarea } from "@car-market/ui/textarea";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useToast } from "@/hooks/useToast";
 
@@ -143,7 +143,7 @@ export function MessageThread({
         {/* Messages */}
         <div className="flex-1 space-y-4 overflow-y-auto p-4">
           {messages && messages.length > 0 ? (
-            messages.map((message) => {
+            messages.map((message: Message) => {
               const isOwnMessage = message.senderId === convexUser._id;
               return (
                 <div

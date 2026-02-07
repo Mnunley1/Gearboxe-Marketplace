@@ -15,8 +15,8 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@car-market/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@car-market/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -24,7 +24,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
+} from "@car-market/ui/dialog";
 import { QRScannerComponent } from "@/components/ui/qr-scanner";
 
 type ScanResult = {
@@ -174,7 +174,7 @@ export default function AdminCheckinPage() {
 
     const csvRows = [
       headers.join(","),
-      ...sheetData.rows.map((row) =>
+      ...sheetData.rows.map((row: typeof sheetData.rows[number]) =>
         [
           escape(row.sellerName),
           escape(row.sellerEmail),

@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { Toaster } from "sonner";
 import { ErrorBoundary } from "../../components/ui/error-boundary";
 import { ConvexClientProvider } from "../../lib/convex-provider";
-import { AdminLayout } from "./admin-layout";
+import AdminLayout from "./admin-layout";
 import "./global.css";
 
 export const metadata: Metadata = {

@@ -8,8 +8,8 @@ import Link from "next/link";
 import { redirect, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@car-market/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@car-market/ui/card";
 
 export default function AdminEventsPage() {
   const searchParams = useSearchParams();

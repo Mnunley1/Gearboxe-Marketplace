@@ -9,6 +9,7 @@
     "start": "next start",
     "lint": "biome lint --write .",
     "format": "biome format --write .",
+    "typecheck": "tsc --noEmit",
     "clean": "rm -rf .next"
   },
   "dependencies": {

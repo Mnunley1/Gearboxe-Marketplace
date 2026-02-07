@@ -13,13 +13,13 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Button } from "../../components/ui/button";
+import { Button } from "@car-market/ui/button";
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
-} from "../../components/ui/card";
+} from "@car-market/ui/card";
 
 export default function AdminDashboardPage() {
   const { isLoading } = useConvexAuth();

@@ -15,7 +15,7 @@ import {
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { Button } from "@/components/ui/button";
+import { Button } from "@car-market/ui/button";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 
 type UserDropdownProps = {

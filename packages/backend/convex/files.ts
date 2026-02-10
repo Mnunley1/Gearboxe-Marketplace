@@ -55,11 +55,9 @@ export const getFileUrl = query({
     key: v.string(),
     expiresIn: v.optional(v.number()),
   },
-  handler: async (ctx, args) => {
-    return await r2().getUrl(args.key, {
+  handler: async (ctx, args) => await r2().getUrl(args.key, {
       expiresIn: args.expiresIn,
-    });
-  },
+    }),
 });
 
 /**
@@ -127,9 +125,7 @@ export const deleteFiles = mutation({
  */
 export const getFileMetadata = query({
   args: { key: v.string() },
-  handler: async (ctx, args) => {
-    return await r2().getMetadata(args.key);
-  },
+  handler: async (ctx, args) => await r2().getMetadata(args.key),
 });
 
 /**

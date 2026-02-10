@@ -7,7 +7,7 @@ import {
   ToastProvider,
   ToastTitle,
   ToastViewport,
-} from "@car-market/ui/toast";
+} from "@gearboxe-market/ui/toast";
 import { useToast } from "@/hooks/useToast";
 
 export function ToastContainer() {

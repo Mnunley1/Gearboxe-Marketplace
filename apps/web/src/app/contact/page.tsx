@@ -1,10 +1,10 @@
 "use client";
 
-import { Button } from "@car-market/ui/button";
-import { Card } from "@car-market/ui/card";
-import { Input } from "@car-market/ui/input";
-import { Label } from "@car-market/ui/label";
-import { Textarea } from "@car-market/ui/textarea";
+import { Button } from "@gearboxe-market/ui/button";
+import { Card } from "@gearboxe-market/ui/card";
+import { Input } from "@gearboxe-market/ui/input";
+import { Label } from "@gearboxe-market/ui/label";
+import { Textarea } from "@gearboxe-market/ui/textarea";
 import { ChevronDown, ChevronUp, Clock, Mail, Phone } from "lucide-react";
 import { useState } from "react";
 import { useToast } from "@/hooks/useToast";
@@ -179,7 +179,7 @@ export default function ContactPage() {
                 Contact Us
               </h1>
               <p className="mx-auto max-w-2xl text-gray-600 text-xl">
-                Have questions about our car market events or need help with
+                Have questions about our Gearboxe Market events or need help with
                 your listing? We're here to help you every step of the way.
               </p>
             </div>

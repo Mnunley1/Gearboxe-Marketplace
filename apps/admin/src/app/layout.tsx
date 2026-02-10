@@ -8,7 +8,7 @@ import "./global.css";
 
 export const metadata: Metadata = {
   title: "Gearboxe Market - Admin",
-  description: "Admin panel for managing car marketplace",
+  description: "Admin panel for Gearboxe Market",
 };
 
 export default function RootLayout({

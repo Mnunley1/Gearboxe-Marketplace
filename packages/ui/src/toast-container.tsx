@@ -1,6 +1,6 @@
 "use client";
 
-import { Toaster } from "@car-market/ui/sonner";
+import { Toaster } from "@gearboxe-market/ui/sonner";
 
 export function ToastContainer() {
   return <Toaster />;

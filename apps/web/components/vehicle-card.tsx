@@ -1,8 +1,8 @@
 "use client";
 
-import { api } from "@car-market/convex/_generated/api";
-import { Button } from "@car-market/ui/button";
-import { Card, CardContent, CardFooter } from "@car-market/ui/card";
+import { api } from "@gearboxe-market/convex/_generated/api";
+import { Button } from "@gearboxe-market/ui/button";
+import { Card, CardContent, CardFooter } from "@gearboxe-market/ui/card";
 import { useMutation, useQuery } from "convex/react";
 import { ArrowRight, Car, Gauge, Heart, MapPin } from "lucide-react";
 import Image from "next/image";
@@ -94,7 +94,7 @@ export function VehicleCard({
     }
 
     // If user is not logged in, show auth dialog
-    if (!isAuthenticated || !convexUser) {
+    if (!(isAuthenticated && convexUser)) {
       setShowAuthDialog(true);
       return;
     }
@@ -157,7 +157,7 @@ export function VehicleCard({
 
   return (
     <>
-      <Card className="group relative overflow-hidden border-gray-200/60 bg-white hover:border-gray-300/80 hover:shadow-xl hover:shadow-gray-200/50">
+      <Card className="group relative overflow-hidden border-gray-200/60 bg-white hover:border-gray-300/80 hover:shadow-gray-200/50 hover:shadow-xl">
         {/* Image Container */}
         <div className="relative aspect-[4/3] overflow-hidden bg-gradient-to-br from-gray-100 to-gray-50">
           {primaryPhoto ? (
@@ -174,7 +174,7 @@ export function VehicleCard({
                 <div className="rounded-full bg-gray-200/80 p-4">
                   <Car className="h-8 w-8 text-gray-400" />
                 </div>
-                <span className="text-xs text-gray-400">No image</span>
+                <span className="text-gray-400 text-xs">No image</span>
               </div>
             </div>
           )}
@@ -185,7 +185,7 @@ export function VehicleCard({
           {/* Sale Status Badge */}
           {vehicle.saleStatus && vehicle.saleStatus !== "available" && (
             <div
-              className={`absolute top-3 left-3 z-10 flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-bold uppercase tracking-wide shadow-lg ${
+              className={`absolute top-3 left-3 z-10 flex items-center gap-1.5 rounded-full px-3 py-1.5 font-bold text-xs uppercase tracking-wide shadow-lg ${
                 vehicle.saleStatus === "sold"
                   ? "bg-red-500 text-white"
                   : vehicle.saleStatus === "salePending"
@@ -193,7 +193,7 @@ export function VehicleCard({
                     : ""
               }`}
             >
-              <span className="h-1.5 w-1.5 rounded-full bg-current opacity-75 animate-pulse" />
+              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-current opacity-75" />
               {vehicle.saleStatus === "sold"
                 ? "Sold"
                 : vehicle.saleStatus === "salePending"
@@ -204,7 +204,7 @@ export function VehicleCard({
 
           {/* Photo count badge */}
           {photoCount > 1 && (
-            <div className="absolute bottom-3 left-3 z-10 flex items-center gap-1.5 rounded-full bg-black/60 px-2.5 py-1 text-xs font-medium text-white backdrop-blur-sm">
+            <div className="absolute bottom-3 left-3 z-10 flex items-center gap-1.5 rounded-full bg-black/60 px-2.5 py-1 font-medium text-white text-xs backdrop-blur-sm">
               <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
@@ -217,8 +217,8 @@ export function VehicleCard({
             <Button
               className={`absolute top-3 right-3 z-20 rounded-full shadow-lg backdrop-blur-sm ${
                 isFavorited
-                  ? "bg-red-500 text-white border-transparent hover:bg-red-600 active:bg-red-700"
-                  : "bg-white/90 text-gray-700 border-transparent hover:bg-white active:bg-gray-100"
+                  ? "border-transparent bg-red-500 text-white hover:bg-red-600 active:bg-red-700"
+                  : "border-transparent bg-white/90 text-gray-700 hover:bg-white active:bg-gray-100"
               }`}
               disabled={isLoading || userLoading}
               onClick={handleFavoriteToggle}
@@ -227,7 +227,7 @@ export function VehicleCard({
             >
               <Heart
                 className={`h-4.5 w-4.5 transition-all duration-200 ${
-                  isFavorited ? "fill-current scale-110" : ""
+                  isFavorited ? "scale-110 fill-current" : ""
                 } ${isLoading || userLoading ? "opacity-50" : ""}`}
               />
             </Button>
@@ -237,7 +237,7 @@ export function VehicleCard({
           <div className="absolute inset-0 flex items-center justify-center opacity-0 transition-opacity duration-300 group-hover:opacity-100">
             <Link
               href={`/vehicles/${vehicle._id}`}
-              className="flex items-center gap-2 rounded-full bg-white px-5 py-2.5 font-medium text-sm text-gray-900 shadow-xl transition-transform duration-200 hover:scale-105"
+              className="flex items-center gap-2 rounded-full bg-white px-5 py-2.5 font-medium text-gray-900 text-sm shadow-xl transition-transform duration-200 hover:scale-105"
             >
               Quick View
               <ArrowRight className="h-4 w-4" />
@@ -250,7 +250,7 @@ export function VehicleCard({
             {/* Title and Price Row */}
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0 flex-1">
-                <h3 className="truncate font-semibold text-gray-900 text-base leading-tight group-hover:text-primary transition-colors duration-200">
+                <h3 className="truncate font-semibold text-base text-gray-900 leading-tight transition-colors duration-200 group-hover:text-primary">
                   {vehicle.title}
                 </h3>
                 <p className="mt-0.5 text-gray-500 text-sm">
@@ -258,14 +258,14 @@ export function VehicleCard({
                 </p>
               </div>
               <div className="flex-shrink-0 text-right">
-                <div className="font-bold text-primary text-lg tabular-nums tracking-tight">
+                <div className="font-bold text-lg text-primary tabular-nums tracking-tight">
                   {formatPrice(vehicle.price)}
                 </div>
               </div>
             </div>
 
             {/* Details Row */}
-            <div className="flex items-center gap-4 border-t border-gray-100 pt-3">
+            <div className="flex items-center gap-4 border-gray-100 border-t pt-3">
               <div className="flex items-center gap-1.5 text-gray-600 text-sm">
                 <Gauge className="h-4 w-4 text-gray-400" />
                 <span className="tabular-nums">{formatMileage(vehicle.mileage)}</span>
@@ -281,10 +281,10 @@ export function VehicleCard({
           </div>
         </CardContent>
 
-        <CardFooter className="border-t border-gray-100 p-0">
+        <CardFooter className="border-gray-100 border-t p-0">
           <Link
             href={`/vehicles/${vehicle._id}`}
-            className="flex w-full items-center justify-center gap-2 py-3.5 font-medium text-sm text-primary transition-all duration-200 hover:bg-primary/5 hover:gap-3"
+            className="flex w-full items-center justify-center gap-2 py-3.5 font-medium text-primary text-sm transition-all duration-200 hover:gap-3 hover:bg-primary/5"
           >
             View Details
             <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5" />
@@ -295,7 +295,7 @@ export function VehicleCard({
       {/* Auth Dialog - render outside fragment to avoid transform issues */}
       {showAuthDialog && (
         <div
-          className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm animate-in fade-in-0 duration-200"
+          className="fade-in-0 fixed inset-0 z-[9999] flex animate-in items-center justify-center bg-black/50 p-4 backdrop-blur-sm duration-200"
           onClick={() => setShowAuthDialog(false)}
           role="dialog"
           aria-modal="true"
@@ -304,13 +304,13 @@ export function VehicleCard({
           style={{ position: "fixed" }}
         >
           <div
-            className="relative w-full max-w-md rounded-2xl border border-gray-200 bg-white p-8 shadow-2xl animate-in zoom-in-95 fade-in-0 slide-in-from-bottom-4 duration-300"
+            className="zoom-in-95 fade-in-0 slide-in-from-bottom-4 relative w-full max-w-md animate-in rounded-2xl border border-gray-200 bg-white p-8 shadow-2xl duration-300"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Close button */}
             <button
               onClick={() => setShowAuthDialog(false)}
-              className="absolute right-4 top-4 rounded-full p-2 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+              className="absolute top-4 right-4 rounded-full p-2 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
               aria-label="Close dialog"
             >
               <svg

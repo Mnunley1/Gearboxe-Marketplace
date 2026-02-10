@@ -1,7 +1,7 @@
 "use client";
 
-import { Button } from "@car-market/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@car-market/ui/card";
+import { Button } from "@gearboxe-market/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@gearboxe-market/ui/card";
 import { Scanner } from "@yudiel/react-qr-scanner";
 import { Camera, CameraOff, CheckCircle, XCircle } from "lucide-react";
 import { useRef, useState } from "react";

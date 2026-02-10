@@ -6,7 +6,7 @@ import { Menu, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { Button } from "@car-market/ui/button";
+import { Button } from "@gearboxe-market/ui/button";
 import { UserDropdown } from "@/components/ui/user-dropdown";
 
 export function Navbar() {

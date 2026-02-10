@@ -40,13 +40,13 @@ export const seedDatabase = mutation({
       {
         externalId: "admin_1",
         name: "Admin User",
-        email: "admin@carmarket.com",
+        email: "admin@gearboxe.com",
         role: "admin" as const,
       },
       {
         externalId: "superadmin_1",
         name: "Super Admin",
-        email: "superadmin@carmarket.com",
+        email: "superadmin@gearboxe.com",
         role: "superAdmin" as const,
       },
     ];

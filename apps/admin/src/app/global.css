@@ -1,5 +1,5 @@
 @import "tailwindcss";
-@import "@car-market/ui/theme";
+@import "@gearboxe-market/ui/theme";
 
 /* Admin app specific styles */
 .admin-gradient {

@@ -1,4 +1,4 @@
-import { api } from "@car-market/convex/_generated/api";
+import { api } from "@gearboxe-market/convex/_generated/api";
 import { ConvexHttpClient } from "convex/browser";
 import { type NextRequest, NextResponse } from "next/server";
 import QRCode from "qrcode";

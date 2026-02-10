@@ -99,7 +99,7 @@ export const getVehicles = query({
     const vehicles = await query.collect();
 
     // Apply filters
-    let filtered = vehicles.filter((vehicle) => {
+    const filtered = vehicles.filter((vehicle) => {
       if (args.make && vehicle.make.toLowerCase() !== args.make.toLowerCase()) {
         return false;
       }

@@ -1,17 +1,17 @@
 "use client";
 
-import { Button } from "@car-market/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@car-market/ui/card";
-import { Input } from "@car-market/ui/input";
-import { Label } from "@car-market/ui/label";
+import { Button } from "@gearboxe-market/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@gearboxe-market/ui/card";
+import { Input } from "@gearboxe-market/ui/input";
+import { Label } from "@gearboxe-market/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@car-market/ui/select";
-import { ChevronDown, ChevronUp, RotateCcw, SlidersHorizontal, X } from "lucide-react";
+} from "@gearboxe-market/ui/select";
+import { RotateCcw, SlidersHorizontal, X } from "lucide-react";
 import { useState } from "react";
 
 type VehicleFiltersProps = {
@@ -149,7 +149,7 @@ export function VehicleFilters({
     <>
       <CardHeader className="pb-4">
         <div className="flex items-center justify-between">
-          <CardTitle className="flex items-center gap-2 text-lg font-semibold text-gray-900">
+          <CardTitle className="flex items-center gap-2 font-semibold text-gray-900 text-lg">
             <SlidersHorizontal className="h-5 w-5 text-primary" />
             Filters
           </CardTitle>
@@ -183,10 +183,10 @@ export function VehicleFilters({
       <CardContent className="space-y-6">
         {/* Make & Model */}
         <div className="space-y-4">
-          <h3 className="text-sm font-medium text-gray-900">Make & Model</h3>
+          <h3 className="font-medium text-gray-900 text-sm">Make & Model</h3>
           <div className="space-y-3">
             <div className="space-y-1.5">
-              <Label htmlFor="make" className="text-xs text-gray-600">
+              <Label htmlFor="make" className="text-gray-600 text-xs">
                 Make
               </Label>
               <Select
@@ -208,7 +208,7 @@ export function VehicleFilters({
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="model" className="text-xs text-gray-600">
+              <Label htmlFor="model" className="text-gray-600 text-xs">
                 Model
               </Label>
               <Input
@@ -223,14 +223,14 @@ export function VehicleFilters({
         </div>
 
         {/* Divider */}
-        <div className="border-t border-gray-100" />
+        <div className="border-gray-100 border-t" />
 
         {/* Price Range */}
         <div className="space-y-4">
-          <h3 className="text-sm font-medium text-gray-900">Price Range</h3>
+          <h3 className="font-medium text-gray-900 text-sm">Price Range</h3>
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <Label htmlFor="minPrice" className="text-xs text-gray-600">
+              <Label htmlFor="minPrice" className="text-gray-600 text-xs">
                 Min
               </Label>
               <Input
@@ -243,7 +243,7 @@ export function VehicleFilters({
               />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="maxPrice" className="text-xs text-gray-600">
+              <Label htmlFor="maxPrice" className="text-gray-600 text-xs">
                 Max
               </Label>
               <Input
@@ -259,14 +259,14 @@ export function VehicleFilters({
         </div>
 
         {/* Divider */}
-        <div className="border-t border-gray-100" />
+        <div className="border-gray-100 border-t" />
 
         {/* Year Range */}
         <div className="space-y-4">
-          <h3 className="text-sm font-medium text-gray-900">Year</h3>
+          <h3 className="font-medium text-gray-900 text-sm">Year</h3>
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <Label htmlFor="minYear" className="text-xs text-gray-600">
+              <Label htmlFor="minYear" className="text-gray-600 text-xs">
                 From
               </Label>
               <Select
@@ -287,7 +287,7 @@ export function VehicleFilters({
               </Select>
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="maxYear" className="text-xs text-gray-600">
+              <Label htmlFor="maxYear" className="text-gray-600 text-xs">
                 To
               </Label>
               <Select
@@ -311,14 +311,14 @@ export function VehicleFilters({
         </div>
 
         {/* Divider */}
-        <div className="border-t border-gray-100" />
+        <div className="border-gray-100 border-t" />
 
         {/* Mileage Range */}
         <div className="space-y-4">
-          <h3 className="text-sm font-medium text-gray-900">Mileage</h3>
+          <h3 className="font-medium text-gray-900 text-sm">Mileage</h3>
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <Label htmlFor="minMileage" className="text-xs text-gray-600">
+              <Label htmlFor="minMileage" className="text-gray-600 text-xs">
                 Min
               </Label>
               <Input
@@ -331,7 +331,7 @@ export function VehicleFilters({
               />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="maxMileage" className="text-xs text-gray-600">
+              <Label htmlFor="maxMileage" className="text-gray-600 text-xs">
                 Max
               </Label>
               <Input
@@ -366,14 +366,14 @@ export function VehicleFilters({
       {/* Mobile overlay */}
       {isMobileOpen && (
         <div
-          className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm lg:hidden animate-in fade-in-0 duration-200"
+          className="fade-in-0 fixed inset-0 z-40 animate-in bg-black/50 backdrop-blur-sm duration-200 lg:hidden"
           onClick={onMobileClose}
         />
       )}
 
       {/* Desktop Card */}
       <Card
-        className={`${className} hidden lg:block border-gray-200 shadow-sm`}
+        className={`${className} hidden border-gray-200 shadow-sm lg:block`}
       >
         {filterContent}
       </Card>

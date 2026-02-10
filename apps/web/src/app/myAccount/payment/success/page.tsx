@@ -1,17 +1,16 @@
 "use client";
 
-import { api } from "@car-market/convex/_generated/api";
-import { Button } from "@car-market/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@car-market/ui/card";
+import { api } from "@gearboxe-market/convex/_generated/api";
+import { Button } from "@gearboxe-market/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@gearboxe-market/ui/card";
 import { useQuery } from "convex/react";
-import { CheckCircle, QrCode, Mail, ArrowLeft } from "lucide-react";
+import { CheckCircle, Mail, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Footer } from "../../../../../components/footer";
 import { Navbar } from "../../../../../components/navbar";
 import { QRDisplay } from "../../../../../components/qr-display";
-import { components } from "@car-market/convex/_generated/api";
 
 export default function PaymentSuccessPage() {
   const searchParams = useSearchParams();
@@ -68,7 +67,7 @@ export default function PaymentSuccessPage() {
         <div className="mx-auto max-w-3xl flex-1 px-4 py-12 sm:px-6 lg:px-8">
           <Card>
             <CardContent className="py-12 text-center">
-              <h2 className="mb-2 font-semibold text-xl text-gray-900">
+              <h2 className="mb-2 font-semibold text-gray-900 text-xl">
                 Payment Processing
               </h2>
               <p className="mb-6 text-gray-600">
@@ -108,7 +107,7 @@ export default function PaymentSuccessPage() {
             </div>
 
             <div>
-              <h3 className="mb-4 font-semibold text-lg text-gray-900">
+              <h3 className="mb-4 font-semibold text-gray-900 text-lg">
                 Event Details
               </h3>
               <div className="space-y-2 rounded-lg bg-gray-50 p-4">
@@ -126,7 +125,7 @@ export default function PaymentSuccessPage() {
 
             {reg.qrCodeData && (
               <div>
-                <h3 className="mb-4 font-semibold text-lg text-gray-900">
+                <h3 className="mb-4 font-semibold text-gray-900 text-lg">
                   Your Check-in QR Code
                 </h3>
                 <div className="rounded-lg border-2 border-primary p-6">

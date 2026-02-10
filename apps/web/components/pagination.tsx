@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@car-market/ui/button";
+import { Button } from "@gearboxe-market/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 type PaginationProps = {

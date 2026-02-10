@@ -1,7 +1,7 @@
 "use client";
 
-import { api } from "@car-market/convex/_generated/api";
-import { Button } from "@car-market/ui/button";
+import { api } from "@gearboxe-market/convex/_generated/api";
+import { Button } from "@gearboxe-market/ui/button";
 import { useQuery } from "convex/react";
 import {
   Calendar,
@@ -11,7 +11,6 @@ import {
   MapPin,
   Quote,
   ShieldCheck,
-  User,
 } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -114,7 +113,7 @@ export default function ProfilePage({ params }: ProfilePageProps) {
 
       <div className="mx-auto w-full max-w-5xl flex-1 px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
         {/* Breadcrumb */}
-        <nav className="mb-6 flex items-center gap-1.5 text-sm text-gray-500">
+        <nav className="mb-6 flex items-center gap-1.5 text-gray-500 text-sm">
           <Link href="/" className="transition-colors hover:text-gray-900">
             Home
           </Link>
@@ -188,7 +187,7 @@ export default function ProfilePage({ params }: ProfilePageProps) {
                   {profile.name}
                 </h1>
                 {hasListings && (
-                  <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-medium text-emerald-700">
+                  <span className="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-0.5 font-medium text-emerald-700 text-xs">
                     <ShieldCheck className="h-3.5 w-3.5" />
                     Verified Seller
                   </span>
@@ -196,7 +195,7 @@ export default function ProfilePage({ params }: ProfilePageProps) {
               </div>
 
               {/* Stats row */}
-              <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-gray-500">
+              <div className="mt-3 flex flex-wrap items-center gap-x-5 gap-y-2 text-gray-500 text-sm">
                 {profile.location && (
                   <div className="flex items-center gap-1.5">
                     <MapPin className="h-4 w-4 text-gray-400" />
@@ -229,7 +228,7 @@ export default function ProfilePage({ params }: ProfilePageProps) {
 
         {/* Vehicles */}
         <div>
-          <h2 className="mb-6 font-semibold text-xl text-gray-900">
+          <h2 className="mb-6 font-semibold text-gray-900 text-xl">
             Listings
           </h2>
           {userVehicles && userVehicles.length > 0 ? (
@@ -243,12 +242,12 @@ export default function ProfilePage({ params }: ProfilePageProps) {
               ))}
             </div>
           ) : (
-            <div className="rounded-2xl border border-dashed border-gray-300 bg-white py-20 text-center">
+            <div className="rounded-2xl border border-gray-300 border-dashed bg-white py-20 text-center">
               <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-gray-100">
                 <Car className="h-8 w-8 text-gray-400" />
               </div>
               <h3 className="font-medium text-gray-900">No listings yet</h3>
-              <p className="mt-1 text-sm text-gray-500">
+              <p className="mt-1 text-gray-500 text-sm">
                 This seller hasn&apos;t posted any vehicles.
               </p>
             </div>

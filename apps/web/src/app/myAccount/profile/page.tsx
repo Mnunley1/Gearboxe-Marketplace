@@ -1,8 +1,8 @@
 "use client";
 
-import { api } from "@car-market/convex/_generated/api";
-import { Button } from "@car-market/ui/button";
-import { Input } from "@car-market/ui/input";
+import { api } from "@gearboxe-market/convex/_generated/api";
+import { Button } from "@gearboxe-market/ui/button";
+import { Input } from "@gearboxe-market/ui/input";
 import { useUser } from "@clerk/nextjs";
 import { useConvexAuth, useMutation, useQuery } from "convex/react";
 import { ArrowLeft, ExternalLink, Mail, MapPin, Phone, Save, User } from "lucide-react";
@@ -129,7 +129,7 @@ export default function EditProfilePage() {
         {/* Back link */}
         <Link
           href="/myAccount"
-          className="mb-6 inline-flex items-center gap-1.5 text-sm text-gray-500 transition-colors hover:text-gray-900"
+          className="mb-6 inline-flex items-center gap-1.5 text-gray-500 text-sm transition-colors hover:text-gray-900"
         >
           <ArrowLeft className="h-4 w-4" />
           Back to Account
@@ -156,14 +156,14 @@ export default function EditProfilePage() {
                 <h1 className="truncate font-bold text-2xl text-white">
                   {clerkUser?.fullName || "User"}
                 </h1>
-                <p className="mt-1 truncate text-sm text-slate-300">
+                <p className="mt-1 truncate text-slate-300 text-sm">
                   {clerkUser?.primaryEmailAddress?.emailAddress}
                 </p>
               </div>
               {currentUser?._id && (
                 <Link
                   href={`/profile/${currentUser._id}`}
-                  className="hidden items-center gap-1.5 rounded-lg bg-white/10 px-4 py-2 text-sm font-medium text-white backdrop-blur-sm transition-colors hover:bg-white/20 sm:inline-flex"
+                  className="hidden items-center gap-1.5 rounded-lg bg-white/10 px-4 py-2 font-medium text-sm text-white backdrop-blur-sm transition-colors hover:bg-white/20 sm:inline-flex"
                 >
                   <ExternalLink className="h-3.5 w-3.5" />
                   View Public Profile
@@ -173,7 +173,7 @@ export default function EditProfilePage() {
             {currentUser?._id && (
               <Link
                 href={`/profile/${currentUser._id}`}
-                className="mt-4 inline-flex items-center gap-1.5 rounded-lg bg-white/10 px-4 py-2 text-sm font-medium text-white backdrop-blur-sm transition-colors hover:bg-white/20 sm:hidden"
+                className="mt-4 inline-flex items-center gap-1.5 rounded-lg bg-white/10 px-4 py-2 font-medium text-sm text-white backdrop-blur-sm transition-colors hover:bg-white/20 sm:hidden"
               >
                 <ExternalLink className="h-3.5 w-3.5" />
                 View Public Profile
@@ -189,7 +189,7 @@ export default function EditProfilePage() {
             <h2 className="mb-1 font-semibold text-base text-gray-900">
               Account Information
             </h2>
-            <p className="mb-5 text-sm text-gray-500">
+            <p className="mb-5 text-gray-500 text-sm">
               These fields are managed by your authentication provider and cannot be changed here.
             </p>
             <div className="space-y-4">
@@ -203,7 +203,7 @@ export default function EditProfilePage() {
                   <span className="text-gray-600">
                     {clerkUser?.fullName || "User"}
                   </span>
-                  <span className="ml-auto rounded-full bg-gray-100 px-2.5 py-0.5 text-xs text-gray-400">
+                  <span className="ml-auto rounded-full bg-gray-100 px-2.5 py-0.5 text-gray-400 text-xs">
                     Read-only
                   </span>
                 </div>
@@ -219,7 +219,7 @@ export default function EditProfilePage() {
                   <span className="truncate text-gray-600">
                     {clerkUser?.primaryEmailAddress?.emailAddress || "No email"}
                   </span>
-                  <span className="ml-auto shrink-0 rounded-full bg-gray-100 px-2.5 py-0.5 text-xs text-gray-400">
+                  <span className="ml-auto shrink-0 rounded-full bg-gray-100 px-2.5 py-0.5 text-gray-400 text-xs">
                     Read-only
                   </span>
                 </div>
@@ -228,14 +228,14 @@ export default function EditProfilePage() {
           </div>
 
           {/* Divider */}
-          <div className="border-t border-gray-100" />
+          <div className="border-gray-100 border-t" />
 
           {/* Profile Details Section */}
           <div>
             <h2 className="mb-1 font-semibold text-base text-gray-900">
               Profile Details
             </h2>
-            <p className="mb-5 text-sm text-gray-500">
+            <p className="mb-5 text-gray-500 text-sm">
               This information will be visible on your public profile.
             </p>
             <div className="space-y-5">
@@ -257,7 +257,7 @@ export default function EditProfilePage() {
                   value={bio}
                 />
                 <div className="mt-1.5 flex items-center justify-between">
-                  <p className="text-xs text-gray-400">
+                  <p className="text-gray-400 text-xs">
                     This will be visible on your public profile
                   </p>
                   <span
@@ -281,7 +281,7 @@ export default function EditProfilePage() {
                   Phone
                 </label>
                 <div className="relative">
-                  <Phone className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                  <Phone className="-translate-y-1/2 absolute top-1/2 left-3 h-4 w-4 text-gray-400" />
                   <Input
                     className="pl-10"
                     id="phone"
@@ -291,7 +291,7 @@ export default function EditProfilePage() {
                     value={phone}
                   />
                 </div>
-                <p className="mt-1.5 text-xs text-gray-400">
+                <p className="mt-1.5 text-gray-400 text-xs">
                   Optional. Allows buyers to contact you directly.
                 </p>
               </div>
@@ -305,7 +305,7 @@ export default function EditProfilePage() {
                   Location
                 </label>
                 <div className="relative">
-                  <MapPin className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+                  <MapPin className="-translate-y-1/2 absolute top-1/2 left-3 h-4 w-4 text-gray-400" />
                   <Input
                     className="pl-10"
                     id="location"
@@ -314,7 +314,7 @@ export default function EditProfilePage() {
                     value={location}
                   />
                 </div>
-                <p className="mt-1.5 text-xs text-gray-400">
+                <p className="mt-1.5 text-gray-400 text-xs">
                   Helps buyers find vehicles near them.
                 </p>
               </div>
@@ -323,11 +323,11 @@ export default function EditProfilePage() {
         </div>
 
         {/* Save bar */}
-        <div className="sticky bottom-0 z-10 -mx-4 mt-6 border-t border-gray-200/80 bg-white/80 px-4 py-4 backdrop-blur-md sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">
+        <div className="-mx-4 sm:-mx-6 lg:-mx-8 sticky bottom-0 z-10 mt-6 border-gray-200/80 border-t bg-white/80 px-4 py-4 backdrop-blur-md sm:px-6 lg:px-8">
           <div className="flex items-center justify-between gap-4">
             <Link
               href="/myAccount"
-              className="text-sm font-medium text-gray-500 transition-colors hover:text-gray-900"
+              className="font-medium text-gray-500 text-sm transition-colors hover:text-gray-900"
             >
               Cancel
             </Link>

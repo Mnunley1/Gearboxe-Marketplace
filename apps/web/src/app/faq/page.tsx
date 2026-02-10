@@ -3,8 +3,8 @@
 import { useState } from "react";
 import { Navbar } from "../../../components/navbar";
 import { Footer } from "../../../components/footer";
-import { Card } from "@car-market/ui/card";
-import { Button } from "@car-market/ui/button";
+import { Card } from "@gearboxe-market/ui/card";
+import { Button } from "@gearboxe-market/ui/button";
 import {
   HelpCircle,
   Car,
@@ -253,7 +253,7 @@ export default function FAQPage() {
         </section>
 
         <section className="bg-gradient-to-br from-primary/10 to-primary/5 py-16">
-          <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 text-center">
+          <div className="mx-auto max-w-4xl px-4 text-center sm:px-6 lg:px-8">
             <Mail className="mx-auto mb-4 h-10 w-10 text-primary" />
             <h2 className="mb-4 font-bold text-2xl text-gray-900">
               Still have questions?

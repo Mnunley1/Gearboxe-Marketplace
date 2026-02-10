@@ -1,18 +1,18 @@
 "use client";
 
-import { api } from "@car-market/convex/_generated/api";
-import { Button } from "@car-market/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@car-market/ui/card";
-import { Input } from "@car-market/ui/input";
-import { Label } from "@car-market/ui/label";
+import { api } from "@gearboxe-market/convex/_generated/api";
+import { Button } from "@gearboxe-market/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@gearboxe-market/ui/card";
+import { Input } from "@gearboxe-market/ui/input";
+import { Label } from "@gearboxe-market/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@car-market/ui/select";
-import { Textarea } from "@car-market/ui/textarea";
+} from "@gearboxe-market/ui/select";
+import { Textarea } from "@gearboxe-market/ui/textarea";
 import { useUser } from "@clerk/nextjs";
 import { useMutation, useQuery } from "convex/react";
 import { Car } from "lucide-react";
@@ -23,7 +23,6 @@ import { useToast } from "@/hooks/useToast";
 import { Footer } from "../../../../components/footer";
 import { Navbar } from "../../../../components/navbar";
 import { ImageUpload } from "../../../../components/image-upload";
-import { Id } from "@car-market/convex/_generated/dataModel";
 
 const makes = [
   "Acura",
@@ -133,29 +132,29 @@ export default function NewListingPage() {
     if (!formData.model.trim()) {
       newErrors.model = "Model is required";
     }
-    if (!formData.year) {
-      newErrors.year = "Year is required";
-    } else {
+    if (formData.year) {
       const yearNum = Number.parseInt(formData.year);
       if (isNaN(yearNum) || yearNum < 1900 || yearNum > new Date().getFullYear() + 1) {
         newErrors.year = "Please enter a valid year";
       }
-    }
-    if (!formData.mileage.trim()) {
-      newErrors.mileage = "Mileage is required";
     } else {
+      newErrors.year = "Year is required";
+    }
+    if (formData.mileage.trim()) {
       const mileageNum = Number.parseInt(formData.mileage);
       if (isNaN(mileageNum) || mileageNum < 0) {
         newErrors.mileage = "Please enter a valid mileage";
       }
-    }
-    if (!formData.price.trim()) {
-      newErrors.price = "Price is required";
     } else {
+      newErrors.mileage = "Mileage is required";
+    }
+    if (formData.price.trim()) {
       const priceNum = Number.parseFloat(formData.price);
       if (isNaN(priceNum) || priceNum <= 0) {
         newErrors.price = "Please enter a valid price";
       }
+    } else {
+      newErrors.price = "Price is required";
     }
     if (formData.vin && formData.vin.length !== 17) {
       newErrors.vin = "VIN must be exactly 17 characters";
@@ -168,14 +167,14 @@ export default function NewListingPage() {
     if (!formData.contactInfo.trim()) {
       newErrors.contactInfo = "Contact information is required";
     }
-    if (!formData.eventId) {
-      newErrors.eventId = "Please select an event";
-    } else {
+    if (formData.eventId) {
       // Check if selected event is full
       const selectedEvent = upcomingEvents?.find((e) => e._id === formData.eventId);
       if (selectedEvent?.isFull) {
         newErrors.eventId = "This event is full. Please select a different event.";
       }
+    } else {
+      newErrors.eventId = "Please select an event";
     }
 
     setErrors(newErrors);
@@ -183,7 +182,7 @@ export default function NewListingPage() {
   };
 
   const handleSubmit = async () => {
-    if (!currentUser || !formData.eventId) return;
+    if (!(currentUser && formData.eventId)) return;
 
     // Validate form before submission
     if (!validateForm()) {

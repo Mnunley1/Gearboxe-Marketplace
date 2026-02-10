@@ -2,17 +2,17 @@
 
 import { Filter, X } from "lucide-react";
 import { useState } from "react";
-import { Button } from "@car-market/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@car-market/ui/card";
-import { Input } from "@car-market/ui/input";
-import { Label } from "@car-market/ui/label";
+import { Button } from "@gearboxe-market/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@gearboxe-market/ui/card";
+import { Input } from "@gearboxe-market/ui/input";
+import { Label } from "@gearboxe-market/ui/label";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@car-market/ui/select";
+} from "@gearboxe-market/ui/select";
 
 type VehicleFiltersProps = {
   onFiltersChange: (filters: {

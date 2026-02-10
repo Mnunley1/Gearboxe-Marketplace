@@ -1,13 +1,13 @@
 "use client";
 
-import { api } from "@car-market/convex/_generated/api";
+import { api } from "@gearboxe-market/convex/_generated/api";
 import { useMutation, useQuery } from "convex/react";
 import { Heart } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { Button } from "@car-market/ui/button";
-import { Card, CardContent, CardFooter } from "@car-market/ui/card";
+import { Button } from "@gearboxe-market/ui/button";
+import { Card, CardContent, CardFooter } from "@gearboxe-market/ui/card";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useToast } from "@/hooks/useToast";
 

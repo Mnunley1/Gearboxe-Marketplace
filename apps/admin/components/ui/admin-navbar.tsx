@@ -1,6 +1,6 @@
 "use client";
 
-import { api } from "@car-market/convex/_generated/api";
+import { api } from "@gearboxe-market/convex/_generated/api";
 import { useAuth, useUser } from "@clerk/nextjs";
 import { useConvexAuth, useQuery } from "convex/react";
 import {
@@ -18,7 +18,7 @@ import {
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { Button } from "@car-market/ui/button";
+import { Button } from "@gearboxe-market/ui/button";
 import { UserDropdown } from "@/components/ui/user-dropdown";
 
 export function AdminNavbar() {

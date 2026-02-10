@@ -1,7 +1,7 @@
 "use client";
 
-import { api } from "@car-market/convex/_generated/api";
-import { Button } from "@car-market/ui/button";
+import { api } from "@gearboxe-market/convex/_generated/api";
+import { Button } from "@gearboxe-market/ui/button";
 import { useConvexAuth, useQuery } from "convex/react";
 import { ArrowRight, Calendar, Car, CheckCircle2, Shield, Sparkles, Star, TrendingUp, Users } from "lucide-react";
 import Link from "next/link";
@@ -33,28 +33,28 @@ export default function HomePage() {
         <section className="relative overflow-hidden bg-gradient-to-b from-primary/5 via-white to-white">
           {/* Background decorative elements */}
           <div className="absolute inset-0 bg-grid-pattern opacity-30" />
-          <div className="absolute -top-24 -left-24 h-96 w-96 rounded-full bg-primary/10 blur-3xl" />
-          <div className="absolute top-1/2 -right-24 h-96 w-96 rounded-full bg-primary/5 blur-3xl" />
+          <div className="-top-24 -left-24 absolute h-96 w-96 rounded-full bg-primary/10 blur-3xl" />
+          <div className="-right-24 absolute top-1/2 h-96 w-96 rounded-full bg-primary/5 blur-3xl" />
 
           <div className="relative mx-auto max-w-7xl px-4 py-20 sm:px-6 sm:py-28 lg:px-8 lg:py-36">
             <div className="mx-auto max-w-4xl text-center">
               {/* Badge */}
-              <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-2 text-sm font-medium text-primary">
+              <div className="mb-8 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-2 font-medium text-primary text-sm">
                 <Sparkles className="h-4 w-4" />
                 The Modern Way to Buy & Sell Cars
               </div>
 
               {/* Main Heading */}
-              <h1 className="mb-6 text-4xl font-bold tracking-tight text-gray-900 sm:text-5xl md:text-6xl lg:text-7xl">
+              <h1 className="mb-6 font-bold text-4xl text-gray-900 tracking-tight sm:text-5xl md:text-6xl lg:text-7xl">
                 Find Your Perfect
                 <span className="relative mx-2 inline-block">
                   <span className="relative z-10 text-gradient-primary">Dream Car</span>
-                  <span className="absolute -bottom-2 left-0 right-0 h-3 bg-primary/10 -rotate-1 rounded" />
+                  <span className="-bottom-2 -rotate-1 absolute right-0 left-0 h-3 rounded bg-primary/10" />
                 </span>
               </h1>
 
               {/* Subtitle */}
-              <p className="mx-auto mb-10 max-w-2xl text-lg text-gray-600 leading-relaxed sm:text-xl">
+              <p className="mx-auto mb-10 max-w-2xl text-gray-600 text-lg leading-relaxed sm:text-xl">
                 Connect with local sellers at exclusive popup events. Browse curated vehicles,
                 meet sellers in person, and drive away with confidence.
               </p>
@@ -64,7 +64,7 @@ export default function HomePage() {
                 <Button
                   asChild
                   size="lg"
-                  className="group shadow-lg shadow-primary/25 transition-all hover:shadow-xl hover:shadow-primary/30"
+                  className="group shadow-lg shadow-primary/25 transition-all hover:shadow-primary/30 hover:shadow-xl"
                 >
                   <Link href="/vehicles" className="flex items-center gap-2">
                     <Car className="h-5 w-5" />
@@ -88,7 +88,7 @@ export default function HomePage() {
               {/* Trust Indicators */}
               <div className="flex flex-wrap items-center justify-center gap-x-8 gap-y-4">
                 <div className="flex items-center gap-2 text-gray-600">
-                  <div className="flex -space-x-1">
+                  <div className="-space-x-1 flex">
                     {[...Array(5)].map((_, i) => (
                       <Star key={i} className="h-4 w-4 fill-amber-400 text-amber-400" />
                     ))}
@@ -100,7 +100,7 @@ export default function HomePage() {
                   <Users className="h-5 w-5 text-primary" />
                   <span className="font-medium">1,200+ Members</span>
                 </div>
-                <div className="h-5 w-px bg-gray-200 hidden sm:block" />
+                <div className="hidden h-5 w-px bg-gray-200 sm:block" />
                 <div className="flex items-center gap-2 text-gray-600">
                   <Shield className="h-5 w-5 text-primary" />
                   <span className="font-medium">Verified Sellers</span>
@@ -110,8 +110,8 @@ export default function HomePage() {
           </div>
 
           {/* Decorative Bottom Wave */}
-          <div className="absolute bottom-0 left-0 right-0">
-            <svg className="w-full h-12 text-white" viewBox="0 0 1440 48" preserveAspectRatio="none">
+          <div className="absolute right-0 bottom-0 left-0">
+            <svg className="h-12 w-full text-white" viewBox="0 0 1440 48" preserveAspectRatio="none">
               <path fill="currentColor" d="M0,48L60,42.7C120,37,240,27,360,26.7C480,27,600,37,720,42.7C840,48,960,48,1080,42.7C1200,37,1320,27,1380,21.3L1440,16L1440,48L1380,48C1320,48,1200,48,1080,48C960,48,840,48,720,48C600,48,480,48,360,48C240,48,120,48,60,48L0,48Z" />
             </svg>
           </div>
@@ -121,10 +121,10 @@ export default function HomePage() {
         <section className="bg-white py-20 lg:py-24">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="mb-16 text-center">
-              <h2 className="mb-4 text-3xl font-bold text-gray-900 sm:text-4xl">
+              <h2 className="mb-4 font-bold text-3xl text-gray-900 sm:text-4xl">
                 How It Works
               </h2>
-              <p className="mx-auto max-w-2xl text-lg text-gray-600">
+              <p className="mx-auto max-w-2xl text-gray-600 text-lg">
                 Three simple steps to find or sell your next vehicle
               </p>
             </div>
@@ -153,7 +153,7 @@ export default function HomePage() {
                 <div key={step.title} className="group relative">
                   <div className="relative rounded-2xl border border-gray-100 bg-white p-8 shadow-sm transition-all duration-300 hover:border-gray-200 hover:shadow-lg">
                     {/* Step Number */}
-                    <div className="absolute -top-4 left-8 flex h-8 w-8 items-center justify-center rounded-full bg-white text-sm font-bold text-gray-400 shadow-md border border-gray-100">
+                    <div className="-top-4 absolute left-8 flex h-8 w-8 items-center justify-center rounded-full border border-gray-100 bg-white font-bold text-gray-400 text-sm shadow-md">
                       {index + 1}
                     </div>
 
@@ -162,7 +162,7 @@ export default function HomePage() {
                       <step.icon className="h-7 w-7" />
                     </div>
 
-                    <h3 className="mb-3 text-xl font-semibold text-gray-900">
+                    <h3 className="mb-3 font-semibold text-gray-900 text-xl">
                       {step.title}
                     </h3>
                     <p className="text-gray-600 leading-relaxed">
@@ -177,15 +177,15 @@ export default function HomePage() {
 
         {/* Next Event Section */}
         {nextEvent && (
-          <section className="bg-white py-20 lg:py-24 border-y border-gray-100">
+          <section className="border-gray-100 border-y bg-white py-20 lg:py-24">
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
               <div className="mb-12 flex flex-col items-center justify-between gap-4 sm:flex-row">
                 <div>
-                  <div className="mb-2 inline-flex items-center gap-2 text-sm font-medium text-primary">
+                  <div className="mb-2 inline-flex items-center gap-2 font-medium text-primary text-sm">
                     <Calendar className="h-4 w-4" />
                     Don't Miss Out
                   </div>
-                  <h2 className="text-3xl font-bold text-gray-900 sm:text-4xl">
+                  <h2 className="font-bold text-3xl text-gray-900 sm:text-4xl">
                     Next Upcoming Event
                   </h2>
                 </div>
@@ -209,11 +209,11 @@ export default function HomePage() {
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="mb-12 flex flex-col items-center justify-between gap-4 sm:flex-row">
               <div>
-                <div className="mb-2 inline-flex items-center gap-2 text-sm font-medium text-primary">
+                <div className="mb-2 inline-flex items-center gap-2 font-medium text-primary text-sm">
                   <TrendingUp className="h-4 w-4" />
                   Featured Selection
                 </div>
-                <h2 className="text-3xl font-bold text-gray-900 sm:text-4xl">
+                <h2 className="font-bold text-3xl text-gray-900 sm:text-4xl">
                   Popular Vehicles
                 </h2>
               </div>
@@ -252,7 +252,7 @@ export default function HomePage() {
                 <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-primary/10">
                   <Car className="h-10 w-10 text-primary" />
                 </div>
-                <h3 className="mb-3 text-xl font-semibold text-gray-900">
+                <h3 className="mb-3 font-semibold text-gray-900 text-xl">
                   No vehicles available yet
                 </h3>
                 <p className="mx-auto mb-8 max-w-md text-gray-600">
@@ -286,15 +286,15 @@ export default function HomePage() {
 
           <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="mx-auto max-w-3xl text-center">
-              <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 text-sm font-medium text-white">
+              <div className="mb-6 inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2 font-medium text-sm text-white">
                 <Sparkles className="h-4 w-4" />
                 Join Our Community
               </div>
 
-              <h2 className="mb-6 text-3xl font-bold text-white sm:text-4xl md:text-5xl">
+              <h2 className="mb-6 font-bold text-3xl text-white sm:text-4xl md:text-5xl">
                 Ready to Sell Your Car?
               </h2>
-              <p className="mx-auto mb-10 max-w-2xl text-lg text-gray-300 leading-relaxed">
+              <p className="mx-auto mb-10 max-w-2xl text-gray-300 text-lg leading-relaxed">
                 Join thousands of sellers who've found buyers through our curated events.
                 Get direct access to serious buyers and sell faster.
               </p>
@@ -367,7 +367,7 @@ export default function HomePage() {
                     <h3 className="mb-2 font-semibold text-white">
                       {benefit.title}
                     </h3>
-                    <p className="text-sm text-gray-400">
+                    <p className="text-gray-400 text-sm">
                       {benefit.description}
                     </p>
                   </div>

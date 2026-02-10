@@ -1,4 +1,4 @@
-import { api } from "@car-market/convex/_generated/api";
+import { api } from "@gearboxe-market/convex/_generated/api";
 import { auth } from "@clerk/nextjs/server";
 import { ConvexHttpClient } from "convex/browser";
 import { type NextRequest, NextResponse } from "next/server";

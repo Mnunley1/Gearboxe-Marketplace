@@ -1,9 +1,9 @@
 "use client";
 
-import { Button } from "@car-market/ui/button";
-import { Card } from "@car-market/ui/card";
-import { Input } from "@car-market/ui/input";
-import { Label } from "@car-market/ui/label";
+import { Button } from "@gearboxe-market/ui/button";
+import { Card } from "@gearboxe-market/ui/card";
+import { Input } from "@gearboxe-market/ui/input";
+import { Label } from "@gearboxe-market/ui/label";
 import { useAuth, useSignUp } from "@clerk/nextjs";
 import { Eye, EyeOff, Lock, Mail, User } from "lucide-react";
 import Link from "next/link";

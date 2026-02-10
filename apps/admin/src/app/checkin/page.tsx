@@ -1,6 +1,6 @@
 "use client";
 
-import { api } from "@car-market/convex/_generated/api";
+import { api } from "@gearboxe-market/convex/_generated/api";
 import { useUser } from "@clerk/nextjs";
 import { useConvex, useConvexAuth, useMutation, useQuery } from "convex/react";
 import {
@@ -15,8 +15,8 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
-import { Button } from "@car-market/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@car-market/ui/card";
+import { Button } from "@gearboxe-market/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@gearboxe-market/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -24,7 +24,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@car-market/ui/dialog";
+} from "@gearboxe-market/ui/dialog";
 import { QRScannerComponent } from "@/components/ui/qr-scanner";
 
 type ScanResult = {

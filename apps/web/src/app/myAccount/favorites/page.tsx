@@ -1,8 +1,8 @@
 "use client";
 
-import { api } from "@car-market/convex/_generated/api";
-import { Button } from "@car-market/ui/button";
-import { Card, CardContent } from "@car-market/ui/card";
+import { api } from "@gearboxe-market/convex/_generated/api";
+import { Button } from "@gearboxe-market/ui/button";
+import { Card, CardContent } from "@gearboxe-market/ui/card";
 import { useAuth } from "@clerk/nextjs";
 import { useMutation, useQuery } from "convex/react";
 import { Eye, Heart, SortAsc } from "lucide-react";

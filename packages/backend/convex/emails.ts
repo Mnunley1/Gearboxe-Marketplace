@@ -28,7 +28,7 @@ export const sendRegistrationConfirmationEmail = internalMutation({
     const event = await ctx.db.get(registration.eventId);
     const user = await ctx.db.get(registration.userId);
     
-    if (!vehicle || !event || !user) {
+    if (!((vehicle && event ) && user)) {
       throw new Error("Missing registration data");
     }
     
@@ -104,7 +104,7 @@ export const sendRegistrationConfirmationEmail = internalMutation({
             
             <p style="font-size: 14px; color: #6b7280; margin-top: 30px; border-top: 1px solid #e5e7eb; padding-top: 20px;">
               Best regards,<br>
-              The Car Market Team
+              The Gearboxe Market Team
             </p>
           </div>
         </body>
@@ -113,7 +113,7 @@ export const sendRegistrationConfirmationEmail = internalMutation({
     
     // Send email
     await resend.sendEmail(ctx, {
-      from: process.env.RESEND_FROM_EMAIL || "noreply@carmarket.com",
+      from: process.env.RESEND_FROM_EMAIL || "noreply@gearboxe.com",
       to: user.email,
       subject: `Event Registration Confirmation - ${event.name}`,
       html,
@@ -130,7 +130,7 @@ export const resendConfirmationEmail = internalMutation({
   },
   handler: async (ctx, args) => {
     const registration = await ctx.db.get(args.registrationId);
-    if (!registration || !registration.qrCodeData) {
+    if (!(registration && registration.qrCodeData)) {
       throw new Error("Registration not found or QR code not generated");
     }
     

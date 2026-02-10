@@ -27,10 +27,10 @@
       "@/*": [
         "./*"
       ],
-      "@car-market/ui/*": [
+      "@gearboxe-market/ui/*": [
         "../../packages/ui/src/*"
       ],
-      "@car-market/convex/*": [
+      "@gearboxe-market/convex/*": [
         "../../packages/backend/convex/*"
       ]
     }

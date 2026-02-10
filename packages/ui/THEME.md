@@ -8,7 +8,7 @@ This package provides a shared Tailwind CSS theme for both the web and admin app
 2. **Import in Apps**: Each app imports the shared theme in their `global.css`:
    ```css
    @import "tailwindcss";
-   @import "@car-market/ui/theme";
+   @import "@gearboxe-market/ui/theme";
    ```
 3. **Content Scanning**: Each app's `tailwind.config.ts` scans the UI package:
    ```typescript

@@ -1,9 +1,8 @@
 "use client";
 
-import { api } from "@car-market/convex/_generated/api";
-import { Button } from "@car-market/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@car-market/ui/card";
-import { useUser } from "@clerk/nextjs";
+import { api } from "@gearboxe-market/convex/_generated/api";
+import { Button } from "@gearboxe-market/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@gearboxe-market/ui/card";
 import { useAction, useQuery } from "convex/react";
 import { CreditCard, ArrowLeft, AlertCircle } from "lucide-react";
 import Link from "next/link";
@@ -59,12 +58,12 @@ export default function PaymentPage() {
     return null;
   }
 
-  if (!registrationId || !vehicleId || !eventId) {
+  if (!((registrationId && vehicleId ) && eventId)) {
     router.push("/myAccount/my-listings");
     return null;
   }
 
-  if (!vehicle || !event || !registration) {
+  if (!((vehicle && event ) && registration)) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-white">
         <div className="text-center">
@@ -90,7 +89,7 @@ export default function PaymentPage() {
           <Card>
             <CardContent className="py-12 text-center">
               <AlertCircle className="mx-auto mb-4 h-16 w-16 text-red-500" />
-              <h2 className="mb-2 font-semibold text-xl text-gray-900">
+              <h2 className="mb-2 font-semibold text-gray-900 text-xl">
                 Event is Full
               </h2>
               <p className="mb-6 text-gray-600">
@@ -167,7 +166,7 @@ export default function PaymentPage() {
           </CardHeader>
           <CardContent className="space-y-6">
             <div>
-              <h3 className="mb-4 font-semibold text-lg text-gray-900">
+              <h3 className="mb-4 font-semibold text-gray-900 text-lg">
                 Registration Summary
               </h3>
               
@@ -210,7 +209,7 @@ export default function PaymentPage() {
 
             <div className="border-t pt-6">
               <div className="mb-4 flex items-center justify-between">
-                <span className="text-lg text-gray-900">Registration Fee:</span>
+                <span className="text-gray-900 text-lg">Registration Fee:</span>
                 <span className="font-bold text-2xl text-primary">
                   ${priceInDollars}
                 </span>

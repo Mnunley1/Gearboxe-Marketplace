@@ -1,4 +1,4 @@
-import { api } from "@car-market/convex/_generated/api";
+import { api } from "@gearboxe-market/convex/_generated/api";
 import { useConvexAuth, useQuery } from "convex/react";
 
 export function useCurrentUser() {

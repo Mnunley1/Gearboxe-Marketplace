@@ -1,4 +1,4 @@
-import { ToastContainer } from "@car-market/ui/toast-container";
+import { ToastContainer } from "@gearboxe-market/ui/toast-container";
 import { ClerkProvider } from "@clerk/nextjs";
 import type { Metadata } from "next";
 import { ErrorBoundary } from "@/components/error-boundary";

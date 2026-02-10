@@ -1,6 +1,6 @@
 "use client";
 
-import { api } from "@car-market/convex/_generated/api";
+import { api } from "@gearboxe-market/convex/_generated/api";
 import { useMutation } from "convex/react";
 import {
   Calendar,
@@ -12,14 +12,14 @@ import {
   Users,
 } from "lucide-react";
 import { useState } from "react";
-import { Button } from "@car-market/ui/button";
+import { Button } from "@gearboxe-market/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@car-market/ui/card";
+} from "@gearboxe-market/ui/card";
 
 export default function SeedPage() {
   const [isSeeding, setIsSeeding] = useState(false);

@@ -1,12 +1,12 @@
 "use client";
 
-import { api } from "@car-market/convex/_generated/api";
+import { api } from "@gearboxe-market/convex/_generated/api";
 import { useMutation, useQuery } from "convex/react";
 import { Check, CheckCheck, MessageCircle, Send } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { Button } from "@car-market/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@car-market/ui/card";
-import { Textarea } from "@car-market/ui/textarea";
+import { Button } from "@gearboxe-market/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@gearboxe-market/ui/card";
+import { Textarea } from "@gearboxe-market/ui/textarea";
 import { useCurrentUser } from "@/hooks/useCurrentUser";
 import { useToast } from "@/hooks/useToast";
 

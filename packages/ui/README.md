@@ -1,6 +1,6 @@
-# @car-market/ui
+# @gearboxe-market/ui
 
-Shared UI components for the Car Market monorepo.
+Shared UI components for the Gearboxe Market monorepo.
 
 ## Components
 
@@ -16,9 +16,9 @@ Shared UI components for the Car Market monorepo.
 ## Usage
 
 ```tsx
-import { Button } from "@car-market/ui/button";
-import { Card } from "@car-market/ui/card";
-import { Input } from "@car-market/ui/input";
+import { Button } from "@gearboxe-market/ui/button";
+import { Card } from "@gearboxe-market/ui/card";
+import { Input } from "@gearboxe-market/ui/input";
 ```
 
 ## Dependencies

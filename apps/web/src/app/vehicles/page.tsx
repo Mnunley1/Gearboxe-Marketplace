@@ -1,16 +1,16 @@
 "use client";
 
-import { api } from "@car-market/convex/_generated/api";
-import { Button } from "@car-market/ui/button";
+import { api } from "@gearboxe-market/convex/_generated/api";
+import { Button } from "@gearboxe-market/ui/button";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@car-market/ui/select";
+} from "@gearboxe-market/ui/select";
 import { useQuery } from "convex/react";
-import { Car, Filter, Grid, LayoutList, SlidersHorizontal, X } from "lucide-react";
+import { Car, Grid, LayoutList, SlidersHorizontal, X } from "lucide-react";
 import { useState } from "react";
 import { Footer } from "../../../components/footer";
 import { Navbar } from "../../../components/navbar";
@@ -89,10 +89,10 @@ export default function VehiclesPage() {
       <Navbar />
 
       {/* Page Header */}
-      <div className="border-b border-gray-200 bg-white">
+      <div className="border-gray-200 border-b bg-white">
         <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
           <div className="flex flex-col gap-1">
-            <h1 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+            <h1 className="font-bold text-3xl text-gray-900 tracking-tight sm:text-4xl">
               Browse Vehicles
             </h1>
             <p className="text-gray-600">
@@ -112,7 +112,7 @@ export default function VehiclesPage() {
           </aside>
 
           {/* Main Content */}
-          <main className="flex-1 min-w-0">
+          <main className="min-w-0 flex-1">
             {/* Toolbar */}
             <div className="mb-6 flex flex-col gap-4 rounded-xl border border-gray-200 bg-white p-4 shadow-sm sm:flex-row sm:items-center sm:justify-between">
               {/* Left side - Results count and mobile filter button */}
@@ -127,20 +127,20 @@ export default function VehiclesPage() {
                   <SlidersHorizontal className="mr-2 h-4 w-4" />
                   Filters
                   {activeFilterCount > 0 && (
-                    <span className="ml-2 flex h-5 w-5 items-center justify-center rounded-full bg-primary text-xs font-medium text-white">
+                    <span className="ml-2 flex h-5 w-5 items-center justify-center rounded-full bg-primary font-medium text-white text-xs">
                       {activeFilterCount}
                     </span>
                   )}
                 </Button>
 
                 {/* Results Count */}
-                <div className="text-sm text-gray-600">
+                <div className="text-gray-600 text-sm">
                   {result ? (
                     <span>
                       <span className="font-semibold text-gray-900">{total.toLocaleString()}</span>
                       {" "}vehicle{total !== 1 ? "s" : ""} found
                       {totalPages > 1 && (
-                        <span className="hidden sm:inline text-gray-400">
+                        <span className="hidden text-gray-400 sm:inline">
                           {" "}| Page {currentPage} of {totalPages}
                         </span>
                       )}
@@ -206,7 +206,7 @@ export default function VehiclesPage() {
             {/* Active Filters Chips */}
             {activeFilterCount > 0 && (
               <div className="mb-6 flex flex-wrap items-center gap-2">
-                <span className="text-sm text-gray-500">Active filters:</span>
+                <span className="text-gray-500 text-sm">Active filters:</span>
                 {filters.make && (
                   <FilterChip
                     label={`Make: ${filters.make}`}
@@ -282,7 +282,7 @@ export default function VehiclesPage() {
                 <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-gray-100">
                   <Car className="h-10 w-10 text-gray-400" />
                 </div>
-                <h3 className="mb-2 text-xl font-semibold text-gray-900">
+                <h3 className="mb-2 font-semibold text-gray-900 text-xl">
                   No vehicles found
                 </h3>
                 <p className="mb-6 max-w-sm text-gray-600">
@@ -337,11 +337,11 @@ export default function VehiclesPage() {
 // Filter Chip Component
 function FilterChip({ label, onRemove }: { label: string; onRemove: () => void }) {
   return (
-    <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 text-sm font-medium text-primary">
+    <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 font-medium text-primary text-sm">
       {label}
       <button
         onClick={onRemove}
-        className="ml-1 rounded-full p-0.5 hover:bg-primary/20 transition-colors"
+        className="ml-1 rounded-full p-0.5 transition-colors hover:bg-primary/20"
         aria-label={`Remove ${label} filter`}
       >
         <X className="h-3 w-3" />

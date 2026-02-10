@@ -35,18 +35,18 @@ importers:
 
   apps/admin:
     dependencies:
-      '@car-market/convex':
-        specifier: workspace:*
-        version: link:../../packages/backend
-      '@car-market/ui':
-        specifier: workspace:*
-        version: link:../../packages/ui
       '@clerk/backend':
         specifier: ^2.17.2
         version: 2.19.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       '@clerk/nextjs':
         specifier: ^6.35.2
         version: 6.36.7(next@16.1.3(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      '@gearboxe-market/convex':
+        specifier: workspace:*
+        version: link:../../packages/backend
+      '@gearboxe-market/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
       '@radix-ui/react-dialog':
         specifier: ^1.1.15
         version: 1.1.15(@types/react-dom@19.2.2(@types/react@19.2.2))(@types/react@19.2.2)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -153,12 +153,6 @@ importers:
 
   apps/web:
     dependencies:
-      '@car-market/convex':
-        specifier: workspace:*
-        version: link:../../packages/backend
-      '@car-market/ui':
-        specifier: workspace:*
-        version: link:../../packages/ui
       '@clerk/backend':
         specifier: ^2.17.2
         version: 2.19.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -168,6 +162,12 @@ importers:
       '@convex-dev/r2':
         specifier: ^0.7.1
         version: 0.7.3(@standard-schema/spec@1.1.0)(convex-svelte@0.0.11(convex@1.31.1(@clerk/clerk-react@5.59.3(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react@19.1.0))(svelte@5.46.3))(convex@1.31.1(@clerk/clerk-react@5.59.3(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(svelte@5.46.3)(typescript@5.9.3)(zod@4.1.12)
+      '@gearboxe-market/convex':
+        specifier: workspace:*
+        version: link:../../packages/backend
+      '@gearboxe-market/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
       '@radix-ui/react-dialog':
         specifier: ^1.1.15
         version: 1.1.15(@types/react-dom@19.2.2(@types/react@19.2.2))(@types/react@19.2.2)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)

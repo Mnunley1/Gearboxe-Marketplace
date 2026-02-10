@@ -1,7 +1,7 @@
 "use client";
 
-import { api } from "@car-market/convex/_generated/api";
-import { Button } from "@car-market/ui/button";
+import { api } from "@gearboxe-market/convex/_generated/api";
+import { Button } from "@gearboxe-market/ui/button";
 import { useAuth } from "@clerk/nextjs";
 import { useConvexAuth, useMutation, useQuery } from "convex/react";
 import {
@@ -85,7 +85,7 @@ export default function VehiclePage({ params }: VehiclePageProps) {
   useEffect(() => {
     // Set page title
     if (vehicle) {
-      document.title = `${vehicle.title} - Car Market`;
+      document.title = `${vehicle.title} - Gearboxe Market`;
     }
   }, [vehicle]);
 
@@ -254,7 +254,7 @@ export default function VehiclePage({ params }: VehiclePageProps) {
 
   const handleShareEmail = () => {
     const subject = `Check out this ${vehicle.year} ${vehicle.make} ${vehicle.model}`;
-    const body = `I found this vehicle on Car Market and thought you might be interested:\n\n${vehicle.title}\n${vehicle.year} ${vehicle.make} ${vehicle.model}\nPrice: ${formatPrice(vehicle.price)}\n\nView it here: ${window.location.href}`;
+    const body = `I found this vehicle on Gearboxe Market and thought you might be interested:\n\n${vehicle.title}\n${vehicle.year} ${vehicle.make} ${vehicle.model}\nPrice: ${formatPrice(vehicle.price)}\n\nView it here: ${window.location.href}`;
     const mailtoLink = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
     window.open(mailtoLink);
     setShowShareMenu(false);
@@ -271,7 +271,7 @@ export default function VehiclePage({ params }: VehiclePageProps) {
     if (userLoading) return;
 
     // If user is not logged in, show auth dialog
-    if (!isUserAuthenticated || !convexUser) {
+    if (!(isUserAuthenticated && convexUser)) {
       setShowAuthDialog(true);
       return;
     }
@@ -409,7 +409,7 @@ export default function VehiclePage({ params }: VehiclePageProps) {
               <span>All Vehicles</span>
             </Link>
             <span className="text-gray-300">/</span>
-            <span className="font-medium text-gray-900 truncate max-w-[200px] sm:max-w-none">{vehicle.title}</span>
+            <span className="max-w-[200px] truncate font-medium text-gray-900 sm:max-w-none">{vehicle.title}</span>
           </nav>
 
           <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
@@ -419,23 +419,23 @@ export default function VehiclePage({ params }: VehiclePageProps) {
               <div className="rounded-2xl border border-gray-200/60 bg-white p-6 shadow-sm sm:p-8">
                 <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                   <div className="flex-1">
-                    <h1 className="mb-2 text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl">
+                    <h1 className="mb-2 font-bold text-2xl text-gray-900 tracking-tight sm:text-3xl">
                       {vehicle.title}
                     </h1>
-                    <p className="mb-4 text-lg text-gray-600">
+                    <p className="mb-4 text-gray-600 text-lg">
                       {vehicle.year} {vehicle.make} {vehicle.model}
                     </p>
                     <div className="flex flex-wrap items-center gap-3 sm:gap-4">
-                      <div className="flex items-center gap-1.5 rounded-full bg-gray-100 px-3 py-1.5 text-sm text-gray-700">
+                      <div className="flex items-center gap-1.5 rounded-full bg-gray-100 px-3 py-1.5 text-gray-700 text-sm">
                         <Gauge className="h-4 w-4 text-gray-500" />
                         <span className="tabular-nums">{formatMileage(vehicle.mileage)}</span>
                         <span className="text-gray-500">mi</span>
                       </div>
-                      <div className="flex items-center gap-1.5 rounded-full bg-gray-100 px-3 py-1.5 text-sm text-gray-700">
+                      <div className="flex items-center gap-1.5 rounded-full bg-gray-100 px-3 py-1.5 text-gray-700 text-sm">
                         <Calendar className="h-4 w-4 text-gray-500" />
                         <span>{vehicle.year}</span>
                       </div>
-                      <div className="flex items-center gap-1.5 text-sm text-gray-500">
+                      <div className="flex items-center gap-1.5 text-gray-500 text-sm">
                         <Clock className="h-4 w-4" />
                         <span>Listed {formatDate(vehicle.createdAt)}</span>
                       </div>
@@ -506,14 +506,14 @@ export default function VehiclePage({ params }: VehiclePageProps) {
                 </div>
 
                 {/* Price */}
-                <div className="flex items-center justify-between border-t border-gray-100 pt-6">
+                <div className="flex items-center justify-between border-gray-100 border-t pt-6">
                   <div>
-                    <div className="text-sm font-medium text-gray-500 uppercase tracking-wider">Price</div>
-                    <div className="text-3xl font-bold text-primary tabular-nums tracking-tight sm:text-4xl">
+                    <div className="font-medium text-gray-500 text-sm uppercase tracking-wider">Price</div>
+                    <div className="font-bold text-3xl text-primary tabular-nums tracking-tight sm:text-4xl">
                       {formatPrice(vehicle.price)}
                     </div>
                   </div>
-                  <div className="flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1.5 text-sm font-medium text-emerald-700">
+                  <div className="flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1.5 font-medium text-emerald-700 text-sm">
                     <Shield className="h-4 w-4" />
                     <span>Verified</span>
                   </div>
@@ -536,7 +536,7 @@ export default function VehiclePage({ params }: VehiclePageProps) {
                     {/* Sale Status Overlay */}
                     {vehicle.saleStatus && vehicle.saleStatus !== "available" && (
                       <div
-                        className={`absolute bottom-0 left-0 right-0 z-10 flex items-center justify-center py-4 font-bold text-xl shadow-lg ${
+                        className={`absolute right-0 bottom-0 left-0 z-10 flex items-center justify-center py-4 font-bold text-xl shadow-lg ${
                           vehicle.saleStatus === "sold"
                             ? "bg-red-200/80 text-red-900"
                             : vehicle.saleStatus === "salePending"
@@ -575,7 +575,7 @@ export default function VehiclePage({ params }: VehiclePageProps) {
                     )}
 
                     {/* Photo Counter */}
-                    <div className="absolute right-4 top-4 rounded-full bg-black/70 px-3 py-1 text-sm text-white">
+                    <div className="absolute top-4 right-4 rounded-full bg-black/70 px-3 py-1 text-sm text-white">
                       {currentPhotoIndex + 1} / {vehicle.photos.length}
                     </div>
                   </div>
@@ -706,7 +706,7 @@ export default function VehiclePage({ params }: VehiclePageProps) {
                           </div>
                           <div>
                             <div className="font-medium text-gray-900 text-sm">Verified</div>
-                            <div className="text-xs text-gray-500">Listing checked</div>
+                            <div className="text-gray-500 text-xs">Listing checked</div>
                           </div>
                         </div>
                         <div className="flex items-center gap-3 rounded-xl bg-blue-50 p-4">
@@ -715,7 +715,7 @@ export default function VehiclePage({ params }: VehiclePageProps) {
                           </div>
                           <div>
                             <div className="font-medium text-gray-900 text-sm">Quality</div>
-                            <div className="text-xs text-gray-500">Standards met</div>
+                            <div className="text-gray-500 text-xs">Standards met</div>
                           </div>
                         </div>
                         <div className="flex items-center gap-3 rounded-xl bg-violet-50 p-4">
@@ -724,7 +724,7 @@ export default function VehiclePage({ params }: VehiclePageProps) {
                           </div>
                           <div>
                             <div className="font-medium text-gray-900 text-sm">Community</div>
-                            <div className="text-xs text-gray-500">Member verified</div>
+                            <div className="text-gray-500 text-xs">Member verified</div>
                           </div>
                         </div>
                       </div>
@@ -744,7 +744,7 @@ export default function VehiclePage({ params }: VehiclePageProps) {
                       <User className="h-7 w-7 text-primary" />
                     </div>
                     <div>
-                      <Link href={`/profile/${seller._id}`} className="font-semibold text-gray-900 text-lg hover:text-primary transition-colors">
+                      <Link href={`/profile/${seller._id}`} className="font-semibold text-gray-900 text-lg transition-colors hover:text-primary">
                         {seller.name}
                       </Link>
                       <div className="flex items-center gap-1.5 text-sm">
@@ -755,11 +755,11 @@ export default function VehiclePage({ params }: VehiclePageProps) {
                   </div>
 
                   <div className="mb-6 space-y-3 rounded-xl bg-gray-50 p-4">
-                    <div className="flex items-center gap-2 text-sm text-gray-700">
+                    <div className="flex items-center gap-2 text-gray-700 text-sm">
                       <Mail className="h-4 w-4 text-gray-400" />
                       <span className="truncate">{vehicle.contactInfo}</span>
                     </div>
-                    <div className="flex items-center gap-2 text-sm text-gray-700">
+                    <div className="flex items-center gap-2 text-gray-700 text-sm">
                       <MapPin className="h-4 w-4 text-gray-400" />
                       <span>Local Seller</span>
                     </div>
@@ -946,7 +946,7 @@ export default function VehiclePage({ params }: VehiclePageProps) {
         {/* Auth Dialog */}
         {showAuthDialog && (
           <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm animate-in fade-in-0"
+            className="fade-in-0 fixed inset-0 z-50 flex animate-in items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
             onClick={() => setShowAuthDialog(false)}
             role="dialog"
             aria-modal="true"
@@ -954,13 +954,13 @@ export default function VehiclePage({ params }: VehiclePageProps) {
             aria-describedby="auth-dialog-description"
           >
             <div
-              className="relative w-full max-w-md rounded-xl border border-gray-200 bg-white shadow-2xl animate-in zoom-in-95 fade-in-0 slide-in-from-bottom-4"
+              className="zoom-in-95 fade-in-0 slide-in-from-bottom-4 relative w-full max-w-md animate-in rounded-xl border border-gray-200 bg-white shadow-2xl"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Close button */}
               <button
                 onClick={() => setShowAuthDialog(false)}
-                className="absolute right-4 top-4 rounded-sm opacity-70 transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-gray-950 focus:ring-offset-2 disabled:pointer-events-none"
+                className="absolute top-4 right-4 rounded-sm opacity-70 transition-opacity hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-gray-950 focus:ring-offset-2 disabled:pointer-events-none"
                 aria-label="Close dialog"
               >
                 <X className="h-4 w-4 text-gray-500" />

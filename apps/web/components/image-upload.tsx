@@ -1,7 +1,7 @@
 "use client";
 
-import { api } from "@car-market/convex/_generated/api";
-import { Button } from "@car-market/ui/button";
+import { api } from "@gearboxe-market/convex/_generated/api";
+import { Button } from "@gearboxe-market/ui/button";
 import { useQuery } from "convex/react";
 import { GripVertical, Trash2, Upload } from "lucide-react";
 import Image from "next/image";
@@ -178,7 +178,7 @@ export function ImageUpload({
   return (
     <div className="space-y-4">
       <div
-        className="rounded-lg border-2 border-dashed border-gray-300 p-6 text-center transition-colors hover:border-primary"
+        className="rounded-lg border-2 border-gray-300 border-dashed p-6 text-center transition-colors hover:border-primary"
         onDrop={handleDrop}
         onDragOver={(e) => e.preventDefault()}
       >
@@ -254,7 +254,7 @@ export function ImageUpload({
                   </div>
                 </div>
                 {index === 0 && (
-                  <div className="absolute left-2 top-2 rounded bg-primary px-2 py-1 text-white text-xs font-medium">
+                  <div className="absolute top-2 left-2 rounded bg-primary px-2 py-1 font-medium text-white text-xs">
                     Primary
                   </div>
                 )}

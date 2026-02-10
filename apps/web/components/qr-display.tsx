@@ -1,7 +1,7 @@
 "use client";
 
-import { Button } from "@car-market/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@car-market/ui/card";
+import { Button } from "@gearboxe-market/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@gearboxe-market/ui/card";
 import { Download, Share } from "lucide-react";
 import QRCode from "qrcode";
 import { useEffect, useState } from "react";

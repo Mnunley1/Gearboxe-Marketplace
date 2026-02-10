@@ -1,6 +1,6 @@
-# @car-market/convex
+# @gearboxe-market/convex
 
-Shared Convex backend for the Car Market application.
+Shared Convex backend for the Gearboxe Market application.
 
 ## Structure
 
@@ -28,7 +28,7 @@ npx convex dev
 ## Usage
 
 ```tsx
-import { api } from "@car-market/convex/_generated/api";
+import { api } from "@gearboxe-market/convex/_generated/api";
 import { useQuery, useMutation } from "convex/react";
 
 const data = useQuery(api.vehicles.list);

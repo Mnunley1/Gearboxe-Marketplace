@@ -1,6 +1,6 @@
-# Car Market Monorepo
+# Gearboxe Market Monorepo
 
-This is a monorepo setup for the Car Market application using pnpm workspaces and Turborepo.
+This is a monorepo setup for the Gearboxe Market application using pnpm workspaces and Turborepo.
 
 ## Structure
 
@@ -38,12 +38,12 @@ pnpm dev
 # Run web app only (http://localhost:3000)
 pnpm dev:web
 # OR
-pnpm --filter @car-market/web dev
+pnpm --filter @gearboxe-market/web dev
 
 # Run admin app only (http://localhost:3001)
 pnpm dev:admin
 # OR
-pnpm --filter @car-market/admin dev
+pnpm --filter @gearboxe-market/admin dev
 
 # Run both apps simultaneously
 pnpm dev
@@ -58,12 +58,12 @@ pnpm build
 # Build web app only
 pnpm build:web
 # OR
-pnpm --filter @car-market/web build
+pnpm --filter @gearboxe-market/web build
 
 # Build admin app only
 pnpm build:admin
 # OR
-pnpm --filter @car-market/admin build
+pnpm --filter @gearboxe-market/admin build
 ```
 
 ### Linting
@@ -73,23 +73,23 @@ pnpm --filter @car-market/admin build
 pnpm lint
 
 # Lint specific package
-pnpm --filter @car-market/web lint
+pnpm --filter @gearboxe-market/web lint
 ```
 
 ## Packages
 
-### @car-market/convex
+### @gearboxe-market/convex
 
 Shared Convex backend functions, schema, and mutations/queries used by both apps.
 
-### @car-market/ui
+### @gearboxe-market/ui
 
 Shared UI components (shadcn/ui base components) used by both applications.
 
 ### Apps
 
-- **@car-market/web**: Main customer-facing application
-- **@car-market/admin**: Admin panel for managing the marketplace
+- **@gearboxe-market/web**: Main customer-facing application
+- **@gearboxe-market/admin**: Admin panel for managing the marketplace
 
 ## Convex Setup
 
@@ -126,7 +126,7 @@ Required variables:
 ## Architecture Decisions
 
 1. **Shared Convex backend**: Both apps share the same Convex functions and database
-2. **Shared UI components**: Base shadcn/ui components are shared via the `@car-market/ui` package
+2. **Shared UI components**: Base shadcn/ui components are shared via the `@gearboxe-market/ui` package
 3. **Separate apps**: Web and Admin are separate Next.js applications for better separation of concerns
 4. **Turborepo**: Used for efficient builds and caching
 5. **pnpm workspaces**: Efficient dependency management across packages

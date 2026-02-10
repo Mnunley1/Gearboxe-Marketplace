@@ -1,7 +1,7 @@
 "use client";
 
-import { api } from "@car-market/convex/_generated/api";
-import { Button } from "@car-market/ui/button";
+import { api } from "@gearboxe-market/convex/_generated/api";
+import { Button } from "@gearboxe-market/ui/button";
 import { useAuth, useUser } from "@clerk/nextjs";
 import { useQuery } from "convex/react";
 import {

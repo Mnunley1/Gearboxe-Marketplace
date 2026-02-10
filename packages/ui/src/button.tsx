@@ -12,15 +12,15 @@ const buttonVariants = cva(
         default:
           "bg-primary text-white shadow-md shadow-primary/20 hover:bg-primary/85 active:bg-primary/80",
         destructive:
-          "bg-destructive text-white shadow-md shadow-destructive/20 hover:bg-destructive/85 active:bg-destructive/80",
+          "bg-destructive text-white shadow-destructive/20 shadow-md hover:bg-destructive/85 active:bg-destructive/80",
         outline:
-          "border-2 border-gray-200 bg-white text-gray-900 hover:bg-gray-50 hover:border-gray-300 active:bg-gray-100",
+          "border-2 border-gray-200 bg-white text-gray-900 hover:border-gray-300 hover:bg-gray-50 active:bg-gray-100",
         secondary:
           "bg-gray-100 text-gray-900 shadow-sm hover:bg-gray-200 active:bg-gray-300",
         ghost:
-          "text-gray-700 hover:text-gray-900 hover:bg-gray-100 active:bg-gray-200",
+          "text-gray-700 hover:bg-gray-100 hover:text-gray-900 active:bg-gray-200",
         link:
-          "text-primary underline-offset-4 hover:underline active:underline focus-visible:underline",
+          "text-primary underline-offset-4 hover:underline focus-visible:underline active:underline",
         premium:
           "bg-gradient-to-r from-primary to-primary/80 text-white shadow-lg shadow-primary/25 hover:brightness-110 active:brightness-105",
       },

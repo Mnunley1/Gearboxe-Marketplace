@@ -1,16 +1,16 @@
 "use client";
 
-import { api } from "@car-market/convex/_generated/api";
-import { Button } from "@car-market/ui/button";
-import { Card, CardContent, CardFooter } from "@car-market/ui/card";
-import { Input } from "@car-market/ui/input";
+import { api } from "@gearboxe-market/convex/_generated/api";
+import { Button } from "@gearboxe-market/ui/button";
+import { Card, CardContent, CardFooter } from "@gearboxe-market/ui/card";
+import { Input } from "@gearboxe-market/ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@car-market/ui/select";
+} from "@gearboxe-market/ui/select";
 import { useUser } from "@clerk/nextjs";
 import { useConvexAuth, useMutation, useQuery } from "convex/react";
 import {
@@ -295,8 +295,8 @@ export default function MyListingsPage() {
   };
 
   const formatNumber = (num: number): string => {
-    if (num >= 1000000) {
-      return `${(num / 1000000).toFixed(1)}M`;
+    if (num >= 1_000_000) {
+      return `${(num / 1_000_000).toFixed(1)}M`;
     }
     if (num >= 1000) {
       return `${(num / 1000).toFixed(1)}K`;
@@ -328,10 +328,10 @@ export default function MyListingsPage() {
       <div className="space-y-2.5">
         {/* Title + Price row */}
         <div className="flex items-baseline justify-between gap-3">
-          <h3 className="min-w-0 truncate font-semibold text-gray-900 text-base leading-tight">
+          <h3 className="min-w-0 truncate font-semibold text-base text-gray-900 leading-tight">
             {vehicle.year} {vehicle.make} {vehicle.model}
           </h3>
-          <span className="flex-shrink-0 font-bold text-primary text-lg tabular-nums">
+          <span className="flex-shrink-0 font-bold text-lg text-primary tabular-nums">
             ${vehicle.price.toLocaleString()}
           </span>
         </div>
@@ -346,18 +346,18 @@ export default function MyListingsPage() {
             </div>
           )}
           <span
-            className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium ${getStatusColor(vehicle.status)}`}
+            className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 font-medium text-xs ${getStatusColor(vehicle.status)}`}
           >
             {getStatusIcon(vehicle.status)}
             <span className="capitalize">{vehicle.status}</span>
           </span>
           {vehicle.status === "pending" && (
-            <span className="text-xs text-gray-400">
+            <span className="text-gray-400 text-xs">
               {getDaysAgo(vehicle._creationTime)}d ago
             </span>
           )}
           {vehicle.status === "rejected" && (
-            <span className="text-xs text-red-500">
+            <span className="text-red-500 text-xs">
               Did not meet guidelines
             </span>
           )}
@@ -431,7 +431,7 @@ export default function MyListingsPage() {
 
         {/* Event Location - compact */}
         {vehicle.event && (
-          <div className="flex flex-wrap items-center gap-x-3 text-xs text-gray-500">
+          <div className="flex flex-wrap items-center gap-x-3 text-gray-500 text-xs">
             <span className="font-medium text-gray-700">{vehicle.event.name}</span>
             {vehicle.event.location && <span>{vehicle.event.location}</span>}
             {vehicle.event.date && (
@@ -453,8 +453,8 @@ export default function MyListingsPage() {
   const renderSaleStatus = (vehicle: any) => {
     if (vehicle.status !== "approved") return null;
     return (
-      <div className="flex items-center gap-3 border-t border-gray-100 px-5 py-3">
-        <span className="text-xs font-medium text-gray-500 uppercase tracking-wide">Sale Status</span>
+      <div className="flex items-center gap-3 border-gray-100 border-t px-5 py-3">
+        <span className="font-medium text-gray-500 text-xs uppercase tracking-wide">Sale Status</span>
         <Select
           value={vehicle.saleStatus || "available"}
           onValueChange={(value) =>
@@ -475,17 +475,17 @@ export default function MyListingsPage() {
           </SelectContent>
         </Select>
         {updatingStatus === vehicle._id && (
-          <span className="text-xs text-gray-400 animate-pulse">Updating...</span>
+          <span className="animate-pulse text-gray-400 text-xs">Updating...</span>
         )}
       </div>
     );
   };
 
   const renderActionButtons = (vehicle: any) => (
-    <CardFooter className="flex items-center gap-2 border-t border-gray-100 px-5 py-3">
+    <CardFooter className="flex items-center gap-2 border-gray-100 border-t px-5 py-3">
       <Button
         asChild
-        className="flex-1 h-9"
+        className="h-9 flex-1"
         size="sm"
         variant="outline"
       >
@@ -496,7 +496,7 @@ export default function MyListingsPage() {
       </Button>
       <Button
         asChild
-        className="flex-1 h-9"
+        className="h-9 flex-1"
         size="sm"
         variant="outline"
       >
@@ -506,7 +506,7 @@ export default function MyListingsPage() {
         </Link>
       </Button>
       <Button
-        className="flex-1 h-9"
+        className="h-9 flex-1"
         onClick={() =>
           setVehicleToDelete({
             id: vehicle._id,
@@ -541,7 +541,7 @@ export default function MyListingsPage() {
               <div className="rounded-full bg-gray-200/80 p-4">
                 <Car className="h-8 w-8 text-gray-400" />
               </div>
-              <span className="text-xs text-gray-400">No image</span>
+              <span className="text-gray-400 text-xs">No image</span>
             </div>
           </div>
         )}
@@ -551,7 +551,7 @@ export default function MyListingsPage() {
 
         {/* Photo count badge */}
         {vehicle.photos.length > 1 && (
-          <div className={`absolute z-10 flex items-center gap-1.5 rounded-full bg-black/60 px-2.5 py-1 text-xs font-medium text-white backdrop-blur-sm ${
+          <div className={`absolute z-10 flex items-center gap-1.5 rounded-full bg-black/60 px-2.5 py-1 font-medium text-white text-xs backdrop-blur-sm ${
             vehicle.saleStatus && vehicle.saleStatus !== "available" ? "bottom-3 left-3" : "bottom-3 left-3"
           }`}>
             <Camera className="h-3.5 w-3.5" />
@@ -562,7 +562,7 @@ export default function MyListingsPage() {
         {/* Sale Status Badge */}
         {vehicle.saleStatus && vehicle.saleStatus !== "available" && (
           <div
-            className={`absolute top-3 left-3 z-10 flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-bold uppercase tracking-wide shadow-lg ${
+            className={`absolute top-3 left-3 z-10 flex items-center gap-1.5 rounded-full px-3 py-1.5 font-bold text-xs uppercase tracking-wide shadow-lg ${
               vehicle.saleStatus === "sold"
                 ? "bg-red-500 text-white"
                 : vehicle.saleStatus === "salePending"
@@ -570,7 +570,7 @@ export default function MyListingsPage() {
                   : ""
             }`}
           >
-            <span className="h-1.5 w-1.5 rounded-full bg-current opacity-75 animate-pulse" />
+            <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-current opacity-75" />
             {vehicle.saleStatus === "sold"
               ? "Sold"
               : vehicle.saleStatus === "salePending"
@@ -659,7 +659,7 @@ export default function MyListingsPage() {
                 </div>
                 <div>
                   <p className="font-bold text-2xl text-gray-900">{stats.total}</p>
-                  <p className="text-xs text-gray-500">Total</p>
+                  <p className="text-gray-500 text-xs">Total</p>
                 </div>
               </CardContent>
             </Card>
@@ -670,7 +670,7 @@ export default function MyListingsPage() {
                 </div>
                 <div>
                   <p className="font-bold text-2xl text-gray-900">{stats.active}</p>
-                  <p className="text-xs text-gray-500">Active</p>
+                  <p className="text-gray-500 text-xs">Active</p>
                 </div>
               </CardContent>
             </Card>
@@ -681,7 +681,7 @@ export default function MyListingsPage() {
                 </div>
                 <div>
                   <p className="font-bold text-2xl text-gray-900">{stats.pending}</p>
-                  <p className="text-xs text-gray-500">Pending</p>
+                  <p className="text-gray-500 text-xs">Pending</p>
                 </div>
               </CardContent>
             </Card>
@@ -692,7 +692,7 @@ export default function MyListingsPage() {
                 </div>
                 <div>
                   <p className="font-bold text-2xl text-gray-900">{stats.sold}</p>
-                  <p className="text-xs text-gray-500">Sold</p>
+                  <p className="text-gray-500 text-xs">Sold</p>
                 </div>
               </CardContent>
             </Card>
@@ -704,7 +704,7 @@ export default function MyListingsPage() {
           <div className="mb-6 space-y-4">
             {/* Search */}
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+              <Search className="-translate-y-1/2 absolute top-1/2 left-3 h-4 w-4 text-gray-400" />
               <Input
                 className="pl-10"
                 placeholder="Search by make, model, or year..."
@@ -721,7 +721,7 @@ export default function MyListingsPage() {
                   <button
                     key={option.value}
                     onClick={() => setStatusFilter(option.value)}
-                    className={`rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
+                    className={`rounded-full px-3 py-1.5 font-medium text-xs transition-colors ${
                       statusFilter === option.value
                         ? "bg-primary text-white"
                         : "bg-gray-100 text-gray-700 hover:bg-gray-200"
@@ -783,7 +783,7 @@ export default function MyListingsPage() {
               <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
                 {filteredVehicles.map((vehicle) => (
                   <Card
-                    className="group overflow-hidden rounded-xl border-gray-200/60 bg-white transition-all duration-300 hover:border-gray-300/80 hover:shadow-xl hover:shadow-gray-200/50 hover:-translate-y-0.5"
+                    className="group hover:-translate-y-0.5 overflow-hidden rounded-xl border-gray-200/60 bg-white transition-all duration-300 hover:border-gray-300/80 hover:shadow-gray-200/50 hover:shadow-xl"
                     key={vehicle._id}
                   >
                     {/* Image */}
@@ -807,7 +807,7 @@ export default function MyListingsPage() {
               <div className="space-y-4">
                 {filteredVehicles.map((vehicle) => (
                   <Card
-                    className="group overflow-hidden rounded-xl border-gray-200/60 bg-white transition-all duration-300 hover:border-gray-300/80 hover:shadow-lg hover:shadow-gray-200/40"
+                    className="group overflow-hidden rounded-xl border-gray-200/60 bg-white transition-all duration-300 hover:border-gray-300/80 hover:shadow-gray-200/40 hover:shadow-lg"
                     key={vehicle._id}
                   >
                     <div className="flex flex-col sm:flex-row">
@@ -904,10 +904,10 @@ export default function MyListingsPage() {
           <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-xl">
             <div className="flex items-start justify-between">
               <div>
-                <h3 className="font-semibold text-lg text-gray-900">
+                <h3 className="font-semibold text-gray-900 text-lg">
                   Delete vehicle?
                 </h3>
-                <p className="mt-1 text-sm text-gray-600">
+                <p className="mt-1 text-gray-600 text-sm">
                   This will permanently remove {vehicleToDelete.title} from your
                   listings. This action cannot be undone.
                 </p>

@@ -1,5 +1,5 @@
 {
-  "name": "@car-market/web",
+  "name": "@gearboxe-market/web",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -13,8 +13,8 @@
     "clean": "rm -rf .next"
   },
   "dependencies": {
-    "@car-market/convex": "workspace:*",
-    "@car-market/ui": "workspace:*",
+    "@gearboxe-market/convex": "workspace:*",
+    "@gearboxe-market/ui": "workspace:*",
     "@clerk/backend": "^2.17.2",
     "@clerk/nextjs": "^6.35.2",
     "@convex-dev/r2": "^0.7.1",

@@ -1,6 +1,6 @@
 "use client";
 
-import { api } from "@car-market/convex/_generated/api";
+import { api } from "@gearboxe-market/convex/_generated/api";
 import { useQuery } from "convex/react";
 import { Calendar, MapPin } from "lucide-react";
 import { EventCard } from "../../../components/event-card";
@@ -21,7 +21,7 @@ export default function EventsPage() {
             Upcoming Events
           </h1>
           <p className="mx-auto max-w-3xl text-gray-600 text-xl">
-            Join us at our monthly car market events. Meet sellers, browse
+            Join us at our monthly Gearboxe Market events. Meet sellers, browse
             vehicles, and find your next car in person.
           </p>
         </div>
@@ -40,7 +40,7 @@ export default function EventsPage() {
               No Upcoming Events
             </h3>
             <p className="text-gray-600">
-              Check back soon for our next car market event!
+              Check back soon for our next Gearboxe Market event!
             </p>
           </div>
         )}

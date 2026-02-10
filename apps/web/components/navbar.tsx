@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@car-market/ui/button";
+import { Button } from "@gearboxe-market/ui/button";
 import { useAuth } from "@clerk/nextjs";
 import { useConvexAuth } from "convex/react";
 import { Car, Menu, X } from "lucide-react";
@@ -54,7 +54,7 @@ export function Navbar() {
                 <span className="font-bold text-gray-900 text-lg tracking-tight">
                   Gearboxe
                 </span>
-                <span className="-mt-1 text-[10px] font-medium text-gray-500 uppercase tracking-widest">
+                <span className="-mt-1 font-medium text-[10px] text-gray-500 uppercase tracking-widest">
                   Market
                 </span>
               </div>
@@ -89,7 +89,7 @@ export function Navbar() {
                 <span className="font-bold text-gray-900 text-lg tracking-tight">
                   Gearboxe
                 </span>
-                <span className="-mt-1 text-[10px] font-medium text-gray-500 uppercase tracking-widest">
+                <span className="-mt-1 font-medium text-[10px] text-gray-500 uppercase tracking-widest">
                   Market
                 </span>
               </div>
@@ -102,16 +102,16 @@ export function Navbar() {
                 return (
                   <Link
                     key={link.href}
-                    className={`relative px-4 py-2 font-medium text-sm transition-colors duration-200 rounded-lg ${
+                    className={`relative rounded-lg px-4 py-2 font-medium text-sm transition-colors duration-200 ${
                       isActive
-                        ? "text-primary bg-primary/5"
-                        : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                        ? "bg-primary/5 text-primary"
+                        : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
                     }`}
                     href={link.href}
                   >
                     {link.label}
                     {isActive && (
-                      <span className="absolute bottom-0 left-1/2 h-0.5 w-6 -translate-x-1/2 rounded-full bg-primary" />
+                      <span className="-translate-x-1/2 absolute bottom-0 left-1/2 h-0.5 w-6 rounded-full bg-primary" />
                     )}
                   </Link>
                 );
@@ -169,7 +169,7 @@ export function Navbar() {
             isMobileMenuOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
           }`}
         >
-          <div className="space-y-1 border-t border-gray-100 pb-4 pt-3">
+          <div className="space-y-1 border-gray-100 border-t pt-3 pb-4">
             {navLinks.map((link) => {
               const isActive = pathname === link.href;
               return (
@@ -190,7 +190,7 @@ export function Navbar() {
 
             {/* Mobile auth buttons */}
             {!(isAuthenticated || isSignedIn) && (
-              <div className="mt-4 flex flex-col gap-2 px-4 pt-4 border-t border-gray-100">
+              <div className="mt-4 flex flex-col gap-2 border-gray-100 border-t px-4 pt-4">
                 <Button asChild variant="outline" className="w-full justify-center">
                   <Link href="/sign-in">Sign In</Link>
                 </Button>
@@ -201,7 +201,7 @@ export function Navbar() {
             )}
 
             {(isAuthenticated || isSignedIn) && (
-              <div className="mt-4 px-4 pt-4 border-t border-gray-100">
+              <div className="mt-4 border-gray-100 border-t px-4 pt-4">
                 <Button asChild className="w-full justify-center">
                   <Link href="/myAccount/new-listing">List Your Car</Link>
                 </Button>

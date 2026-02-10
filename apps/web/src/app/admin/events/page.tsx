@@ -1,8 +1,8 @@
 "use client";
 
-import { api } from "@car-market/convex/_generated/api";
-import { Button } from "@car-market/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@car-market/ui/card";
+import { api } from "@gearboxe-market/convex/_generated/api";
+import { Button } from "@gearboxe-market/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@gearboxe-market/ui/card";
 import { useUser } from "@clerk/nextjs";
 import { useConvexAuth, useMutation, useQuery } from "convex/react";
 import { ArrowLeft, Calendar, MapPin, Plus, Trash2, Users } from "lucide-react";
@@ -82,7 +82,7 @@ export default function AdminEventsPage() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="font-bold text-3xl text-gray-900">Manage Events</h1>
-            <p className="text-gray-600">Create and manage car market events</p>
+            <p className="text-gray-600">Create and manage Gearboxe Market events</p>
           </div>
           <Button onClick={() => setShowCreateForm(!showCreateForm)}>
             <Plus className="mr-2 h-5 w-5" />
@@ -183,7 +183,7 @@ export default function AdminEventsPage() {
               No Events Yet
             </h3>
             <p className="mb-6 text-gray-600">
-              Create your first car market event to get started.
+              Create your first Gearboxe Market event to get started.
             </p>
             <Button onClick={() => setShowCreateForm(true)}>
               <Plus className="mr-2 h-5 w-5" />
@@ -300,7 +300,7 @@ function EventCreateForm({
             onChange={(e) =>
               setFormData((prev) => ({ ...prev, name: e.target.value }))
             }
-            placeholder="e.g., Raleigh Car Market - March 2024"
+            placeholder="e.g., Raleigh Gearboxe Market - March 2024"
             required
             type="text"
             value={formData.name}

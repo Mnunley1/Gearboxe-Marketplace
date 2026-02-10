@@ -1,14 +1,14 @@
 "use client";
 
-import { api } from "@car-market/convex/_generated/api";
-import { Button } from "@car-market/ui/button";
+import { api } from "@gearboxe-market/convex/_generated/api";
+import { Button } from "@gearboxe-market/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@car-market/ui/card";
+} from "@gearboxe-market/ui/card";
 import { useMutation } from "convex/react";
 import {
   Calendar,

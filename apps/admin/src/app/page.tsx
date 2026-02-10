@@ -1,6 +1,6 @@
 "use client";
 
-import { api } from "@car-market/convex/_generated/api";
+import { api } from "@gearboxe-market/convex/_generated/api";
 import { useAuth, useUser } from "@clerk/nextjs";
 import { useConvexAuth, useQuery } from "convex/react";
 import {
@@ -13,13 +13,13 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Button } from "@car-market/ui/button";
+import { Button } from "@gearboxe-market/ui/button";
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
-} from "@car-market/ui/card";
+} from "@gearboxe-market/ui/card";
 
 export default function AdminDashboardPage() {
   const { isLoading } = useConvexAuth();

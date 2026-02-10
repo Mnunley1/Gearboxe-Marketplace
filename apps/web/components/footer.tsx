@@ -1,4 +1,4 @@
-import { Car, Mail, MapPin, Phone } from "lucide-react";
+import { Car, Mail, MapPin, } from "lucide-react";
 import Link from "next/link";
 
 const footerLinks = {
@@ -26,7 +26,7 @@ export function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="border-t border-gray-200 bg-white">
+    <footer className="border-gray-200 border-t bg-white">
       {/* Main Footer */}
       <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:gap-12">
@@ -40,13 +40,13 @@ export function Footer() {
                 <span className="font-bold text-gray-900 text-xl tracking-tight">
                   Gearboxe
                 </span>
-                <span className="-mt-1 text-[10px] font-medium text-gray-500 uppercase tracking-widest">
+                <span className="-mt-1 font-medium text-[10px] text-gray-500 uppercase tracking-widest">
                   Market
                 </span>
               </div>
             </Link>
 
-            <p className="mt-4 max-w-xs text-sm text-gray-600 leading-relaxed">
+            <p className="mt-4 max-w-xs text-gray-600 text-sm leading-relaxed">
               Connect with local car sellers and buyers at exclusive popup events.
               Find your next vehicle or sell yours with confidence.
             </p>
@@ -55,12 +55,12 @@ export function Footer() {
             <div className="mt-6 space-y-3">
               <a
                 href="mailto:hello@gearboxe.com"
-                className="flex items-center gap-2 text-sm text-gray-600 transition-colors hover:text-primary"
+                className="flex items-center gap-2 text-gray-600 text-sm transition-colors hover:text-primary"
               >
                 <Mail className="h-4 w-4" />
                 hello@gearboxe.com
               </a>
-              <div className="flex items-center gap-2 text-sm text-gray-600">
+              <div className="flex items-center gap-2 text-gray-600 text-sm">
                 <MapPin className="h-4 w-4" />
                 Los Angeles, CA
               </div>
@@ -71,7 +71,7 @@ export function Footer() {
           <div className="grid grid-cols-2 gap-8 sm:grid-cols-3 lg:col-span-8">
             {/* Browse */}
             <div>
-              <h3 className="mb-4 text-sm font-semibold text-gray-900 uppercase tracking-wider">
+              <h3 className="mb-4 font-semibold text-gray-900 text-sm uppercase tracking-wider">
                 Browse
               </h3>
               <ul className="space-y-3">
@@ -79,7 +79,7 @@ export function Footer() {
                   <li key={link.href}>
                     <Link
                       href={link.href}
-                      className="text-sm text-gray-600 transition-colors hover:text-primary"
+                      className="text-gray-600 text-sm transition-colors hover:text-primary"
                     >
                       {link.label}
                     </Link>
@@ -90,7 +90,7 @@ export function Footer() {
 
             {/* Sell */}
             <div>
-              <h3 className="mb-4 text-sm font-semibold text-gray-900 uppercase tracking-wider">
+              <h3 className="mb-4 font-semibold text-gray-900 text-sm uppercase tracking-wider">
                 Sell
               </h3>
               <ul className="space-y-3">
@@ -98,7 +98,7 @@ export function Footer() {
                   <li key={link.href}>
                     <Link
                       href={link.href}
-                      className="text-sm text-gray-600 transition-colors hover:text-primary"
+                      className="text-gray-600 text-sm transition-colors hover:text-primary"
                     >
                       {link.label}
                     </Link>
@@ -109,7 +109,7 @@ export function Footer() {
 
             {/* Support */}
             <div>
-              <h3 className="mb-4 text-sm font-semibold text-gray-900 uppercase tracking-wider">
+              <h3 className="mb-4 font-semibold text-gray-900 text-sm uppercase tracking-wider">
                 Support
               </h3>
               <ul className="space-y-3">
@@ -117,7 +117,7 @@ export function Footer() {
                   <li key={link.href}>
                     <Link
                       href={link.href}
-                      className="text-sm text-gray-600 transition-colors hover:text-primary"
+                      className="text-gray-600 text-sm transition-colors hover:text-primary"
                     >
                       {link.label}
                     </Link>
@@ -130,29 +130,29 @@ export function Footer() {
       </div>
 
       {/* Bottom Bar */}
-      <div className="border-t border-gray-100 bg-gray-50/50">
+      <div className="border-gray-100 border-t bg-gray-50/50">
         <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
           <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
-            <p className="text-sm text-gray-500">
+            <p className="text-gray-500 text-sm">
               {currentYear} Gearboxe Market. All rights reserved.
             </p>
 
             <div className="flex items-center gap-6">
               <Link
                 href="/privacy"
-                className="text-sm text-gray-500 transition-colors hover:text-gray-700"
+                className="text-gray-500 text-sm transition-colors hover:text-gray-700"
               >
                 Privacy
               </Link>
               <Link
                 href="/terms"
-                className="text-sm text-gray-500 transition-colors hover:text-gray-700"
+                className="text-gray-500 text-sm transition-colors hover:text-gray-700"
               >
                 Terms
               </Link>
               <Link
                 href="/cookies"
-                className="text-sm text-gray-500 transition-colors hover:text-gray-700"
+                className="text-gray-500 text-sm transition-colors hover:text-gray-700"
               >
                 Cookies
               </Link>

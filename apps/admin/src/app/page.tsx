@@ -144,8 +144,8 @@ export default function AdminDashboardPage() {
         <Card className="admin-stat-card">
           <CardContent className="p-6">
             <div className="flex items-center">
-              <div className="rounded-lg bg-blue-100 p-2">
-                <Calendar className="h-6 w-6 text-blue-600" />
+              <div className="rounded-lg bg-primary-100 p-2">
+                <Calendar className="h-6 w-6 text-primary" />
               </div>
               <div className="ml-4">
                 <p className="font-medium text-gray-600 text-sm">
@@ -318,7 +318,7 @@ export default function AdminDashboardPage() {
                   </div>
                 </div>
                 <div className="flex items-center space-x-3">
-                  <div className="h-2 w-2 rounded-full bg-blue-500" />
+                  <div className="h-2 w-2 rounded-full bg-primary" />
                   <div className="flex-1">
                     <p className="text-gray-900 text-sm">
                       Event registration completed

@@ -161,7 +161,7 @@ export default function ProfilePage({ params }: ProfilePageProps) {
                     src={profile.profileImageUrl}
                   />
                 ) : (
-                  <div className="flex h-24 w-24 items-center justify-center rounded-full border-4 border-white bg-gradient-to-br from-blue-500 to-indigo-600 shadow-lg sm:h-28 sm:w-28">
+                  <div className="flex h-24 w-24 items-center justify-center rounded-full border-4 border-white bg-gradient-to-br from-primary to-primary-700 shadow-lg sm:h-28 sm:w-28">
                     <span className="font-bold text-3xl text-white sm:text-4xl">
                       {initials || "U"}
                     </span>

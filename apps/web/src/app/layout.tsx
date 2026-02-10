@@ -1,6 +1,7 @@
 import { ToastContainer } from "@gearboxe-market/ui/toast-container";
 import { ClerkProvider } from "@clerk/nextjs";
 import type { Metadata } from "next";
+import { AnnouncementBanner } from "@/components/announcement-banner";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { ConvexClientProvider } from "@/lib/convex-provider";
 import "./global.css";
@@ -25,6 +26,7 @@ export default function RootLayout({
         <body className="antialiased">
           <ErrorBoundary>
             <ConvexClientProvider>
+              <AnnouncementBanner />
               {children}
               <ToastContainer />
             </ConvexClientProvider>

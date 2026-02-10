@@ -146,7 +146,7 @@ export default function EditProfilePage() {
                   src={clerkUser.imageUrl}
                 />
               ) : (
-                <div className="flex h-20 w-20 items-center justify-center rounded-full border-2 border-white/20 bg-gradient-to-br from-blue-500 to-indigo-600 shadow-lg">
+                <div className="flex h-20 w-20 items-center justify-center rounded-full border-2 border-white/20 bg-gradient-to-br from-primary to-primary-700 shadow-lg">
                   <span className="font-semibold text-2xl text-white">
                     {initials || "U"}
                   </span>

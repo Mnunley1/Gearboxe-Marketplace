@@ -9,19 +9,19 @@
   --color-popover: #ffffff;
   --color-popover-foreground: #0f172a;
 
-  /* Primary - Premium Blue */
-  --color-primary: #0066cc;
+  /* Primary - Azure Blue */
+  --color-primary: #007fff;
   --color-primary-foreground: #ffffff;
-  --color-primary-50: #e6f0ff;
-  --color-primary-100: #cce0ff;
-  --color-primary-200: #99c2ff;
-  --color-primary-300: #66a3ff;
-  --color-primary-400: #3385ff;
-  --color-primary-500: #0066cc;
-  --color-primary-600: #0052a3;
-  --color-primary-700: #003d7a;
-  --color-primary-800: #002952;
-  --color-primary-900: #001429;
+  --color-primary-50: #e6f2ff;
+  --color-primary-100: #cce5ff;
+  --color-primary-200: #99ccff;
+  --color-primary-300: #66b2ff;
+  --color-primary-400: #3399ff;
+  --color-primary-500: #007fff;
+  --color-primary-600: #0066cc;
+  --color-primary-700: #004c99;
+  --color-primary-800: #003366;
+  --color-primary-900: #001933;
 
   /* Secondary */
   --color-secondary: #f1f5f9;
@@ -50,7 +50,7 @@
   /* Borders and Inputs */
   --color-border: #e2e8f0;
   --color-input: #e2e8f0;
-  --color-ring: #0066cc;
+  --color-ring: #007fff;
 
   /* Radius */
   --radius: 0.625rem;
@@ -67,8 +67,8 @@
   --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
   --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
   --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
-  --shadow-primary: 0 4px 14px 0 rgb(0 102 204 / 0.25);
-  --shadow-primary-lg: 0 8px 25px 0 rgb(0 102 204 / 0.3);
+  --shadow-primary: 0 4px 14px 0 rgb(0 127 255 / 0.25);
+  --shadow-primary-lg: 0 8px 25px 0 rgb(0 127 255 / 0.3);
 
   /* Animation Durations */
   --duration-fast: 150ms;
@@ -120,7 +120,7 @@ body {
 .bg-grid-pattern {
   background-image: radial-gradient(
     circle at 1px 1px,
-    rgb(0 102 204 / 0.08) 1px,
+    rgb(0 127 255 / 0.08) 1px,
     transparent 0
   );
   background-size: 24px 24px;
@@ -129,7 +129,7 @@ body {
 .bg-grid-pattern-light {
   background-image: radial-gradient(
     circle at 1px 1px,
-    rgb(0 102 204 / 0.05) 1px,
+    rgb(0 127 255 / 0.05) 1px,
     transparent 0
   );
   background-size: 32px 32px;
@@ -137,19 +137,19 @@ body {
 
 /* Premium Gradient Backgrounds */
 .bg-gradient-premium {
-  background: linear-gradient(135deg, #0066cc 0%, #004499 50%, #003366 100%);
+  background: linear-gradient(135deg, #007fff 0%, #0066cc 50%, #004c99 100%);
 }
 
 .bg-gradient-premium-soft {
-  background: linear-gradient(135deg, rgb(0 102 204 / 0.08) 0%, rgb(0 102 204 / 0.02) 100%);
+  background: linear-gradient(135deg, rgb(0 127 255 / 0.08) 0%, rgb(0 127 255 / 0.02) 100%);
 }
 
 .bg-gradient-hero {
-  background: linear-gradient(180deg, rgb(0 102 204 / 0.06) 0%, rgb(255 255 255 / 0) 100%);
+  background: linear-gradient(180deg, rgb(0 127 255 / 0.06) 0%, rgb(255 255 255 / 0) 100%);
 }
 
 .bg-gradient-radial-primary {
-  background: radial-gradient(ellipse at 50% 0%, rgb(0 102 204 / 0.15) 0%, transparent 70%);
+  background: radial-gradient(ellipse at 50% 0%, rgb(0 127 255 / 0.15) 0%, transparent 70%);
 }
 
 /* Card Enhancements */
@@ -213,7 +213,7 @@ body {
 
 /* Text Gradients */
 .text-gradient-primary {
-  background: linear-gradient(135deg, #0066cc 0%, #0099ff 100%);
+  background: linear-gradient(135deg, #007fff 0%, #33aaff 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -322,7 +322,7 @@ body {
 
 /* Premium Badge Styles */
 .badge-premium {
-  background: linear-gradient(135deg, #0066cc 0%, #0052a3 100%);
+  background: linear-gradient(135deg, #007fff 0%, #0066cc 100%);
   color: white;
   font-weight: 600;
   padding: 0.25rem 0.75rem;
@@ -330,7 +330,7 @@ body {
   font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.025em;
-  box-shadow: 0 2px 8px rgb(0 102 204 / 0.25);
+  box-shadow: 0 2px 8px rgb(0 127 255 / 0.25);
 }
 
 /* Price Tag Styles */
@@ -400,6 +400,6 @@ body {
 
 /* Selection styling */
 ::selection {
-  background-color: rgb(0 102 204 / 0.2);
+  background-color: rgb(0 127 255 / 0.2);
   color: inherit;
 }

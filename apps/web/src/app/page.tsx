@@ -172,7 +172,7 @@ export default function HomePage() {
                   title: "Browse Vehicles",
                   description:
                     "Explore our curated selection of quality pre-owned vehicles from verified local sellers.",
-                  color: "bg-blue-500",
+                  color: "bg-primary",
                 },
                 {
                   icon: Calendar,
@@ -242,8 +242,8 @@ export default function HomePage() {
                   title: "Verified Sellers",
                   description:
                     "Every seller is vetted. No scams, no surprises — just real people selling real cars.",
-                  color: "text-blue-600",
-                  bg: "bg-blue-50",
+                  color: "text-primary",
+                  bg: "bg-primary-50",
                 },
                 {
                   icon: Eye,
@@ -702,8 +702,8 @@ export default function HomePage() {
                                 </div>
                               </div>
                               <div className="flex items-center gap-2">
-                                <div className="flex h-5 w-5 items-center justify-center rounded-full bg-blue-100">
-                                  <CircleGauge className="h-3 w-3 text-blue-500" />
+                                <div className="flex h-5 w-5 items-center justify-center rounded-full bg-primary-100">
+                                  <CircleGauge className="h-3 w-3 text-primary" />
                                 </div>
                                 <div className="flex-1">
                                   <p className="font-medium text-[9px] text-gray-800">

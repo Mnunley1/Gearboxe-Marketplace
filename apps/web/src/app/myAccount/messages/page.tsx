@@ -88,7 +88,7 @@ export default function MessagesPage() {
     const diffInHours = (now.getTime() - date.getTime()) / (1000 * 60 * 60);
 
     if (diffInHours < 1) return "bg-green-500";
-    if (diffInHours < 24) return "bg-blue-500";
+    if (diffInHours < 24) return "bg-primary";
     return "bg-gray-400";
   };
 

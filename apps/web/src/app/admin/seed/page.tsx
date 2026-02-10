@@ -158,9 +158,9 @@ export default function SeedPage() {
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
-              <div className="rounded-lg bg-blue-50 p-4 text-center">
-                <Users className="mx-auto mb-2 h-8 w-8 text-blue-600" />
-                <div className="font-bold text-2xl text-blue-600">
+              <div className="rounded-lg bg-primary-50 p-4 text-center">
+                <Users className="mx-auto mb-2 h-8 w-8 text-primary" />
+                <div className="font-bold text-2xl text-primary">
                   {seedResult.users}
                 </div>
                 <div className="text-gray-600 text-sm">Users</div>

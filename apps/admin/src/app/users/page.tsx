@@ -81,7 +81,7 @@ export default function AdminUsersPage() {
       case "admin":
         return <Crown className="h-4 w-4 text-yellow-600" />;
       case "user":
-        return <User className="h-4 w-4 text-blue-600" />;
+        return <User className="h-4 w-4 text-primary" />;
       default:
         return <User className="h-4 w-4 text-gray-600" />;
     }
@@ -94,7 +94,7 @@ export default function AdminUsersPage() {
       case "admin":
         return "bg-yellow-100 text-yellow-800";
       case "user":
-        return "bg-blue-100 text-blue-800";
+        return "bg-primary-100 text-primary-800";
       default:
         return "bg-gray-100 text-gray-800";
     }
@@ -247,7 +247,7 @@ export default function AdminUsersPage() {
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600 text-sm">Users</span>
-                <span className="font-medium text-blue-600">
+                <span className="font-medium text-primary">
                   {allUsers.filter((u) => u.role === "user").length}
                 </span>
               </div>
@@ -286,8 +286,8 @@ export default function AdminUsersPage() {
               </div>
               <div>
                 <div className="mb-2 flex items-center space-x-2">
-                  <User className="h-4 w-4 text-blue-600" />
-                  <span className="font-medium text-blue-800">User</span>
+                  <User className="h-4 w-4 text-primary" />
+                  <span className="font-medium text-primary-800">User</span>
                 </div>
                 <ul className="space-y-1 text-gray-600 text-sm">
                   <li>• Buy vehicles</li>

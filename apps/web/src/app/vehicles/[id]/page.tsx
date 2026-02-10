@@ -709,9 +709,9 @@ export default function VehiclePage({ params }: VehiclePageProps) {
                             <div className="text-gray-500 text-xs">Listing checked</div>
                           </div>
                         </div>
-                        <div className="flex items-center gap-3 rounded-xl bg-blue-50 p-4">
-                          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100">
-                            <Award className="h-5 w-5 text-blue-600" />
+                        <div className="flex items-center gap-3 rounded-xl bg-primary-50 p-4">
+                          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary-100">
+                            <Award className="h-5 w-5 text-primary" />
                           </div>
                           <div>
                             <div className="font-medium text-gray-900 text-sm">Quality</div>

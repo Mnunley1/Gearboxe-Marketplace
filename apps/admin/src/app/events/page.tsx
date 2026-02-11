@@ -1,21 +1,32 @@
 "use client";
 
-import { api } from "@gearboxe-market/convex/_generated/api";
 import { useUser } from "@clerk/nextjs";
+import { api } from "@gearboxe-market/convex/_generated/api";
+import { Button } from "@gearboxe-market/ui/button";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@gearboxe-market/ui/card";
 import { useConvexAuth, useMutation, useQuery } from "convex/react";
 import { ArrowLeft, Calendar, MapPin, Plus, Trash2, Users } from "lucide-react";
 import Link from "next/link";
-import { redirect, useSearchParams } from "next/navigation";
+import { redirect } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Button } from "@gearboxe-market/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@gearboxe-market/ui/card";
 
 export default function AdminEventsPage() {
-  const searchParams = useSearchParams();
-  const { isAuthenticated, isLoading } = useConvexAuth();
+  const { isLoading } = useConvexAuth();
   const { user } = useUser();
   const [showCreateForm, setShowCreateForm] = useState(false);
+  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
+
+  const isAdmin = useQuery(api.users.isAdmin);
+  const orgContext = useQuery(api.users.getOrgContext);
+  const allEvents = useQuery(api.admin.getAllEvents);
+  const cities = useQuery(api.cities.getCities);
+  const deleteEvent = useMutation(api.events.deleteEvent);
 
   if (isLoading) {
     return (
@@ -28,14 +39,9 @@ export default function AdminEventsPage() {
     );
   }
 
-  if (!(isAuthenticated && user)) {
+  if (!user) {
     redirect("/sign-in");
   }
-
-  const isAdmin = useQuery(api.users.isAdmin);
-  const allEvents = useQuery(api.admin.getAllEvents);
-  const cities = useQuery(api.cities.getCities);
-  const deleteEvent = useMutation(api.events.deleteEvent);
 
   if (isAdmin === false) {
     redirect("/myAccount");
@@ -53,22 +59,43 @@ export default function AdminEventsPage() {
   }
 
   const handleDeleteEvent = async (eventId: string) => {
-    if (confirm("Are you sure you want to delete this event?")) {
-      try {
-        await deleteEvent({ id: eventId as any });
-      } catch (error) {
-        console.error("Error deleting event:", error);
-      }
+    setPendingDeleteId(null);
+    try {
+      await deleteEvent({ id: eventId as any });
+    } catch (error) {
+      console.error("Error deleting event:", error);
     }
   };
 
-  const selectedEventId = searchParams.get("event");
-  const selectedEvent = selectedEventId
-    ? allEvents.find((e) => e._id === selectedEventId)
-    : null;
-
   return (
     <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+      {/* Delete confirmation */}
+      {pendingDeleteId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <Card className="mx-4 max-w-sm">
+            <CardContent className="p-6 text-center">
+              <p className="mb-4 text-gray-900">
+                Are you sure you want to delete this event?
+              </p>
+              <div className="flex justify-center space-x-3">
+                <Button
+                  onClick={() => setPendingDeleteId(null)}
+                  variant="outline"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={() => handleDeleteEvent(pendingDeleteId)}
+                  variant="destructive"
+                >
+                  Delete
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
       {/* Header */}
       <div className="mb-8">
         <div className="mb-4 flex items-center space-x-4">
@@ -82,7 +109,9 @@ export default function AdminEventsPage() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="font-bold text-3xl text-gray-900">Manage Events</h1>
-            <p className="text-gray-600">Create and manage Gearboxe Market events</p>
+            <p className="text-gray-600">
+              Create and manage Gearboxe Market events
+            </p>
           </div>
           <Button onClick={() => setShowCreateForm(!showCreateForm)}>
             <Plus className="mr-2 h-5 w-5" />
@@ -105,6 +134,7 @@ export default function AdminEventsPage() {
                 // Refresh the page to show new event
                 window.location.reload();
               }}
+              orgCityId={orgContext?.city?._id ?? null}
             />
           </CardContent>
         </Card>
@@ -163,7 +193,7 @@ export default function AdminEventsPage() {
                     </Button>
                     <Button
                       className="text-red-600"
-                      onClick={() => handleDeleteEvent(event._id)}
+                      onClick={() => setPendingDeleteId(event._id)}
                       size="sm"
                       variant="destructive"
                     >
@@ -199,13 +229,15 @@ export default function AdminEventsPage() {
 // Event Create Form Component
 function EventCreateForm({
   cities,
+  orgCityId,
   onSuccess,
 }: {
   cities: any[];
+  orgCityId: string | null;
   onSuccess: () => void;
 }) {
   const [formData, setFormData] = useState({
-    cityId: "",
+    cityId: orgCityId ?? "",
     name: "",
     date: "",
     location: "",
@@ -243,7 +275,7 @@ function EventCreateForm({
         date: new Date(formData.date).getTime(),
         location: formData.location,
         address: formData.address,
-        capacity: Number.parseInt(formData.capacity),
+        capacity: Number.parseInt(formData.capacity, 10),
         description: formData.description,
       });
       toast.success("Event Created", {
@@ -266,9 +298,16 @@ function EventCreateForm({
     <form className="space-y-6" onSubmit={handleSubmit}>
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         <div className="space-y-2">
-          <label className="font-medium text-gray-700 text-sm">City *</label>
+          <label
+            className="font-medium text-gray-700 text-sm"
+            htmlFor="city-select"
+          >
+            City *
+          </label>
           <select
-            className="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-primary"
+            className="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-primary disabled:cursor-not-allowed disabled:bg-gray-100"
+            disabled={!!orgCityId}
+            id="city-select"
             onChange={(e) =>
               setFormData((prev) => ({ ...prev, cityId: e.target.value }))
             }
@@ -285,11 +324,15 @@ function EventCreateForm({
         </div>
 
         <div className="space-y-2">
-          <label className="font-medium text-gray-700 text-sm">
+          <label
+            className="font-medium text-gray-700 text-sm"
+            htmlFor="event-name"
+          >
             Event Name *
           </label>
           <input
             className="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-primary"
+            id="event-name"
             onChange={(e) =>
               setFormData((prev) => ({ ...prev, name: e.target.value }))
             }
@@ -301,9 +344,15 @@ function EventCreateForm({
         </div>
 
         <div className="space-y-2">
-          <label className="font-medium text-gray-700 text-sm">Date *</label>
+          <label
+            className="font-medium text-gray-700 text-sm"
+            htmlFor="event-date"
+          >
+            Date *
+          </label>
           <input
             className="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-primary"
+            id="event-date"
             onChange={(e) =>
               setFormData((prev) => ({ ...prev, date: e.target.value }))
             }
@@ -314,11 +363,15 @@ function EventCreateForm({
         </div>
 
         <div className="space-y-2">
-          <label className="font-medium text-gray-700 text-sm">
+          <label
+            className="font-medium text-gray-700 text-sm"
+            htmlFor="event-capacity"
+          >
             Capacity *
           </label>
           <input
             className="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-primary"
+            id="event-capacity"
             min="1"
             onChange={(e) =>
               setFormData((prev) => ({ ...prev, capacity: e.target.value }))
@@ -331,11 +384,15 @@ function EventCreateForm({
         </div>
 
         <div className="space-y-2">
-          <label className="font-medium text-gray-700 text-sm">
+          <label
+            className="font-medium text-gray-700 text-sm"
+            htmlFor="event-location"
+          >
             Location *
           </label>
           <input
             className="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-primary"
+            id="event-location"
             onChange={(e) =>
               setFormData((prev) => ({ ...prev, location: e.target.value }))
             }
@@ -347,9 +404,15 @@ function EventCreateForm({
         </div>
 
         <div className="space-y-2">
-          <label className="font-medium text-gray-700 text-sm">Address *</label>
+          <label
+            className="font-medium text-gray-700 text-sm"
+            htmlFor="event-address"
+          >
+            Address *
+          </label>
           <input
             className="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-primary"
+            id="event-address"
             onChange={(e) =>
               setFormData((prev) => ({ ...prev, address: e.target.value }))
             }
@@ -362,9 +425,15 @@ function EventCreateForm({
       </div>
 
       <div className="space-y-2">
-        <label className="font-medium text-gray-700 text-sm">Description</label>
+        <label
+          className="font-medium text-gray-700 text-sm"
+          htmlFor="event-description"
+        >
+          Description
+        </label>
         <textarea
           className="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-primary"
+          id="event-description"
           onChange={(e) =>
             setFormData((prev) => ({ ...prev, description: e.target.value }))
           }

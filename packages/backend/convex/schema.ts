@@ -24,8 +24,21 @@ export default defineSchema({
     state: v.string(),
     slug: v.string(),
     active: v.boolean(),
+    clerkOrgId: v.optional(v.string()),
     createdAt: v.number(),
-  }).index("by_slug", ["slug"]),
+  })
+    .index("by_slug", ["slug"])
+    .index("by_clerkOrgId", ["clerkOrgId"]),
+
+  orgMemberships: defineTable({
+    userId: v.id("users"),
+    clerkOrgId: v.string(),
+    orgRole: v.string(),
+    createdAt: v.number(),
+  })
+    .index("by_user", ["userId"])
+    .index("by_org", ["clerkOrgId"])
+    .index("by_user_org", ["userId", "clerkOrgId"]),
 
   vehicles: defineTable({
     userId: v.id("users"),
@@ -53,11 +66,7 @@ export default defineSchema({
       )
     ),
     paymentStatus: v.optional(
-      v.union(
-        v.literal("pending"),
-        v.literal("completed"),
-        v.literal("failed")
-      )
+      v.union(v.literal("pending"), v.literal("completed"), v.literal("failed"))
     ),
     createdAt: v.number(),
   })
@@ -146,6 +155,5 @@ export default defineSchema({
     vehicleId: v.id("vehicles"),
     views: v.number(),
     shares: v.number(),
-  })
-    .index("by_vehicle", ["vehicleId"]),
+  }).index("by_vehicle", ["vehicleId"]),
 });

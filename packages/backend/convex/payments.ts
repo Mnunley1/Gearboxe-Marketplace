@@ -1,14 +1,16 @@
-import { action } from "./_generated/server";
-import { v } from "convex/values";
-import { components } from "./_generated/api";
 import { StripeSubscriptions } from "@convex-dev/stripe";
-import { internal } from "./_generated/api";
+import { v } from "convex/values";
 import Stripe from "stripe";
+import { components, internal } from "./_generated/api";
+import { action } from "./_generated/server";
 
 const stripeClient = new StripeSubscriptions(components.stripe, {});
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2024-12-18.acacia",
-});
+
+function getStripe() {
+  return new Stripe(process.env.STRIPE_SECRET_KEY!, {
+    apiVersion: "2024-12-18.acacia",
+  });
+}
 
 /**
  * Create a checkout session for event registration payment
@@ -32,20 +34,23 @@ export const createEventRegistrationCheckout = action({
       internal.registrations.getRegistrationById,
       { id: args.registrationId }
     );
-    
-    if (!registration || registration.registration.paymentStatus !== "pending") {
+
+    if (
+      !registration ||
+      registration.registration.paymentStatus !== "pending"
+    ) {
       throw new Error("Invalid registration or already paid");
     }
-    
+
     // Get user details
     const user = await ctx.runQuery(internal.users.getUserById, {
       id: args.userId,
     });
-    
+
     if (!user) {
       throw new Error("User not found");
     }
-    
+
     // Verify current user matches args.userId
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) {
@@ -74,23 +79,23 @@ export const createEventRegistrationCheckout = action({
     const vehicle = await ctx.runQuery(internal.vehicles.getVehicleById, {
       id: args.vehicleId,
     });
-    
+
     if (!vehicle) {
       throw new Error("Vehicle not found");
     }
-    
+
     // Get or create Stripe customer using component
     const customer = await stripeClient.getOrCreateCustomer(ctx, {
       userId: user.externalId, // Use Clerk ID
       email: user.email,
       name: user.name,
     });
-    
+
     // Create checkout session using Stripe SDK directly for dynamic pricing
     const successUrl = `${process.env.NEXT_PUBLIC_APP_URL}/myAccount/payment/success?session_id={CHECKOUT_SESSION_ID}`;
     const cancelUrl = `${process.env.NEXT_PUBLIC_APP_URL}/myAccount/payment?registrationId=${args.registrationId}`;
-    
-    const session = await stripe.checkout.sessions.create({
+
+    const session = await getStripe().checkout.sessions.create({
       customer: customer.customerId,
       payment_method_types: ["card"],
       line_items: [
@@ -117,7 +122,7 @@ export const createEventRegistrationCheckout = action({
       },
       customer_email: user.email,
     });
-    
+
     return {
       sessionId: session.id,
       url: session.url!,

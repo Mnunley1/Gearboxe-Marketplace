@@ -1,8 +1,13 @@
-import { v } from "convex/values";
-import { mutation, query } from "./_generated/server";
-import { components } from "./_generated/api";
 import { R2 } from "@convex-dev/r2";
-import { getCurrentUser, getCurrentUserOrThrow, requireAdmin } from "./users";
+import { v } from "convex/values";
+import { components } from "./_generated/api";
+import { mutation, query } from "./_generated/server";
+import {
+  getCurrentUser,
+  getCurrentUserOrThrow,
+  requireAdmin,
+  requireOrgAdmin,
+} from "./users";
 
 // Initialize R2 component client
 const r2 = new R2(components.r2);
@@ -13,10 +18,8 @@ const r2 = new R2(components.r2);
  */
 async function getPhotoUrls(photoKeys: string[]) {
   if (photoKeys.length === 0) return [];
-  
-  return await Promise.all(
-    photoKeys.map((key) => r2.getUrl(key))
-  );
+
+  return await Promise.all(photoKeys.map((key) => r2.getUrl(key)));
 }
 
 export const createVehicle = mutation({
@@ -192,7 +195,7 @@ export const getVehicleById = query({
   handler: async (ctx, args) => {
     const vehicle = await ctx.db.get(args.id);
     if (!vehicle) return null;
-    
+
     const photoUrls = await getPhotoUrls(vehicle.photos);
     return {
       ...vehicle,
@@ -205,7 +208,11 @@ export const getVehiclesByUser = query({
   args: { userId: v.id("users") },
   handler: async (ctx, args) => {
     const currentUser = await getCurrentUserOrThrow(ctx);
-    if (currentUser._id !== args.userId && currentUser.role !== "admin" && currentUser.role !== "superAdmin") {
+    if (
+      currentUser._id !== args.userId &&
+      currentUser.role !== "admin" &&
+      currentUser.role !== "superAdmin"
+    ) {
       throw new Error("Unauthorized: cannot view another user's vehicles");
     }
     const vehicles = await ctx.db
@@ -234,7 +241,8 @@ export const getVehiclesByEvent = query({
   args: { eventId: v.id("events") },
   handler: async (ctx, args) => {
     const currentUser = await getCurrentUser(ctx);
-    const isAdmin = currentUser?.role === "admin" || currentUser?.role === "superAdmin";
+    const isAdmin =
+      currentUser?.role === "admin" || currentUser?.role === "superAdmin";
 
     const vehicles = await ctx.db
       .query("vehicles")
@@ -242,7 +250,9 @@ export const getVehiclesByEvent = query({
       .collect();
 
     // Non-admins only see approved vehicles
-    const filtered = isAdmin ? vehicles : vehicles.filter((v) => v.status === "approved");
+    const filtered = isAdmin
+      ? vehicles
+      : vehicles.filter((v) => v.status === "approved");
 
     // Resolve photo URLs for all vehicles
     const vehiclesWithPhotos = await Promise.all(
@@ -297,7 +307,11 @@ export const updateVehicle = mutation({
     if (!existingVehicle) {
       throw new Error("Vehicle not found");
     }
-    if (existingVehicle.userId !== currentUser._id && currentUser.role !== "admin" && currentUser.role !== "superAdmin") {
+    if (
+      existingVehicle.userId !== currentUser._id &&
+      currentUser.role !== "admin" &&
+      currentUser.role !== "superAdmin"
+    ) {
       throw new Error("Unauthorized: not vehicle owner or admin");
     }
 
@@ -355,7 +369,11 @@ export const updateSaleStatus = mutation({
     if (!vehicle) {
       throw new Error("Vehicle not found");
     }
-    if (vehicle.userId !== currentUser._id && currentUser.role !== "admin" && currentUser.role !== "superAdmin") {
+    if (
+      vehicle.userId !== currentUser._id &&
+      currentUser.role !== "admin" &&
+      currentUser.role !== "superAdmin"
+    ) {
       throw new Error("Unauthorized: not vehicle owner or admin");
     }
     await ctx.db.patch(args.id, { saleStatus: args.saleStatus });
@@ -370,7 +388,11 @@ export const deleteVehicle = mutation({
     if (!vehicle) {
       throw new Error("Vehicle not found");
     }
-    if (vehicle.userId !== currentUser._id && currentUser.role !== "admin" && currentUser.role !== "superAdmin") {
+    if (
+      vehicle.userId !== currentUser._id &&
+      currentUser.role !== "admin" &&
+      currentUser.role !== "superAdmin"
+    ) {
       throw new Error("Unauthorized: not vehicle owner or admin");
     }
 
@@ -391,7 +413,17 @@ export const deleteVehicle = mutation({
 export const approveVehicle = mutation({
   args: { id: v.id("vehicles") },
   handler: async (ctx, args) => {
-    await requireAdmin(ctx);
+    const { cityId, isSuperAdmin } = await requireOrgAdmin(ctx);
+    if (!isSuperAdmin && cityId) {
+      const vehicle = await ctx.db.get(args.id);
+      if (!vehicle?.eventId) {
+        throw new Error("Vehicle has no associated event");
+      }
+      const event = await ctx.db.get(vehicle.eventId);
+      if (!event || event.cityId !== cityId) {
+        throw new Error("Unauthorized: vehicle does not belong to your city");
+      }
+    }
     await ctx.db.patch(args.id, { status: "approved" });
   },
 });
@@ -399,7 +431,17 @@ export const approveVehicle = mutation({
 export const rejectVehicle = mutation({
   args: { id: v.id("vehicles") },
   handler: async (ctx, args) => {
-    await requireAdmin(ctx);
+    const { cityId, isSuperAdmin } = await requireOrgAdmin(ctx);
+    if (!isSuperAdmin && cityId) {
+      const vehicle = await ctx.db.get(args.id);
+      if (!vehicle?.eventId) {
+        throw new Error("Vehicle has no associated event");
+      }
+      const event = await ctx.db.get(vehicle.eventId);
+      if (!event || event.cityId !== cityId) {
+        throw new Error("Unauthorized: vehicle does not belong to your city");
+      }
+    }
     await ctx.db.patch(args.id, { status: "rejected" });
   },
 });
@@ -414,26 +456,27 @@ export const migrateVehiclePhotos = mutation({
     await requireAdmin(ctx);
     const vehicles = await ctx.db.query("vehicles").collect();
     let fixed = 0;
-    
+
     for (const vehicle of vehicles) {
       // Check if photos array contains any strings (URLs) instead of storage IDs
       const hasInvalidPhotos = vehicle.photos.some(
         (photo: any) => typeof photo === "string" && photo.startsWith("http")
       );
-      
+
       if (hasInvalidPhotos) {
         // Replace URLs with empty array (or filter out URLs)
         const validPhotos = vehicle.photos.filter(
-          (photo: any) => !(typeof photo === "string" && photo.startsWith("http"))
+          (photo: any) =>
+            !(typeof photo === "string" && photo.startsWith("http"))
         ) as any[];
-        
+
         await ctx.db.patch(vehicle._id, {
           photos: validPhotos,
         });
         fixed++;
       }
     }
-    
+
     return { fixed, total: vehicles.length };
   },
 });

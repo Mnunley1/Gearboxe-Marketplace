@@ -1,13 +1,28 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
-import { requireAdmin, requireSuperAdmin } from "./users";
+import { requireOrgAdmin, requireSuperAdmin } from "./users";
 
 export const getAdminStats = query({
   handler: async (ctx) => {
-    await requireAdmin(ctx);
-    const vehicles = await ctx.db.query("vehicles").collect();
-    const events = await ctx.db.query("events").collect();
-    const registrations = await ctx.db.query("registrations").collect();
+    const { cityId } = await requireOrgAdmin(ctx);
+
+    let events = await ctx.db.query("events").collect();
+    if (cityId) {
+      events = events.filter((e) => e.cityId === cityId);
+    }
+
+    const eventIds = new Set(events.map((e) => e._id));
+
+    let vehicles = await ctx.db.query("vehicles").collect();
+    if (cityId) {
+      vehicles = vehicles.filter((v) => v.eventId && eventIds.has(v.eventId));
+    }
+
+    let registrations = await ctx.db.query("registrations").collect();
+    if (cityId) {
+      registrations = registrations.filter((r) => eventIds.has(r.eventId));
+    }
+
     const users = await ctx.db.query("users").collect();
 
     const pendingVehicles = vehicles.filter((v) => v.status === "pending");
@@ -28,10 +43,18 @@ export const getAdminStats = query({
 
 export const getAllVehicles = query({
   handler: async (ctx) => {
-    await requireAdmin(ctx);
-    const vehicles = await ctx.db.query("vehicles").collect();
+    const { cityId } = await requireOrgAdmin(ctx);
+    let vehicles = await ctx.db.query("vehicles").collect();
 
-    // Get user details for each vehicle
+    if (cityId) {
+      const events = await ctx.db
+        .query("events")
+        .withIndex("by_city", (q) => q.eq("cityId", cityId))
+        .collect();
+      const eventIds = new Set(events.map((e) => e._id));
+      vehicles = vehicles.filter((v) => v.eventId && eventIds.has(v.eventId));
+    }
+
     const vehiclesWithUsers = await Promise.all(
       vehicles.map(async (vehicle) => {
         const user = await ctx.db.get(vehicle.userId);
@@ -45,10 +68,15 @@ export const getAllVehicles = query({
 
 export const getAllEvents = query({
   handler: async (ctx) => {
-    await requireAdmin(ctx);
-    const events = await ctx.db.query("events").collect();
+    const { cityId } = await requireOrgAdmin(ctx);
 
-    // Get city details for each event
+    const events = cityId
+      ? await ctx.db
+          .query("events")
+          .withIndex("by_city", (q) => q.eq("cityId", cityId))
+          .collect()
+      : await ctx.db.query("events").collect();
+
     const eventsWithCities = await Promise.all(
       events.map(async (event) => {
         const city = await ctx.db.get(event.cityId);
@@ -62,7 +90,7 @@ export const getAllEvents = query({
 
 export const getAllUsers = query({
   handler: async (ctx) => {
-    await requireAdmin(ctx);
+    await requireSuperAdmin(ctx);
     const users = await ctx.db.query("users").collect();
     return users.sort((a, b) => b.createdAt - a.createdAt);
   },
@@ -133,10 +161,18 @@ export const demoteToUser = mutation({
 
 export const getAllRegistrations = query({
   handler: async (ctx) => {
-    await requireAdmin(ctx);
-    const registrations = await ctx.db.query("registrations").collect();
+    const { cityId } = await requireOrgAdmin(ctx);
+    let registrations = await ctx.db.query("registrations").collect();
 
-    // Get related details for each registration
+    if (cityId) {
+      const events = await ctx.db
+        .query("events")
+        .withIndex("by_city", (q) => q.eq("cityId", cityId))
+        .collect();
+      const eventIds = new Set(events.map((e) => e._id));
+      registrations = registrations.filter((r) => eventIds.has(r.eventId));
+    }
+
     const registrationsWithDetails = await Promise.all(
       registrations.map(async (registration) => {
         const vehicle = await ctx.db.get(registration.vehicleId);

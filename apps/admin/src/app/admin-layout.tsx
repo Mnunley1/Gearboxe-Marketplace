@@ -1,7 +1,8 @@
 "use client";
 
-import { useAuth } from "@clerk/nextjs";
-import { useConvexAuth } from "convex/react";
+import { OrganizationSwitcher, useAuth, useOrganization } from "@clerk/nextjs";
+import { api } from "@gearboxe-market/convex/_generated/api";
+import { useConvexAuth, useQuery } from "convex/react";
 import { redirect } from "next/navigation";
 import { useEffect } from "react";
 import { AdminNavbar } from "../../components/ui/admin-navbar";
@@ -12,8 +13,10 @@ export default function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const { isAuthenticated, isLoading } = useConvexAuth();
+  const { isLoading } = useConvexAuth();
   const { isSignedIn, isLoaded: authLoaded } = useAuth();
+  const { organization, isLoaded: orgLoaded } = useOrganization();
+  const isSuperAdmin = useQuery(api.users.isSuperAdmin);
 
   useEffect(() => {
     if (authLoaded && !isSignedIn) {
@@ -36,6 +39,32 @@ export default function AdminLayout({
   // Only redirect if Clerk auth is not loaded or user is not signed in
   if (!isSignedIn) {
     return null; // Will redirect via useEffect
+  }
+
+  // Non-superAdmin users must have an active org selected
+  if (orgLoaded && !organization && isSuperAdmin === false) {
+    return (
+      <div className="admin-gradient flex min-h-screen flex-col">
+        <AdminNavbar />
+        <main className="flex-1 bg-white">
+          <div className="mx-auto max-w-md px-4 py-24 text-center">
+            <h2 className="mb-4 font-bold text-2xl text-gray-900">
+              Select an Organization
+            </h2>
+            <p className="mb-6 text-gray-600">
+              Please select your city organization to access the admin panel.
+            </p>
+            <div className="flex justify-center">
+              <OrganizationSwitcher
+                afterSelectOrganizationUrl="/admin"
+                hidePersonal={true}
+              />
+            </div>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
   }
 
   return (

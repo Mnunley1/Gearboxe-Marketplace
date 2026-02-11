@@ -1,7 +1,7 @@
 import { v } from "convex/values";
-import { internalMutation, mutation, query } from "./_generated/server";
 import { internal } from "./_generated/api";
-import { getCurrentUserOrThrow, requireAdmin } from "./users";
+import { internalMutation, mutation, query } from "./_generated/server";
+import { getCurrentUserOrThrow, requireOrgAdmin } from "./users";
 
 /**
  * Create a pending registration before payment
@@ -17,7 +17,9 @@ export const createPendingRegistration = mutation({
   handler: async (ctx, args) => {
     const currentUser = await getCurrentUserOrThrow(ctx);
     if (currentUser._id !== args.userId) {
-      throw new Error("Unauthorized: cannot register on behalf of another user");
+      throw new Error(
+        "Unauthorized: cannot register on behalf of another user"
+      );
     }
 
     // Check if event exists and is upcoming
@@ -25,20 +27,20 @@ export const createPendingRegistration = mutation({
     if (!event) {
       throw new Error("Event not found");
     }
-    
+
     const now = Date.now();
     if (event.date <= now) {
       throw new Error("Cannot register for past events");
     }
-    
+
     // Check capacity - count BOTH completed AND non-expired pending registrations
     const PENDING_EXPIRY_MS = 15 * 60 * 1000; // 15 minutes
-    
+
     const allRegistrations = await ctx.db
       .query("registrations")
       .withIndex("by_event", (q) => q.eq("eventId", args.eventId))
       .collect();
-    
+
     // Count registrations that are either:
     // 1. Completed (always count)
     // 2. Pending and not expired (count as reserved)
@@ -58,17 +60,17 @@ export const createPendingRegistration = mutation({
       }
       return false;
     });
-    
+
     if (activeRegistrations.length >= event.capacity) {
       throw new Error("Event is full");
     }
-    
+
     // Check for existing registration for this vehicle
     const existing = await ctx.db
       .query("registrations")
       .withIndex("by_vehicle", (q) => q.eq("vehicleId", args.vehicleId))
       .first();
-    
+
     if (existing) {
       if (existing.paymentStatus === "completed") {
         throw new Error("Vehicle is already registered for this event");
@@ -83,10 +85,10 @@ export const createPendingRegistration = mutation({
       });
       return existing._id;
     }
-    
+
     // Create new pending registration with expiration (15 minutes to complete payment)
     const expiresAt = Date.now() + 15 * 60 * 1000; // 15 minutes from now
-    
+
     return await ctx.db.insert("registrations", {
       ...args,
       paymentStatus: "pending",
@@ -111,13 +113,16 @@ export const completeRegistration = internalMutation({
     if (!registration) {
       throw new Error("Registration not found");
     }
-    
+
     // Idempotency check - if already completed, return early
     if (registration.paymentStatus === "completed") {
-      console.log("Registration already completed, skipping:", args.registrationId);
+      console.log(
+        "Registration already completed, skipping:",
+        args.registrationId
+      );
       return registration._id;
     }
-    
+
     // Update registration to completed (remove expiration)
     await ctx.db.patch(args.registrationId, {
       paymentStatus: "completed",
@@ -125,12 +130,12 @@ export const completeRegistration = internalMutation({
       qrCodeData: args.qrCodeData,
       expiresAt: undefined, // Clear expiration on completion
     });
-    
+
     // Update vehicle payment status
     await ctx.db.patch(registration.vehicleId, {
       paymentStatus: "completed",
     });
-    
+
     return args.registrationId;
   },
 });
@@ -158,19 +163,19 @@ export const cleanupExpiredRegistrations = internalMutation({
   handler: async (ctx) => {
     const now = Date.now();
     const PENDING_EXPIRY_MS = 15 * 60 * 1000; // 15 minutes
-    
+
     // Find all pending registrations
     const pendingRegistrations = await ctx.db
       .query("registrations")
       .filter((q) => q.eq(q.field("paymentStatus"), "pending"))
       .collect();
-    
+
     let cleaned = 0;
     for (const reg of pendingRegistrations) {
       const isExpired =
         (reg.expiresAt && reg.expiresAt <= now) ||
         (!reg.expiresAt && reg.createdAt <= now - PENDING_EXPIRY_MS);
-      
+
       if (isExpired) {
         // Mark as failed and clear expiration
         await ctx.db.patch(reg._id, {
@@ -180,7 +185,7 @@ export const cleanupExpiredRegistrations = internalMutation({
         cleaned++;
       }
     }
-    
+
     return { cleaned, total: pendingRegistrations.length };
   },
 });
@@ -201,15 +206,15 @@ export const resendConfirmationEmail = mutation({
     if (registration.userId !== currentUser._id) {
       throw new Error("Unauthorized: not the registration owner");
     }
-    
+
     if (registration.paymentStatus !== "completed") {
       throw new Error("Cannot resend email for unpaid registration");
     }
-    
+
     if (!registration.qrCodeData) {
       throw new Error("QR code not found for this registration");
     }
-    
+
     // Schedule email send
     await ctx.scheduler.runAfter(
       0,
@@ -219,7 +224,7 @@ export const resendConfirmationEmail = mutation({
         qrCodeData: registration.qrCodeData,
       }
     );
-    
+
     return { success: true };
   },
 });
@@ -227,13 +232,18 @@ export const resendConfirmationEmail = mutation({
 export const getRegistrationsByEvent = query({
   args: { eventId: v.id("events") },
   handler: async (ctx, args) => {
-    await requireAdmin(ctx);
+    const { cityId, isSuperAdmin } = await requireOrgAdmin(ctx);
+    if (!isSuperAdmin && cityId) {
+      const event = await ctx.db.get(args.eventId);
+      if (!event || event.cityId !== cityId) {
+        throw new Error("Unauthorized: event does not belong to your city");
+      }
+    }
     const registrations = await ctx.db
       .query("registrations")
       .withIndex("by_event", (q) => q.eq("eventId", args.eventId))
       .collect();
-    
-    // Fetch related data
+
     return await Promise.all(
       registrations.map(async (reg) => {
         const vehicle = await ctx.db.get(reg.vehicleId);
@@ -259,7 +269,7 @@ export const getRegistrationsByUser = query({
       .query("registrations")
       .withIndex("by_user", (q) => q.eq("userId", args.userId))
       .collect();
-    
+
     // Fetch related data
     return await Promise.all(
       registrations.map(async (reg) => {
@@ -282,7 +292,11 @@ export const getRegistrationById = query({
     const registration = await ctx.db.get(args.id);
     if (!registration) return null;
 
-    if (registration.userId !== currentUser._id && currentUser.role !== "admin" && currentUser.role !== "superAdmin") {
+    if (
+      registration.userId !== currentUser._id &&
+      currentUser.role !== "admin" &&
+      currentUser.role !== "superAdmin"
+    ) {
       throw new Error("Unauthorized: not the registration owner or admin");
     }
 
@@ -312,7 +326,11 @@ export const getRegistrationByVehicle = query({
       return null;
     }
 
-    if (registration.userId !== currentUser._id && currentUser.role !== "admin" && currentUser.role !== "superAdmin") {
+    if (
+      registration.userId !== currentUser._id &&
+      currentUser.role !== "admin" &&
+      currentUser.role !== "superAdmin"
+    ) {
       throw new Error("Unauthorized: not the registration owner or admin");
     }
 
@@ -330,10 +348,18 @@ export const getRegistrationByVehicle = query({
 export const checkInRegistration = mutation({
   args: { id: v.id("registrations") },
   handler: async (ctx, args) => {
-    const admin = await requireAdmin(ctx);
+    const { user, cityId, isSuperAdmin } = await requireOrgAdmin(ctx);
     const registration = await ctx.db.get(args.id);
     if (!registration) {
       throw new Error("Registration not found");
+    }
+    if (!isSuperAdmin && cityId) {
+      const event = await ctx.db.get(registration.eventId);
+      if (!event || event.cityId !== cityId) {
+        throw new Error(
+          "Unauthorized: registration does not belong to your city"
+        );
+      }
     }
     if (registration.paymentStatus !== "completed") {
       throw new Error("Cannot check in unpaid registration");
@@ -344,7 +370,7 @@ export const checkInRegistration = mutation({
     await ctx.db.patch(args.id, {
       checkedIn: true,
       checkedInAt: Date.now(),
-      checkedInBy: admin._id,
+      checkedInBy: user._id,
     });
   },
 });
@@ -352,7 +378,7 @@ export const checkInRegistration = mutation({
 export const validateQRCode = query({
   args: { qrCodeData: v.string() },
   handler: async (ctx, args) => {
-    await requireAdmin(ctx);
+    const { cityId, isSuperAdmin } = await requireOrgAdmin(ctx);
     const registration = await ctx.db
       .query("registrations")
       .withIndex("by_qr_code", (q) => q.eq("qrCodeData", args.qrCodeData))
@@ -366,8 +392,12 @@ export const validateQRCode = query({
       return null;
     }
 
-    const vehicle = await ctx.db.get(registration.vehicleId);
     const event = await ctx.db.get(registration.eventId);
+    if (!isSuperAdmin && cityId && (!event || event.cityId !== cityId)) {
+      return null;
+    }
+
+    const vehicle = await ctx.db.get(registration.vehicleId);
     const user = await ctx.db.get(registration.userId);
 
     return {
@@ -383,10 +413,13 @@ export const validateQRCode = query({
 export const getCheckInSheetData = query({
   args: { eventId: v.id("events") },
   handler: async (ctx, args) => {
-    await requireAdmin(ctx);
+    const { cityId, isSuperAdmin } = await requireOrgAdmin(ctx);
     const event = await ctx.db.get(args.eventId);
     if (!event) {
       throw new Error("Event not found");
+    }
+    if (!isSuperAdmin && cityId && event.cityId !== cityId) {
+      throw new Error("Unauthorized: event does not belong to your city");
     }
 
     const registrations = await ctx.db

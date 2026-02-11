@@ -1,6 +1,6 @@
 import { v } from "convex/values";
-import { mutation, query } from "./_generated/server";
-import { requireAdmin } from "./users";
+import { internalMutation, mutation, query } from "./_generated/server";
+import { requireOrgAdmin } from "./users";
 
 export const createEvent = mutation({
   args: {
@@ -14,7 +14,10 @@ export const createEvent = mutation({
     vendorPrice: v.number(),
   },
   handler: async (ctx, args) => {
-    await requireAdmin(ctx);
+    const { cityId, isSuperAdmin } = await requireOrgAdmin(ctx);
+    if (!isSuperAdmin && cityId && args.cityId !== cityId) {
+      throw new Error("Unauthorized: cannot create events for another city");
+    }
     return await ctx.db.insert("events", {
       ...args,
       createdAt: Date.now(),
@@ -57,18 +60,17 @@ export const getUpcomingEvents = query({
       .query("events")
       .withIndex("by_date", (q) => q.gt("date", now))
       .collect();
-    
+
     // Get capacity info for each event (count completed + non-expired pending)
-    const now = Date.now();
     const PENDING_EXPIRY_MS = 15 * 60 * 1000; // 15 minutes
-    
+
     return await Promise.all(
       events.map(async (event) => {
         const allRegistrations = await ctx.db
           .query("registrations")
           .withIndex("by_event", (q) => q.eq("eventId", event._id))
           .collect();
-        
+
         // Count active registrations (completed + non-expired pending)
         const activeRegistrations = allRegistrations.filter((reg) => {
           if (reg.paymentStatus === "completed") {
@@ -84,11 +86,11 @@ export const getUpcomingEvents = query({
           }
           return false;
         });
-        
+
         const completedCount = allRegistrations.filter(
           (reg) => reg.paymentStatus === "completed"
         ).length;
-        
+
         return {
           ...event,
           registered: completedCount,
@@ -113,7 +115,13 @@ export const updateEvent = mutation({
     vendorPrice: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
-    await requireAdmin(ctx);
+    const { cityId, isSuperAdmin } = await requireOrgAdmin(ctx);
+    if (!isSuperAdmin && cityId) {
+      const event = await ctx.db.get(args.id);
+      if (!event || event.cityId !== cityId) {
+        throw new Error("Unauthorized: event does not belong to your city");
+      }
+    }
     const { id, ...updates } = args;
     await ctx.db.patch(id, updates);
   },
@@ -124,15 +132,15 @@ export const getEventCapacity = query({
   handler: async (ctx, args) => {
     const event = await ctx.db.get(args.eventId);
     if (!event) return null;
-    
+
     const now = Date.now();
     const PENDING_EXPIRY_MS = 15 * 60 * 1000; // 15 minutes
-    
+
     const allRegistrations = await ctx.db
       .query("registrations")
       .withIndex("by_event", (q) => q.eq("eventId", args.eventId))
       .collect();
-    
+
     // Count active registrations (completed + non-expired pending)
     const activeRegistrations = allRegistrations.filter((reg) => {
       if (reg.paymentStatus === "completed") {
@@ -148,11 +156,11 @@ export const getEventCapacity = query({
       }
       return false;
     });
-    
+
     const completedCount = allRegistrations.filter(
       (reg) => reg.paymentStatus === "completed"
     ).length;
-    
+
     return {
       capacity: event.capacity,
       registered: completedCount,
@@ -166,7 +174,31 @@ export const getEventCapacity = query({
 export const deleteEvent = mutation({
   args: { id: v.id("events") },
   handler: async (ctx, args) => {
-    await requireAdmin(ctx);
+    const { cityId, isSuperAdmin } = await requireOrgAdmin(ctx);
+    if (!isSuperAdmin && cityId) {
+      const event = await ctx.db.get(args.id);
+      if (!event || event.cityId !== cityId) {
+        throw new Error("Unauthorized: event does not belong to your city");
+      }
+    }
     await ctx.db.delete(args.id);
+  },
+});
+
+// One-off backfill: adds vendorPrice to existing events missing it.
+// Run via dashboard: npx convex run --no-push events:backfillVendorPrice
+export const backfillVendorPrice = internalMutation({
+  args: { defaultPrice: v.optional(v.number()) },
+  handler: async (ctx, args) => {
+    const defaultPrice = args.defaultPrice ?? 50;
+    const events = await ctx.db.query("events").collect();
+    let patched = 0;
+    for (const event of events) {
+      if ((event as Record<string, unknown>).vendorPrice === undefined) {
+        await ctx.db.patch(event._id, { vendorPrice: defaultPrice });
+        patched++;
+      }
+    }
+    return { patched };
   },
 });

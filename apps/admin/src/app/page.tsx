@@ -1,7 +1,14 @@
 "use client";
 
-import { api } from "@gearboxe-market/convex/_generated/api";
 import { useAuth, useUser } from "@clerk/nextjs";
+import { api } from "@gearboxe-market/convex/_generated/api";
+import { Button } from "@gearboxe-market/ui/button";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@gearboxe-market/ui/card";
 import { useConvexAuth, useQuery } from "convex/react";
 import {
   Calendar,
@@ -13,13 +20,6 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Button } from "@gearboxe-market/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@gearboxe-market/ui/card";
 
 export default function AdminDashboardPage() {
   const { isLoading } = useConvexAuth();
@@ -29,6 +29,7 @@ export default function AdminDashboardPage() {
   // Call all hooks at the top level (Rules of Hooks)
   const isAdmin = useQuery(api.users.isAdmin);
   const isSuperAdmin = useQuery(api.users.isSuperAdmin);
+  const orgContext = useQuery(api.users.getOrgContext);
   const adminStats = useQuery(api.admin.getAdminStats);
   const pendingVehicles = useQuery(api.admin.getAllVehicles);
   const upcomingEvents = useQuery(api.events.getUpcomingEvents);
@@ -83,7 +84,9 @@ export default function AdminDashboardPage() {
           Admin Dashboard
         </h1>
         <p className="text-gray-600">
-          Manage vehicles, events, and registrations
+          {orgContext?.city
+            ? `Managing ${orgContext.city.name}, ${orgContext.city.state}`
+            : "Global view (all cities)"}
         </p>
       </div>
 

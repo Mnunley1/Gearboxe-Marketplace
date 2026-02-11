@@ -106,6 +106,7 @@ export const seedDatabase = mutation({
         location: "Golden Gate Park",
         address: "Golden Gate Park, San Francisco, CA 94117",
         capacity: 200,
+        vendorPrice: 50,
         description:
           "Join us for our monthly classic car show featuring vintage and modern performance vehicles. Food trucks, live music, and automotive vendors.",
         createdAt: Date.now(),
@@ -117,6 +118,7 @@ export const seedDatabase = mutation({
         location: "Santa Monica Pier",
         address: "200 Santa Monica Pier, Santa Monica, CA 90401",
         capacity: 150,
+        vendorPrice: 75,
         description:
           "Exclusive supercar showcase featuring the latest exotic vehicles. Meet fellow enthusiasts and see rare automotive masterpieces.",
         createdAt: Date.now(),
@@ -128,6 +130,7 @@ export const seedDatabase = mutation({
         location: "Seattle Center",
         address: "305 Harrison St, Seattle, WA 98109",
         capacity: 300,
+        vendorPrice: 40,
         description:
           "The largest car meet in the Pacific Northwest. Featuring everything from classic muscle cars to modern electric vehicles.",
         createdAt: Date.now(),

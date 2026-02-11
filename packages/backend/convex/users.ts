@@ -178,6 +178,71 @@ export const updateProfile = mutation({
   },
 });
 
+export async function getActiveOrg(ctx: QueryCtx) {
+  const identity = await ctx.auth.getUserIdentity();
+  if (!identity) return null;
+  const orgId = (identity as any).org_id as string | undefined;
+  const orgRole = (identity as any).org_role as string | undefined;
+  if (!orgId) return null;
+  return { orgId, orgRole: orgRole ?? "org:member" };
+}
+
+export async function getActiveCityFromOrg(ctx: QueryCtx) {
+  const org = await getActiveOrg(ctx);
+  if (!org) return null;
+  const city = await ctx.db
+    .query("cities")
+    .withIndex("by_clerkOrgId", (q) => q.eq("clerkOrgId", org.orgId))
+    .first();
+  return city;
+}
+
+export async function requireOrgAdmin(ctx: QueryCtx) {
+  const user = await getCurrentUserOrThrow(ctx);
+  const isSuperAdmin = user.role === "superAdmin";
+
+  if (isSuperAdmin) {
+    const city = await getActiveCityFromOrg(ctx);
+    return {
+      user,
+      cityId: city?._id ?? null,
+      isSuperAdmin: true,
+    };
+  }
+
+  if (user.role !== "admin") {
+    throw new Error("Unauthorized: admin access required");
+  }
+
+  const city = await getActiveCityFromOrg(ctx);
+  if (!city) {
+    throw new Error("Unauthorized: no active organization selected");
+  }
+
+  return {
+    user,
+    cityId: city._id,
+    isSuperAdmin: false,
+  };
+}
+
+export const getOrgContext = query({
+  args: {},
+  handler: async (ctx) => {
+    const user = await getCurrentUser(ctx);
+    if (!user) return null;
+
+    const org = await getActiveOrg(ctx);
+    const city = await getActiveCityFromOrg(ctx);
+
+    return {
+      user: { _id: user._id, name: user.name, role: user.role },
+      city: city ? { _id: city._id, name: city.name, state: city.state } : null,
+      orgRole: org?.orgRole ?? null,
+    };
+  },
+});
+
 async function userByExternalId(ctx: QueryCtx, externalId: string) {
   return await ctx.db
     .query("users")

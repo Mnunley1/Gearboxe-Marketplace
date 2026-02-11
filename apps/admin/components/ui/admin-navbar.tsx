@@ -1,7 +1,8 @@
 "use client";
 
+import { OrganizationSwitcher, useAuth, useUser } from "@clerk/nextjs";
 import { api } from "@gearboxe-market/convex/_generated/api";
-import { useAuth, useUser } from "@clerk/nextjs";
+import { Button } from "@gearboxe-market/ui/button";
 import { useConvexAuth, useQuery } from "convex/react";
 import {
   ArrowLeft,
@@ -18,7 +19,6 @@ import {
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { Button } from "@gearboxe-market/ui/button";
 import { UserDropdown } from "@/components/ui/user-dropdown";
 
 export function AdminNavbar() {
@@ -130,8 +130,19 @@ export function AdminNavbar() {
             </div>
           </div>
 
-          {/* User Actions */}
+          {/* Org Switcher + User Actions */}
           <div className="flex items-center space-x-4">
+            <OrganizationSwitcher
+              afterSelectOrganizationUrl="/admin"
+              appearance={{
+                elements: {
+                  rootBox: "flex items-center",
+                  organizationSwitcherTrigger:
+                    "text-gray-300 hover:text-white text-sm",
+                },
+              }}
+              hidePersonal={true}
+            />
             {/* Back to main site */}
             <Button
               asChild

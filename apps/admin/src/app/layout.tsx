@@ -1,10 +1,18 @@
 import { ClerkProvider } from "@clerk/nextjs";
 import type { Metadata } from "next";
+import { Inter, Poppins } from "next/font/google";
 import { Toaster } from "sonner";
 import { ErrorBoundary } from "../../components/ui/error-boundary";
 import { ConvexClientProvider } from "../../lib/convex-provider";
 import AdminLayout from "./admin-layout";
 import "./global.css";
+
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
+const poppins = Poppins({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-poppins",
+});
 
 export const metadata: Metadata = {
   title: "Gearboxe Market - Admin",
@@ -18,8 +26,8 @@ export default function RootLayout({
 }>) {
   return (
     <ClerkProvider signInFallbackRedirectUrl="/" signUpFallbackRedirectUrl="/">
-      <html lang="en">
-        <body className="antialiased">
+      <html className={`${inter.variable} ${poppins.variable}`} lang="en">
+        <body className="font-sans antialiased">
           <ErrorBoundary>
             <ConvexClientProvider>
               <AdminLayout>{children}</AdminLayout>

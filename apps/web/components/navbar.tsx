@@ -1,7 +1,7 @@
 "use client";
 
-import { Button } from "@gearboxe-market/ui/button";
 import { useAuth } from "@clerk/nextjs";
+import { Button } from "@gearboxe-market/ui/button";
 import { useConvexAuth } from "convex/react";
 import { Car, Menu, X } from "lucide-react";
 import Link from "next/link";
@@ -27,7 +27,9 @@ export function Navbar() {
 
   // Close mobile menu on route change
   useEffect(() => {
-    setIsMobileMenuOpen(false);
+    if (pathname) {
+      setIsMobileMenuOpen(false);
+    }
   }, [pathname]);
 
   const navLinks = [
@@ -38,11 +40,13 @@ export function Navbar() {
   // Show loading state while auth is being determined
   if (!authLoaded) {
     return (
-      <nav className={`sticky top-0 z-50 border-b transition-all duration-300 ${
-        isScrolled
-          ? "border-gray-200/80 bg-white/95 shadow-sm backdrop-blur-md"
-          : "border-transparent bg-white"
-      }`}>
+      <nav
+        className={`sticky top-0 z-50 border-b transition-all duration-300 ${
+          isScrolled
+            ? "border-gray-200/80 bg-white/95 shadow-sm backdrop-blur-md"
+            : "border-transparent bg-white"
+        }`}
+      >
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between lg:h-18">
             {/* Logo */}
@@ -51,10 +55,10 @@ export function Navbar() {
                 <Car className="h-5 w-5 text-white" />
               </div>
               <div className="flex flex-col">
-                <span className="font-bold text-gray-900 text-lg tracking-tight">
+                <span className="font-bold font-heading text-gray-900 text-lg uppercase tracking-tight">
                   Gearboxe
                 </span>
-                <span className="-mt-1 font-medium text-[10px] text-gray-500 uppercase tracking-widest">
+                <span className="-mt-1 font-heading font-medium text-[10px] text-gray-500 uppercase tracking-widest">
                   Market
                 </span>
               </div>
@@ -72,11 +76,13 @@ export function Navbar() {
   }
 
   return (
-    <nav className={`sticky top-0 z-50 border-b transition-all duration-300 ${
-      isScrolled
-        ? "border-gray-200/80 bg-white/95 shadow-sm backdrop-blur-md"
-        : "border-transparent bg-white"
-    }`}>
+    <nav
+      className={`sticky top-0 z-50 border-b transition-all duration-300 ${
+        isScrolled
+          ? "border-gray-200/80 bg-white/95 shadow-sm backdrop-blur-md"
+          : "border-transparent bg-white"
+      }`}
+    >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between lg:h-18">
           {/* Logo and Navigation Links */}
@@ -86,10 +92,10 @@ export function Navbar() {
                 <Car className="h-5 w-5 text-white" />
               </div>
               <div className="flex flex-col">
-                <span className="font-bold text-gray-900 text-lg tracking-tight">
+                <span className="font-bold font-heading text-gray-900 text-lg uppercase tracking-tight">
                   Gearboxe
                 </span>
-                <span className="-mt-1 font-medium text-[10px] text-gray-500 uppercase tracking-widest">
+                <span className="-mt-1 font-heading font-medium text-[10px] text-gray-500 uppercase tracking-widest">
                   Market
                 </span>
               </div>
@@ -101,13 +107,13 @@ export function Navbar() {
                 const isActive = pathname === link.href;
                 return (
                   <Link
-                    key={link.href}
                     className={`relative rounded-lg px-4 py-2 font-medium text-sm transition-colors duration-200 ${
                       isActive
                         ? "bg-primary/5 text-primary"
                         : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
                     }`}
                     href={link.href}
+                    key={link.href}
                   >
                     {link.label}
                     {isActive && (
@@ -125,12 +131,10 @@ export function Navbar() {
               <>
                 <Button
                   asChild
-                  size="sm"
                   className="hidden shadow-md shadow-primary/20 sm:inline-flex"
+                  size="sm"
                 >
-                  <Link href="/myAccount/new-listing">
-                    List Your Car
-                  </Link>
+                  <Link href="/myAccount/new-listing">List Your Car</Link>
                 </Button>
                 <UserDropdown afterSignOutUrl="/" />
               </>
@@ -139,7 +143,11 @@ export function Navbar() {
                 <Button asChild size="sm" variant="ghost">
                   <Link href="/sign-in">Sign In</Link>
                 </Button>
-                <Button asChild size="sm" className="shadow-md shadow-primary/20">
+                <Button
+                  asChild
+                  className="shadow-md shadow-primary/20"
+                  size="sm"
+                >
                   <Link href="/sign-up">Get Started</Link>
                 </Button>
               </div>
@@ -147,16 +155,20 @@ export function Navbar() {
 
             {/* Mobile menu button */}
             <Button
+              aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
               className="relative md:hidden"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
               size="icon"
               variant="ghost"
-              aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
             >
-              <span className={`absolute transition-all duration-200 ${isMobileMenuOpen ? "rotate-45 opacity-0" : "rotate-0 opacity-100"}`}>
+              <span
+                className={`absolute transition-all duration-200 ${isMobileMenuOpen ? "rotate-45 opacity-0" : "rotate-0 opacity-100"}`}
+              >
                 <Menu className="h-5 w-5" />
               </span>
-              <span className={`absolute transition-all duration-200 ${isMobileMenuOpen ? "rotate-0 opacity-100" : "-rotate-45 opacity-0"}`}>
+              <span
+                className={`absolute transition-all duration-200 ${isMobileMenuOpen ? "rotate-0 opacity-100" : "-rotate-45 opacity-0"}`}
+              >
                 <X className="h-5 w-5" />
               </span>
             </Button>
@@ -174,13 +186,13 @@ export function Navbar() {
               const isActive = pathname === link.href;
               return (
                 <Link
-                  key={link.href}
                   className={`block rounded-lg px-4 py-3 font-medium text-sm transition-colors ${
                     isActive
                       ? "bg-primary/5 text-primary"
                       : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
                   }`}
                   href={link.href}
+                  key={link.href}
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   {link.label}
@@ -191,7 +203,11 @@ export function Navbar() {
             {/* Mobile auth buttons */}
             {!(isAuthenticated || isSignedIn) && (
               <div className="mt-4 flex flex-col gap-2 border-gray-100 border-t px-4 pt-4">
-                <Button asChild variant="outline" className="w-full justify-center">
+                <Button
+                  asChild
+                  className="w-full justify-center"
+                  variant="outline"
+                >
                   <Link href="/sign-in">Sign In</Link>
                 </Button>
                 <Button asChild className="w-full justify-center">

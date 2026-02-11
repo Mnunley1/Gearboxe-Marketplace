@@ -11,7 +11,7 @@ export function Footer() {
               <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
                 <span className="font-bold text-sm text-white">G</span>
               </div>
-              <span className="font-bold text-gray-900 text-xl">
+              <span className="font-bold font-heading text-gray-900 text-xl uppercase">
                 Gearboxe Market
               </span>
             </div>

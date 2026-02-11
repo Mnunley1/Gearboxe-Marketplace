@@ -1,12 +1,12 @@
 "use client";
 
 import { useAuth } from "@clerk/nextjs";
+import { Button } from "@gearboxe-market/ui/button";
 import { useConvexAuth } from "convex/react";
 import { Menu, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { Button } from "@gearboxe-market/ui/button";
 import { UserDropdown } from "@/components/ui/user-dropdown";
 
 export function Navbar() {
@@ -26,7 +26,7 @@ export function Navbar() {
               <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
                 <span className="font-bold text-sm text-white">G</span>
               </div>
-              <span className="font-bold text-gray-900 text-xl">
+              <span className="font-bold font-heading text-gray-900 text-xl uppercase">
                 Gearboxe Market
               </span>
             </Link>
@@ -52,7 +52,7 @@ export function Navbar() {
               <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
                 <span className="font-bold text-sm text-white">G</span>
               </div>
-              <span className="font-bold text-gray-900 text-xl">
+              <span className="font-bold font-heading text-gray-900 text-xl uppercase">
                 Gearboxe Market
               </span>
             </Link>

@@ -1,4 +1,4 @@
-import { Car, Mail, MapPin, } from "lucide-react";
+import { Car, Mail, MapPin } from "lucide-react";
 import Link from "next/link";
 
 const footerLinks = {
@@ -32,30 +32,30 @@ export function Footer() {
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:gap-12">
           {/* Brand Column */}
           <div className="lg:col-span-4">
-            <Link href="/" className="group inline-flex items-center gap-2.5">
+            <Link className="group inline-flex items-center gap-2.5" href="/">
               <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-primary/80 shadow-md shadow-primary/20 transition-all duration-200 group-hover:shadow-lg group-hover:shadow-primary/25">
                 <Car className="h-5 w-5 text-white" />
               </div>
               <div className="flex flex-col">
-                <span className="font-bold text-gray-900 text-xl tracking-tight">
+                <span className="font-bold font-heading text-gray-900 text-xl uppercase tracking-tight">
                   Gearboxe
                 </span>
-                <span className="-mt-1 font-medium text-[10px] text-gray-500 uppercase tracking-widest">
+                <span className="-mt-1 font-heading font-medium text-[10px] text-gray-500 uppercase tracking-widest">
                   Market
                 </span>
               </div>
             </Link>
 
             <p className="mt-4 max-w-xs text-gray-600 text-sm leading-relaxed">
-              Connect with local car sellers and buyers at exclusive popup events.
-              Find your next vehicle or sell yours with confidence.
+              Connect with local car sellers and buyers at exclusive popup
+              events. Find your next vehicle or sell yours with confidence.
             </p>
 
             {/* Contact Info */}
             <div className="mt-6 space-y-3">
               <a
-                href="mailto:hello@gearboxe.com"
                 className="flex items-center gap-2 text-gray-600 text-sm transition-colors hover:text-primary"
+                href="mailto:hello@gearboxe.com"
               >
                 <Mail className="h-4 w-4" />
                 hello@gearboxe.com
@@ -78,8 +78,8 @@ export function Footer() {
                 {footerLinks.browse.map((link) => (
                   <li key={link.href}>
                     <Link
-                      href={link.href}
                       className="text-gray-600 text-sm transition-colors hover:text-primary"
+                      href={link.href}
                     >
                       {link.label}
                     </Link>
@@ -97,8 +97,8 @@ export function Footer() {
                 {footerLinks.sell.map((link) => (
                   <li key={link.href}>
                     <Link
-                      href={link.href}
                       className="text-gray-600 text-sm transition-colors hover:text-primary"
+                      href={link.href}
                     >
                       {link.label}
                     </Link>
@@ -116,8 +116,8 @@ export function Footer() {
                 {footerLinks.support.map((link) => (
                   <li key={link.href}>
                     <Link
-                      href={link.href}
                       className="text-gray-600 text-sm transition-colors hover:text-primary"
+                      href={link.href}
                     >
                       {link.label}
                     </Link>
@@ -139,20 +139,20 @@ export function Footer() {
 
             <div className="flex items-center gap-6">
               <Link
-                href="/privacy"
                 className="text-gray-500 text-sm transition-colors hover:text-gray-700"
+                href="/privacy"
               >
                 Privacy
               </Link>
               <Link
-                href="/terms"
                 className="text-gray-500 text-sm transition-colors hover:text-gray-700"
+                href="/terms"
               >
                 Terms
               </Link>
               <Link
-                href="/cookies"
                 className="text-gray-500 text-sm transition-colors hover:text-gray-700"
+                href="/cookies"
               >
                 Cookies
               </Link>

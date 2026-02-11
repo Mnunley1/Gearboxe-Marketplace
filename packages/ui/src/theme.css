@@ -1,6 +1,9 @@
 @import "tailwindcss";
 
 @theme {
+  /* Typography */
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-heading: var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
   /* Core Colors */
   --color-background: #ffffff;
   --color-foreground: #0f172a;
@@ -83,29 +86,6 @@
   --ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
 }
 
-@media (prefers-color-scheme: dark) {
-  @theme {
-    --color-background: #0f172a;
-    --color-foreground: #f8fafc;
-    --color-card: #1e293b;
-    --color-card-foreground: #f8fafc;
-    --color-popover: #1e293b;
-    --color-popover-foreground: #f8fafc;
-    --color-primary: #3b82f6;
-    --color-primary-foreground: #ffffff;
-    --color-secondary: #1e293b;
-    --color-secondary-foreground: #f8fafc;
-    --color-muted: #1e293b;
-    --color-muted-foreground: #94a3b8;
-    --color-accent: #1e293b;
-    --color-accent-foreground: #f8fafc;
-    --color-destructive: #ef4444;
-    --color-destructive-foreground: #f8fafc;
-    --color-border: #334155;
-    --color-input: #334155;
-    --color-ring: #3b82f6;
-  }
-}
 
 /* Base Body Styles */
 body {
@@ -114,6 +94,11 @@ body {
   font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* Heading Typography */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
 }
 
 /* Background Patterns */

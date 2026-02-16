@@ -60,10 +60,10 @@ export function OrgSwitcher({ variant }: OrgSwitcherProps) {
     <div className="relative" ref={containerRef}>
       {/* Trigger */}
       <button
-        className={`flex w-full items-center justify-between gap-2 rounded-md px-3 py-2 font-medium text-sm transition-colors ${
+        className={`flex w-full items-center justify-between gap-2 rounded-lg px-3 py-2.5 font-medium text-sm transition-all duration-200 ${
           isDark
-            ? "bg-white/10 text-gray-300 hover:bg-white/15 hover:text-white"
-            : "border border-gray-200 bg-white text-gray-700 hover:bg-gray-50"
+            ? "bg-white/8 text-gray-300 hover:bg-white/12 hover:text-white"
+            : "border border-gray-200 bg-white text-gray-700 shadow-sm hover:border-gray-300 hover:bg-gray-50"
         }`}
         onClick={() => setOpen((prev) => !prev)}
         type="button"
@@ -78,8 +78,8 @@ export function OrgSwitcher({ variant }: OrgSwitcherProps) {
       {/* Dropdown */}
       {open && orgs.length > 0 && (
         <div
-          className={`absolute left-0 z-50 mt-1 w-full rounded-md border py-1 shadow-lg ${
-            isDark ? "border-white/10 bg-gray-800" : "border-gray-200 bg-white"
+          className={`absolute left-0 z-50 mt-1.5 w-full rounded-lg border py-1 shadow-xl ${
+            isDark ? "border-white/10 bg-gray-800" : "border-gray-200/80 bg-white"
           }`}
         >
           {orgs.map((membership) => {
@@ -87,10 +87,10 @@ export function OrgSwitcher({ variant }: OrgSwitcherProps) {
             const isActive = activeOrg?.id === org.id;
             return (
               <button
-                className={`flex w-full items-center gap-2 px-3 py-2 text-sm transition-colors ${
+                className={`flex w-full items-center gap-2 px-3 py-2 text-sm transition-all duration-150 ${
                   isDark
                     ? "text-gray-300 hover:bg-white/10 hover:text-white"
-                    : "text-gray-700 hover:bg-gray-100"
+                    : "text-gray-700 hover:bg-gray-50"
                 }`}
                 key={org.id}
                 onClick={() => handleSelect(org.id)}

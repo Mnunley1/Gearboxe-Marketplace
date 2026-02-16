@@ -103,19 +103,19 @@ export function VehicleCard({
     new Intl.NumberFormat("en-US").format(mileage);
 
   return (
-    <Card className="overflow-hidden border-gray-200 bg-white transition-shadow hover:shadow-lg">
-      <div className="relative">
+    <Card className="group hover:-translate-y-0.5 overflow-hidden border-gray-200/60 bg-white transition-all duration-300 hover:border-gray-300/80 hover:shadow-gray-200/50 hover:shadow-xl">
+      <div className="relative overflow-hidden">
         {vehicle.photos.length > 0 ? (
           <Image
             alt={vehicle.title}
-            className="h-48 w-full object-cover"
+            className="h-48 w-full object-cover transition-transform duration-500 group-hover:scale-105"
             height={300}
             src={vehicle.photos[0]}
             width={400}
           />
         ) : (
           <div className="flex h-48 w-full items-center justify-center bg-gray-100">
-            <span className="text-gray-500">No Image</span>
+            <span className="text-gray-400">No Image</span>
           </div>
         )}
 

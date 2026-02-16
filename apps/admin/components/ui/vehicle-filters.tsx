@@ -130,7 +130,7 @@ export function VehicleFilters({
   });
 
   return (
-    <Card className={className}>
+    <Card className={`border-gray-200/60 transition-all duration-300 hover:shadow-md ${className}`}>
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center space-x-2 text-lg">

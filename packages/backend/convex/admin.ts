@@ -4,24 +4,20 @@ import { requireOrgAdmin, requireSuperAdmin } from "./users";
 
 export const getAdminStats = query({
   handler: async (ctx) => {
-    const { cityId } = await requireOrgAdmin(ctx);
+    const { orgId } = await requireOrgAdmin(ctx);
 
-    let events = await ctx.db.query("events").collect();
-    if (cityId) {
-      events = events.filter((e) => e.cityId === cityId);
-    }
+    const events = await ctx.db
+      .query("events")
+      .withIndex("by_org", (q) => q.eq("clerkOrgId", orgId))
+      .collect();
 
     const eventIds = new Set(events.map((e) => e._id));
 
-    let vehicles = await ctx.db.query("vehicles").collect();
-    if (cityId) {
-      vehicles = vehicles.filter((v) => v.eventId && eventIds.has(v.eventId));
-    }
+    const allVehicles = await ctx.db.query("vehicles").collect();
+    const vehicles = allVehicles.filter((v) => v.eventId && eventIds.has(v.eventId));
 
-    let registrations = await ctx.db.query("registrations").collect();
-    if (cityId) {
-      registrations = registrations.filter((r) => eventIds.has(r.eventId));
-    }
+    const allRegistrations = await ctx.db.query("registrations").collect();
+    const registrations = allRegistrations.filter((r) => eventIds.has(r.eventId));
 
     const users = await ctx.db.query("users").collect();
 
@@ -43,17 +39,16 @@ export const getAdminStats = query({
 
 export const getAllVehicles = query({
   handler: async (ctx) => {
-    const { cityId } = await requireOrgAdmin(ctx);
-    let vehicles = await ctx.db.query("vehicles").collect();
+    const { orgId } = await requireOrgAdmin(ctx);
 
-    if (cityId) {
-      const events = await ctx.db
-        .query("events")
-        .withIndex("by_city", (q) => q.eq("cityId", cityId))
-        .collect();
-      const eventIds = new Set(events.map((e) => e._id));
-      vehicles = vehicles.filter((v) => v.eventId && eventIds.has(v.eventId));
-    }
+    const events = await ctx.db
+      .query("events")
+      .withIndex("by_org", (q) => q.eq("clerkOrgId", orgId))
+      .collect();
+    const eventIds = new Set(events.map((e) => e._id));
+
+    const allVehicles = await ctx.db.query("vehicles").collect();
+    const vehicles = allVehicles.filter((v) => v.eventId && eventIds.has(v.eventId));
 
     const vehiclesWithUsers = await Promise.all(
       vehicles.map(async (vehicle) => {
@@ -68,23 +63,14 @@ export const getAllVehicles = query({
 
 export const getAllEvents = query({
   handler: async (ctx) => {
-    const { cityId } = await requireOrgAdmin(ctx);
+    const { orgId } = await requireOrgAdmin(ctx);
 
-    const events = cityId
-      ? await ctx.db
-          .query("events")
-          .withIndex("by_city", (q) => q.eq("cityId", cityId))
-          .collect()
-      : await ctx.db.query("events").collect();
+    const events = await ctx.db
+      .query("events")
+      .withIndex("by_org", (q) => q.eq("clerkOrgId", orgId))
+      .collect();
 
-    const eventsWithCities = await Promise.all(
-      events.map(async (event) => {
-        const city = await ctx.db.get(event.cityId);
-        return { ...event, city };
-      })
-    );
-
-    return eventsWithCities;
+    return events;
   },
 });
 
@@ -161,17 +147,16 @@ export const demoteToUser = mutation({
 
 export const getAllRegistrations = query({
   handler: async (ctx) => {
-    const { cityId } = await requireOrgAdmin(ctx);
-    let registrations = await ctx.db.query("registrations").collect();
+    const { orgId } = await requireOrgAdmin(ctx);
 
-    if (cityId) {
-      const events = await ctx.db
-        .query("events")
-        .withIndex("by_city", (q) => q.eq("cityId", cityId))
-        .collect();
-      const eventIds = new Set(events.map((e) => e._id));
-      registrations = registrations.filter((r) => eventIds.has(r.eventId));
-    }
+    const events = await ctx.db
+      .query("events")
+      .withIndex("by_org", (q) => q.eq("clerkOrgId", orgId))
+      .collect();
+    const eventIds = new Set(events.map((e) => e._id));
+
+    const allRegistrations = await ctx.db.query("registrations").collect();
+    const registrations = allRegistrations.filter((r) => eventIds.has(r.eventId));
 
     const registrationsWithDetails = await Promise.all(
       registrations.map(async (registration) => {

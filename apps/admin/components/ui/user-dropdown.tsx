@@ -112,7 +112,7 @@ export function UserDropdown({ afterSignOutUrl = "/" }: UserDropdownProps) {
         variant="ghost"
       >
         {/* User Avatar */}
-        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary">
+        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-primary to-primary/80 shadow-primary/20 shadow-sm">
           <span className="font-medium text-sm text-white">{userInitials}</span>
         </div>
 
@@ -132,11 +132,11 @@ export function UserDropdown({ afterSignOutUrl = "/" }: UserDropdownProps) {
 
       {/* Dropdown Menu */}
       {isOpen && (
-        <div className="absolute right-0 z-50 mt-2 w-64 rounded-lg border border-gray-200 bg-white py-2 shadow-lg">
+        <div className="absolute right-0 z-50 mt-2 w-64 rounded-xl border border-gray-200/80 bg-white py-2 shadow-xl">
           {/* User Info Header */}
           <div className="border-gray-100 border-b px-4 py-3">
             <div className="flex items-center space-x-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-primary to-primary/80 shadow-primary/20 shadow-sm">
                 <span className="font-medium text-sm text-white">
                   {userInitials}
                 </span>
@@ -158,7 +158,7 @@ export function UserDropdown({ afterSignOutUrl = "/" }: UserDropdownProps) {
               const Icon = item.icon;
               return (
                 <Link
-                  className={`flex items-center space-x-3 px-4 py-2 text-sm transition-colors hover:bg-gray-50 ${
+                  className={`flex items-center space-x-3 px-4 py-2 text-sm transition-all duration-150 hover:bg-gray-50 ${
                     item.active
                       ? "border-primary border-r-2 bg-primary/5 text-primary"
                       : "text-gray-700"
@@ -187,7 +187,7 @@ export function UserDropdown({ afterSignOutUrl = "/" }: UserDropdownProps) {
                   const Icon = item.icon;
                   return (
                     <Link
-                      className={`flex items-center space-x-3 px-4 py-2 text-sm transition-colors hover:bg-gray-50 ${
+                      className={`flex items-center space-x-3 px-4 py-2 text-sm transition-all duration-150 hover:bg-gray-50 ${
                         item.active
                           ? "border-primary border-r-2 bg-primary/5 text-primary"
                           : "text-gray-700"

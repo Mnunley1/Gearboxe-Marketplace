@@ -232,12 +232,10 @@ export const resendConfirmationEmail = mutation({
 export const getRegistrationsByEvent = query({
   args: { eventId: v.id("events") },
   handler: async (ctx, args) => {
-    const { cityId } = await requireOrgAdmin(ctx);
-    if (cityId) {
-      const event = await ctx.db.get(args.eventId);
-      if (!event || event.cityId !== cityId) {
-        throw new Error("Unauthorized: event does not belong to your city");
-      }
+    const { orgId } = await requireOrgAdmin(ctx);
+    const event = await ctx.db.get(args.eventId);
+    if (!event || event.clerkOrgId !== orgId) {
+      throw new Error("Unauthorized: event does not belong to your organization");
     }
     const registrations = await ctx.db
       .query("registrations")
@@ -348,18 +346,16 @@ export const getRegistrationByVehicle = query({
 export const checkInRegistration = mutation({
   args: { id: v.id("registrations") },
   handler: async (ctx, args) => {
-    const { user, cityId } = await requireOrgAdmin(ctx);
+    const { user, orgId } = await requireOrgAdmin(ctx);
     const registration = await ctx.db.get(args.id);
     if (!registration) {
       throw new Error("Registration not found");
     }
-    if (cityId) {
-      const event = await ctx.db.get(registration.eventId);
-      if (!event || event.cityId !== cityId) {
-        throw new Error(
-          "Unauthorized: registration does not belong to your city"
-        );
-      }
+    const event = await ctx.db.get(registration.eventId);
+    if (!event || event.clerkOrgId !== orgId) {
+      throw new Error(
+        "Unauthorized: registration does not belong to your organization"
+      );
     }
     if (registration.paymentStatus !== "completed") {
       throw new Error("Cannot check in unpaid registration");
@@ -378,7 +374,7 @@ export const checkInRegistration = mutation({
 export const validateQRCode = query({
   args: { qrCodeData: v.string() },
   handler: async (ctx, args) => {
-    const { cityId } = await requireOrgAdmin(ctx);
+    const { orgId } = await requireOrgAdmin(ctx);
     const registration = await ctx.db
       .query("registrations")
       .withIndex("by_qr_code", (q) => q.eq("qrCodeData", args.qrCodeData))
@@ -393,7 +389,7 @@ export const validateQRCode = query({
     }
 
     const event = await ctx.db.get(registration.eventId);
-    if (cityId && (!event || event.cityId !== cityId)) {
+    if (!event || event.clerkOrgId !== orgId) {
       return null;
     }
 
@@ -413,13 +409,13 @@ export const validateQRCode = query({
 export const getCheckInSheetData = query({
   args: { eventId: v.id("events") },
   handler: async (ctx, args) => {
-    const { cityId } = await requireOrgAdmin(ctx);
+    const { orgId } = await requireOrgAdmin(ctx);
     const event = await ctx.db.get(args.eventId);
     if (!event) {
       throw new Error("Event not found");
     }
-    if (cityId && event.cityId !== cityId) {
-      throw new Error("Unauthorized: event does not belong to your city");
+    if (event.clerkOrgId !== orgId) {
+      throw new Error("Unauthorized: event does not belong to your organization");
     }
 
     const registrations = await ctx.db

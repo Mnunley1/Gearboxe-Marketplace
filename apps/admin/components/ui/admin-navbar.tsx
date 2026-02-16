@@ -10,7 +10,6 @@ import {
   Database,
   Menu,
   Settings,
-  Shield,
   X,
 } from "lucide-react";
 import Link from "next/link";
@@ -59,26 +58,31 @@ export function AdminNavbar() {
   ];
 
   return (
-    <nav className="admin-navbar relative text-white shadow-lg">
+    <nav className="admin-sidebar relative border-white/5 border-b text-white shadow-lg">
       <div className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
           {/* Logo and Navigation Links */}
           <div className="flex items-center space-x-8">
             <div className="flex items-center space-x-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
-                <Shield className="h-5 w-5 text-white" />
+              <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-primary/80 shadow-md shadow-primary/20">
+                <Car className="h-5 w-5 text-white" />
               </div>
-              <span className="font-bold font-heading text-xl uppercase">
-                Admin Panel
-              </span>
+              <div className="flex flex-col">
+                <span className="font-bold font-heading text-lg text-white uppercase tracking-tight">
+                  Gearboxe
+                </span>
+                <span className="-mt-1 font-heading font-medium text-[10px] text-gray-400 uppercase tracking-widest">
+                  Admin
+                </span>
+              </div>
             </div>
 
             {/* Navigation Links */}
             <div className="hidden items-center space-x-6 md:flex">
               {adminNavItems.map((item) => (
                 <Link
-                  className={`flex items-center space-x-2 font-medium text-sm transition-colors hover:text-primary ${
-                    item.active ? "text-primary" : "text-gray-300"
+                  className={`flex items-center space-x-2 rounded-lg px-3 py-1.5 font-medium text-sm transition-all duration-200 ${
+                    item.active ? "bg-primary/15 text-primary-300" : "text-gray-400 hover:text-gray-200"
                   }`}
                   href={item.href}
                   key={item.href}

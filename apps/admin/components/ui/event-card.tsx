@@ -13,10 +13,6 @@ type Event = {
   address: string;
   capacity: number;
   description: string;
-  city?: {
-    name: string;
-    state: string;
-  };
 };
 
 type EventCardProps = {
@@ -46,16 +42,11 @@ export function EventCard({ event, showRegister = true }: EventCardProps) {
   const isUpcoming = event.date > Date.now();
 
   return (
-    <Card className="overflow-hidden transition-shadow hover:shadow-lg">
+    <Card className="group hover:-translate-y-0.5 overflow-hidden border-gray-200/60 bg-white transition-all duration-300 hover:border-gray-300/80 hover:shadow-gray-200/50 hover:shadow-xl">
       <CardContent className="p-6">
         <div className="space-y-4">
           <div>
             <h3 className="line-clamp-1 font-semibold text-xl">{event.name}</h3>
-            {event.city && (
-              <p className="text-gray-600 text-sm">
-                {event.city.name}, {event.city.state}
-              </p>
-            )}
           </div>
 
           <div className="space-y-2">

@@ -117,7 +117,7 @@ export default function AdminLayout({
       <AdminAuthProvider
         value={{
           user: orgContext.user,
-          city: orgContext.city,
+          orgId: orgContext.orgId,
           orgRole: orgContext.orgRole,
         }}
       >
@@ -133,9 +133,9 @@ export default function AdminLayout({
 
   // 7. No org selected → show org selector interstitial
   return (
-    <div className="flex min-h-screen flex-col bg-white">
-      {/* Simple branded header (not AdminNavbar which requires AdminAuthContext) */}
-      <div className="bg-gray-900 text-white shadow-lg">
+    <div className="flex min-h-screen flex-col bg-gray-50">
+      {/* Simple branded header */}
+      <div className="admin-sidebar border-white/5 border-b text-white shadow-lg">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center">
             <div className="flex items-center space-x-2">
@@ -156,11 +156,11 @@ export default function AdminLayout({
       </div>
       <main className="flex flex-1 items-center justify-center">
         <div className="mx-auto max-w-md px-4 py-24 text-center">
-          <h2 className="mb-4 font-bold text-2xl text-gray-900">
+          <h2 className="mb-2 font-bold font-heading text-2xl text-gray-900">
             Select an Organization
           </h2>
-          <p className="mb-6 text-gray-600">
-            Please select your city organization to access the admin panel.
+          <p className="mb-6 text-gray-500">
+            Choose your city organization to access the admin panel.
           </p>
           <div className="flex justify-center">
             <OrgSwitcher variant="page" />

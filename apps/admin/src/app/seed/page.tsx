@@ -59,14 +59,15 @@ export default function SeedPage() {
     <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="mb-2 font-bold font-heading text-3xl text-gray-900">
+        <h1 className="mb-1 font-bold font-heading text-3xl text-gray-900">
           Database Seeding
         </h1>
-        <p className="text-gray-600">Add test data for development.</p>
+        <p className="text-gray-500">Add test data for development.</p>
+        <div className="mt-3 h-1 w-12 rounded-full bg-primary" />
       </div>
 
       {/* Migration Button */}
-      <Card className="mb-8">
+      <Card className="mb-8 border-gray-200/60 transition-all duration-300 hover:shadow-md">
         <CardHeader>
           <CardTitle className="flex items-center font-heading">
             <RefreshCw className="mr-2 h-5 w-5" />
@@ -110,7 +111,7 @@ export default function SeedPage() {
       </Card>
 
       {/* Seed Button */}
-      <Card className="mb-8">
+      <Card className="mb-8 border-gray-200/60 transition-all duration-300 hover:shadow-md">
         <CardHeader>
           <CardTitle className="flex items-center font-heading">
             <Database className="mr-2 h-5 w-5" />

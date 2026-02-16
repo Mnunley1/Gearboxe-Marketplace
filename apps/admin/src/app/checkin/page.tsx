@@ -205,34 +205,36 @@ export default function AdminCheckinPage() {
   }
 
   const selectedEventData = selectedEvent
-    ? upcomingEvents.find((e) => e._id === selectedEvent)
+    ? upcomingEvents.find((evt: { _id: string }) => evt._id === selectedEvent)
     : null;
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="font-bold font-heading text-3xl text-gray-900">
+        <h1 className="mb-1 font-bold font-heading text-3xl text-gray-900">
           Event Check-in
         </h1>
+        <p className="text-gray-500">Scan QR codes or manually check in vendors</p>
+        <div className="mt-3 h-1 w-12 rounded-full bg-primary" />
       </div>
 
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
         {/* Event Selection */}
         <div className="lg:col-span-1">
-          <Card>
+          <Card className="border-gray-200/60 transition-all duration-300 hover:shadow-md">
             <CardHeader>
               <CardTitle className="font-heading">Select Event</CardTitle>
             </CardHeader>
             <CardContent>
               {upcomingEvents.length > 0 ? (
                 <div className="space-y-3">
-                  {upcomingEvents.map((event) => (
+                  {upcomingEvents.map((event: { _id: string; name: string; date: number; location: string }) => (
                     <button
-                      className={`w-full rounded-lg border border-gray-200 p-3 text-left transition-colors ${
+                      className={`w-full rounded-lg border p-3 text-left transition-all duration-200 ${
                         selectedEvent === event._id
-                          ? "border-primary bg-primary/5"
-                          : "hover:bg-gray-50"
+                          ? "border-primary bg-primary/5 shadow-sm"
+                          : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
                       }`}
                       key={event._id}
                       onClick={() => setSelectedEvent(event._id)}
@@ -263,7 +265,7 @@ export default function AdminCheckinPage() {
 
           {/* QR Scanner */}
           {selectedEvent && (
-            <Card className="mt-6">
+            <Card className="mt-6 border-gray-200/60 transition-all duration-300 hover:shadow-md">
               <CardHeader>
                 <CardTitle className="font-heading">QR Code Scanner</CardTitle>
               </CardHeader>
@@ -280,7 +282,7 @@ export default function AdminCheckinPage() {
         {/* Registrations List */}
         <div className="lg:col-span-2">
           {selectedEvent ? (
-            <Card>
+            <Card className="border-gray-200/60 transition-all duration-300 hover:shadow-md">
               <CardHeader>
                 <div className="flex items-center justify-between">
                   <CardTitle className="font-heading">
@@ -306,9 +308,9 @@ export default function AdminCheckinPage() {
               <CardContent>
                 {eventRegistrations && eventRegistrations.length > 0 ? (
                   <div className="space-y-4">
-                    {eventRegistrations.map((registration) => (
+                    {eventRegistrations.map((registration: any) => (
                       <div
-                        className="flex items-center justify-between rounded-lg border border-gray-200 p-4"
+                        className="flex items-center justify-between rounded-lg border border-gray-200/60 p-4 transition-all duration-200 hover:border-gray-300 hover:bg-gray-50/50"
                         key={registration._id}
                       >
                         <div className="flex-1">

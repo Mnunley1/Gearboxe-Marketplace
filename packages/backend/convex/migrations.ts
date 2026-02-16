@@ -1,31 +1,42 @@
-import { v } from "convex/values";
-import { mutation } from "./_generated/server";
-import { requireOrgAdmin } from "./users";
+import { internalMutation } from "./_generated/server";
 
-export const linkCityToOrg = mutation({
-  args: {
-    cityId: v.id("cities"),
-    clerkOrgId: v.string(),
-  },
-  handler: async (ctx, args) => {
-    await requireOrgAdmin(ctx);
+/**
+ * One-off migration: backfills `clerkOrgId` on existing events from their
+ * linked city's `clerkOrgId`. Run via dashboard once after deploying the
+ * schema change, then this file can be removed.
+ */
+export const migrateEventsCityToOrg = internalMutation({
+  args: {},
+  handler: async (ctx) => {
+    const events = await ctx.db.query("events").collect();
+    let patched = 0;
+    let skipped = 0;
 
-    const city = await ctx.db.get(args.cityId);
-    if (!city) {
-      throw new Error("City not found");
+    for (const event of events) {
+      // Already migrated
+      if ((event as any).clerkOrgId) {
+        skipped++;
+        continue;
+      }
+
+      const cityId = (event as any).cityId;
+      if (!cityId) {
+        skipped++;
+        continue;
+      }
+
+      const city = await ctx.db.get(cityId);
+      if (!(city && (city as any).clerkOrgId)) {
+        skipped++;
+        continue;
+      }
+
+      await ctx.db.patch(event._id, {
+        clerkOrgId: (city as any).clerkOrgId,
+      } as any);
+      patched++;
     }
 
-    const existing = await ctx.db
-      .query("cities")
-      .withIndex("by_clerkOrgId", (q) => q.eq("clerkOrgId", args.clerkOrgId))
-      .first();
-    if (existing && existing._id !== args.cityId) {
-      throw new Error(
-        `Clerk org ${args.clerkOrgId} is already linked to city "${existing.name}"`
-      );
-    }
-
-    await ctx.db.patch(args.cityId, { clerkOrgId: args.clerkOrgId });
-    return { success: true, cityName: city.name };
+    return { patched, skipped };
   },
 });

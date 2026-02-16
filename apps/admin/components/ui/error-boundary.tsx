@@ -56,7 +56,7 @@ class ErrorBoundaryClass extends React.Component<
 function DefaultErrorFallback({ error, resetError }: ErrorFallbackProps) {
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-50 p-4">
-      <Card className="w-full max-w-md">
+      <Card className="w-full max-w-md border-gray-200/60 shadow-lg">
         <CardContent className="p-6">
           <div className="mb-4 flex items-center justify-center">
             <div className="flex h-16 w-16 items-center justify-center rounded-full bg-red-100">

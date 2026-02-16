@@ -60,47 +60,10 @@ export const seedDatabase = mutation({
       userIds.push(userId);
     }
 
-    // Create fake cities
-    const cities = [
-      {
-        name: "San Francisco",
-        state: "CA",
-        slug: "san-francisco",
-        active: true,
-      },
-      {
-        name: "Los Angeles",
-        state: "CA",
-        slug: "los-angeles",
-        active: true,
-      },
-      {
-        name: "Seattle",
-        state: "WA",
-        slug: "seattle",
-        active: true,
-      },
-      {
-        name: "Portland",
-        state: "OR",
-        slug: "portland",
-        active: true,
-      },
-    ];
-
-    const cityIds = [];
-    for (const city of cities) {
-      const cityId = await ctx.db.insert("cities", {
-        ...city,
-        createdAt: Date.now(),
-      });
-      cityIds.push(cityId);
-    }
-
     // Create fake events first (vehicles require eventId)
     const events = [
       {
-        cityId: cityIds[0], // San Francisco
+        clerkOrgId: "org_seed_sf",
         name: "San Francisco Classic Car Show",
         date: Date.now() + 30 * 24 * 60 * 60 * 1000, // 30 days from now
         location: "Golden Gate Park",
@@ -112,7 +75,7 @@ export const seedDatabase = mutation({
         createdAt: Date.now(),
       },
       {
-        cityId: cityIds[1], // Los Angeles
+        clerkOrgId: "org_seed_la",
         name: "LA Supercar Sunday",
         date: Date.now() + 45 * 24 * 60 * 60 * 1000, // 45 days from now
         location: "Santa Monica Pier",
@@ -124,7 +87,7 @@ export const seedDatabase = mutation({
         createdAt: Date.now(),
       },
       {
-        cityId: cityIds[2], // Seattle
+        clerkOrgId: "org_seed_seattle",
         name: "Pacific Northwest Car Meet",
         date: Date.now() + 60 * 24 * 60 * 60 * 1000, // 60 days from now
         location: "Seattle Center",
@@ -405,7 +368,6 @@ export const seedDatabase = mutation({
 
     return {
       users: userIds.length,
-      cities: cityIds.length,
       vehicles: vehicleIds.length,
       events: eventIds.length,
       registrations: registrations.length,

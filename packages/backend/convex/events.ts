@@ -4,7 +4,7 @@ import { requireOrgAdmin } from "./users";
 
 export const createEvent = mutation({
   args: {
-    cityId: v.id("cities"),
+    clerkOrgId: v.string(),
     name: v.string(),
     date: v.number(),
     location: v.string(),
@@ -14,10 +14,25 @@ export const createEvent = mutation({
     vendorPrice: v.number(),
   },
   handler: async (ctx, args) => {
-    const { cityId } = await requireOrgAdmin(ctx);
-    if (cityId && args.cityId !== cityId) {
-      throw new Error("Unauthorized: cannot create events for another city");
+    const { orgId } = await requireOrgAdmin(ctx);
+    if (args.clerkOrgId !== orgId) {
+      throw new Error("Unauthorized: cannot create events for another organization");
     }
+
+    // If event has a vendor fee, require Stripe Connect to be set up
+    if (args.vendorPrice > 0) {
+      const stripeSettings = await ctx.db
+        .query("orgStripeSettings")
+        .withIndex("by_org", (q) => q.eq("clerkOrgId", orgId))
+        .unique();
+
+      if (!stripeSettings?.onboardingComplete) {
+        throw new Error(
+          "Your organization must connect a Stripe account before creating paid events. Go to Settings → Stripe to connect.",
+        );
+      }
+    }
+
     return await ctx.db.insert("events", {
       ...args,
       createdAt: Date.now(),
@@ -27,17 +42,17 @@ export const createEvent = mutation({
 
 export const getEvents = query({
   args: {
-    cityId: v.optional(v.id("cities")),
+    clerkOrgId: v.optional(v.string()),
     upcoming: v.optional(v.boolean()),
   },
   handler: async (ctx, args) => {
-    let query = ctx.db.query("events");
-
-    if (args.cityId) {
-      query = query.withIndex("by_city", (q) => q.eq("cityId", args.cityId));
-    }
-
-    const events = await query.collect();
+    const orgId = args.clerkOrgId;
+    const events = orgId
+      ? await ctx.db
+          .query("events")
+          .withIndex("by_org", (q) => q.eq("clerkOrgId", orgId))
+          .collect()
+      : await ctx.db.query("events").collect();
 
     if (args.upcoming) {
       const now = Date.now();
@@ -115,12 +130,10 @@ export const updateEvent = mutation({
     vendorPrice: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
-    const { cityId } = await requireOrgAdmin(ctx);
-    if (cityId) {
-      const event = await ctx.db.get(args.id);
-      if (!event || event.cityId !== cityId) {
-        throw new Error("Unauthorized: event does not belong to your city");
-      }
+    const { orgId } = await requireOrgAdmin(ctx);
+    const event = await ctx.db.get(args.id);
+    if (!event || event.clerkOrgId !== orgId) {
+      throw new Error("Unauthorized: event does not belong to your organization");
     }
     const { id, ...updates } = args;
     await ctx.db.patch(id, updates);
@@ -174,12 +187,10 @@ export const getEventCapacity = query({
 export const deleteEvent = mutation({
   args: { id: v.id("events") },
   handler: async (ctx, args) => {
-    const { cityId } = await requireOrgAdmin(ctx);
-    if (cityId) {
-      const event = await ctx.db.get(args.id);
-      if (!event || event.cityId !== cityId) {
-        throw new Error("Unauthorized: event does not belong to your city");
-      }
+    const { orgId } = await requireOrgAdmin(ctx);
+    const event = await ctx.db.get(args.id);
+    if (!event || event.clerkOrgId !== orgId) {
+      throw new Error("Unauthorized: event does not belong to your organization");
     }
     await ctx.db.delete(args.id);
   },

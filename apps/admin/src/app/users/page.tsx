@@ -33,7 +33,7 @@ export default function AdminUsersPage() {
     );
   }
 
-  const filteredUsers = allUsers.filter((user) => {
+  const filteredUsers = allUsers.filter((user: any) => {
     if (roleFilter === "all") return true;
     return user.role === roleFilter;
   });
@@ -81,10 +81,11 @@ export default function AdminUsersPage() {
       <div className="mb-8">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="font-bold font-heading text-3xl text-gray-900">
+            <h1 className="mb-1 font-bold font-heading text-3xl text-gray-900">
               User Management
             </h1>
-            <p className="text-gray-600">Manage user roles</p>
+            <p className="text-gray-500">Manage user roles and permissions</p>
+            <div className="mt-3 h-1 w-12 rounded-full bg-primary" />
           </div>
         </div>
       </div>
@@ -118,15 +119,15 @@ export default function AdminUsersPage() {
         <div className="lg:col-span-2">
           {filteredUsers.length > 0 ? (
             <div className="space-y-4">
-              {filteredUsers.map((user) => (
+              {filteredUsers.map((user: any) => (
                 <Card
-                  className="overflow-hidden transition-all duration-300 hover:border-gray-300/80 hover:shadow-lg"
+                  className="hover:-translate-y-0.5 overflow-hidden border-gray-200/60 bg-white transition-all duration-300 hover:border-gray-300/80 hover:shadow-gray-200/50 hover:shadow-lg"
                   key={user._id}
                 >
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-4">
-                        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
+                        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 transition-colors duration-300 group-hover:bg-primary/15">
                           {getRoleIcon(user.role)}
                         </div>
                         <div>
@@ -186,7 +187,7 @@ export default function AdminUsersPage() {
         {/* Sidebar */}
         <div className="space-y-6">
           {/* User Statistics */}
-          <Card>
+          <Card className="border-gray-200/60 transition-all duration-300 hover:shadow-md">
             <CardHeader>
               <CardTitle className="font-heading">User Statistics</CardTitle>
             </CardHeader>
@@ -198,19 +199,19 @@ export default function AdminUsersPage() {
               <div className="flex justify-between">
                 <span className="text-gray-600 text-sm">Super Admins</span>
                 <span className="font-medium text-purple-600">
-                  {allUsers.filter((u) => u.role === "superAdmin").length}
+                  {allUsers.filter((u: any) => u.role === "superAdmin").length}
                 </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600 text-sm">Admins</span>
                 <span className="font-medium text-yellow-600">
-                  {allUsers.filter((u) => u.role === "admin").length}
+                  {allUsers.filter((u: any) => u.role === "admin").length}
                 </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600 text-sm">Users</span>
                 <span className="font-medium text-primary">
-                  {allUsers.filter((u) => u.role === "user").length}
+                  {allUsers.filter((u: any) => u.role === "user").length}
                 </span>
               </div>
             </CardContent>

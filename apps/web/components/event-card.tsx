@@ -13,10 +13,6 @@ type Event = {
   address: string;
   capacity: number;
   description: string;
-  city?: {
-    name: string;
-    state: string;
-  };
 };
 
 type EventCardProps = {
@@ -86,13 +82,6 @@ export function EventCard({ event, showRegister = true }: EventCardProps) {
               <h3 className="mb-2 font-semibold text-gray-900 text-xl transition-colors duration-200 group-hover:text-primary">
                 {event.name}
               </h3>
-
-              {/* City/State */}
-              {event.city && (
-                <p className="mb-4 font-medium text-primary text-sm">
-                  {event.city.name}, {event.city.state}
-                </p>
-              )}
 
               {/* Details */}
               <div className="space-y-2">

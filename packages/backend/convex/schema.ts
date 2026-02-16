@@ -19,17 +19,6 @@ export default defineSchema({
     profileImageUrl: v.optional(v.string()),
   }).index("byExternalId", ["externalId"]),
 
-  cities: defineTable({
-    name: v.string(),
-    state: v.string(),
-    slug: v.string(),
-    active: v.boolean(),
-    clerkOrgId: v.optional(v.string()),
-    createdAt: v.number(),
-  })
-    .index("by_slug", ["slug"])
-    .index("by_clerkOrgId", ["clerkOrgId"]),
-
   orgMemberships: defineTable({
     userId: v.id("users"),
     clerkOrgId: v.string(),
@@ -77,7 +66,7 @@ export default defineSchema({
     .index("by_event", ["eventId"]),
 
   events: defineTable({
-    cityId: v.id("cities"),
+    clerkOrgId: v.string(),
     name: v.string(),
     date: v.number(),
     location: v.string(),
@@ -87,7 +76,7 @@ export default defineSchema({
     vendorPrice: v.number(), // Price to charge sellers for event registration (in cents)
     createdAt: v.number(),
   })
-    .index("by_city", ["cityId"])
+    .index("by_org", ["clerkOrgId"])
     .index("by_date", ["date"]),
 
   registrations: defineTable({
@@ -156,4 +145,15 @@ export default defineSchema({
     views: v.number(),
     shares: v.number(),
   }).index("by_vehicle", ["vehicleId"]),
+
+  orgStripeSettings: defineTable({
+    clerkOrgId: v.string(),
+    stripeAccountId: v.string(),
+    onboardingComplete: v.boolean(),
+    platformFeeType: v.union(v.literal("percentage"), v.literal("fixed")),
+    platformFeeValue: v.number(),
+    createdAt: v.number(),
+  })
+    .index("by_org", ["clerkOrgId"])
+    .index("by_stripe_account", ["stripeAccountId"]),
 });

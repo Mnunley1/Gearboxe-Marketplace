@@ -54,7 +54,7 @@ export function QRScannerComponent({
   };
 
   return (
-    <Card className="mx-auto w-full max-w-md">
+    <Card className="mx-auto w-full max-w-md border-gray-200/60">
       <CardHeader className="text-center">
         <CardTitle className="text-lg">{title}</CardTitle>
         <div className="flex justify-center">

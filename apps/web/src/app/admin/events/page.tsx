@@ -3,7 +3,7 @@
 import { api } from "@gearboxe-market/convex/_generated/api";
 import { Button } from "@gearboxe-market/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@gearboxe-market/ui/card";
-import { useUser } from "@clerk/nextjs";
+import { useOrganization, useUser } from "@clerk/nextjs";
 import { useConvexAuth, useMutation, useQuery } from "convex/react";
 import { ArrowLeft, Calendar, MapPin, Plus, Trash2, Users } from "lucide-react";
 import Link from "next/link";
@@ -15,6 +15,7 @@ export default function AdminEventsPage() {
   const searchParams = useSearchParams();
   const { isAuthenticated, isLoading } = useConvexAuth();
   const { user } = useUser();
+  const { organization } = useOrganization();
   const [showCreateForm, setShowCreateForm] = useState(false);
 
   if (isLoading) {
@@ -34,14 +35,13 @@ export default function AdminEventsPage() {
 
   const isAdmin = useQuery(api.users.isAdmin);
   const allEvents = useQuery(api.admin.getAllEvents);
-  const cities = useQuery(api.cities.getCities);
   const deleteEvent = useMutation(api.events.deleteEvent);
 
   if (isAdmin === false) {
     redirect("/myAccount/my-listings");
   }
 
-  if (isAdmin === undefined || !allEvents || !cities) {
+  if (isAdmin === undefined || !allEvents) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-white">
         <div className="text-center">
@@ -99,10 +99,9 @@ export default function AdminEventsPage() {
           </CardHeader>
           <CardContent>
             <EventCreateForm
-              cities={cities}
+              clerkOrgId={organization?.id ?? null}
               onSuccess={() => {
                 setShowCreateForm(false);
-                // Refresh the page to show new event
                 window.location.reload();
               }}
             />
@@ -121,11 +120,6 @@ export default function AdminEventsPage() {
                     <h3 className="line-clamp-1 font-semibold text-xl">
                       {event.name}
                     </h3>
-                    {event.city && (
-                      <p className="text-gray-600 text-sm">
-                        {event.city.name}, {event.city.state}
-                      </p>
-                    )}
                   </div>
 
                   <div className="space-y-2">
@@ -198,14 +192,13 @@ export default function AdminEventsPage() {
 
 // Event Create Form Component
 function EventCreateForm({
-  cities,
+  clerkOrgId,
   onSuccess,
 }: {
-  cities: any[];
+  clerkOrgId: string | null;
   onSuccess: () => void;
 }) {
   const [formData, setFormData] = useState({
-    cityId: "",
     name: "",
     date: "",
     location: "",
@@ -221,7 +214,7 @@ function EventCreateForm({
     e.preventDefault();
     if (
       !(
-        formData.cityId &&
+        clerkOrgId &&
         formData.name &&
         formData.date &&
         formData.location &&
@@ -238,13 +231,14 @@ function EventCreateForm({
     setIsSubmitting(true);
     try {
       await createEvent({
-        cityId: formData.cityId as any,
+        clerkOrgId,
         name: formData.name,
         date: new Date(formData.date).getTime(),
         location: formData.location,
         address: formData.address,
         capacity: Number.parseInt(formData.capacity, 10),
         description: formData.description,
+        vendorPrice: 50,
       });
       toast.success("Event Created", {
         description: "The event has been created successfully.",
@@ -265,28 +259,6 @@ function EventCreateForm({
   return (
     <form className="space-y-6" onSubmit={handleSubmit}>
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-        <div className="space-y-2">
-          <label className="font-medium text-gray-700 text-sm" htmlFor="city">
-            City *
-          </label>
-          <select
-            className="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-primary"
-            id="city"
-            onChange={(e) =>
-              setFormData((prev) => ({ ...prev, cityId: e.target.value }))
-            }
-            required
-            value={formData.cityId}
-          >
-            <option value="">Select a city</option>
-            {cities.map((city) => (
-              <option key={city._id} value={city._id}>
-                {city.name}, {city.state}
-              </option>
-            ))}
-          </select>
-        </div>
-
         <div className="space-y-2">
           <label
             className="font-medium text-gray-700 text-sm"
@@ -360,7 +332,7 @@ function EventCreateForm({
           />
         </div>
 
-        <div className="space-y-2">
+        <div className="space-y-2 md:col-span-2">
           <label className="font-medium text-gray-700 text-sm">Address *</label>
           <input
             className="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-primary"
@@ -392,7 +364,6 @@ function EventCreateForm({
         <Button
           onClick={() => {
             setFormData({
-              cityId: "",
               name: "",
               date: "",
               location: "",

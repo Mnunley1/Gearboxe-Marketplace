@@ -8,10 +8,10 @@ export function Footer() {
           {/* Brand */}
           <div className="col-span-1 md:col-span-2">
             <div className="mb-4 flex items-center space-x-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-primary/80 shadow-md shadow-primary/20">
                 <span className="font-bold text-sm text-white">G</span>
               </div>
-              <span className="font-bold font-heading text-gray-900 text-xl uppercase">
+              <span className="font-bold font-heading text-gray-900 text-xl uppercase tracking-tight">
                 Gearboxe Market
               </span>
             </div>
@@ -30,7 +30,7 @@ export function Footer() {
             <ul className="space-y-2">
               <li>
                 <Link
-                  className="text-gray-600 text-sm transition-colors hover:text-primary"
+                  className="text-gray-600 text-sm transition-colors duration-200 hover:text-primary"
                   href="/vehicles"
                 >
                   Browse Vehicles
@@ -38,7 +38,7 @@ export function Footer() {
               </li>
               <li>
                 <Link
-                  className="text-gray-600 text-sm transition-colors hover:text-primary"
+                  className="text-gray-600 text-sm transition-colors duration-200 hover:text-primary"
                   href="/events"
                 >
                   Upcoming Events
@@ -46,7 +46,7 @@ export function Footer() {
               </li>
               <li>
                 <Link
-                  className="text-gray-600 text-sm transition-colors hover:text-primary"
+                  className="text-gray-600 text-sm transition-colors duration-200 hover:text-primary"
                   href="/myAccount"
                 >
                   Seller Dashboard
@@ -63,7 +63,7 @@ export function Footer() {
             <ul className="space-y-2">
               <li>
                 <Link
-                  className="text-gray-600 text-sm transition-colors hover:text-primary"
+                  className="text-gray-600 text-sm transition-colors duration-200 hover:text-primary"
                   href="/contact"
                 >
                   Contact Us
@@ -71,7 +71,7 @@ export function Footer() {
               </li>
               <li>
                 <Link
-                  className="text-gray-600 text-sm transition-colors hover:text-primary"
+                  className="text-gray-600 text-sm transition-colors duration-200 hover:text-primary"
                   href="/terms"
                 >
                   Terms of Service

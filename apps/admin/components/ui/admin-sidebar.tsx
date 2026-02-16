@@ -6,6 +6,7 @@ import {
   Calendar,
   Car,
   CheckCircle,
+  CreditCard,
   Database,
   LogOut,
   Menu,
@@ -77,6 +78,12 @@ export function AdminSidebar() {
       icon: Database,
       active: pathname.startsWith("/seed"),
     },
+    {
+      href: "/settings/stripe",
+      label: "Stripe",
+      icon: CreditCard,
+      active: pathname.startsWith("/settings"),
+    },
   ];
 
   const getInitials = (name: string) =>
@@ -115,16 +122,19 @@ export function AdminSidebar() {
       <nav className="flex-1 space-y-1 px-3">
         {navItems.map((item) => (
           <Link
-            className={`flex items-center gap-3 rounded-md px-3 py-2 font-medium text-sm transition-colors ${
+            className={`group flex items-center gap-3 rounded-lg px-3 py-2.5 font-medium text-sm transition-all duration-200 ${
               item.active
-                ? "bg-white/15 text-white"
-                : "text-gray-400 hover:bg-white/10 hover:text-white"
+                ? "bg-primary/15 text-white shadow-sm"
+                : "text-gray-400 hover:bg-white/8 hover:text-gray-200"
             }`}
             href={item.href}
             key={item.href}
           >
-            <item.icon className="h-4 w-4 shrink-0" />
+            <item.icon className={`h-4 w-4 shrink-0 transition-colors duration-200 ${item.active ? "text-primary-300" : "group-hover:text-gray-300"}`} />
             <span>{item.label}</span>
+            {item.active && (
+              <span className="ml-auto h-1.5 w-1.5 rounded-full bg-primary-300" />
+            )}
           </Link>
         ))}
       </nav>
@@ -133,7 +143,7 @@ export function AdminSidebar() {
       <div className="border-white/10 border-t px-3 py-3">
         {/* Back to Site */}
         <Link
-          className="flex items-center gap-3 rounded-md px-3 py-2 font-medium text-gray-400 text-sm transition-colors hover:bg-white/10 hover:text-white"
+          className="flex items-center gap-3 rounded-lg px-3 py-2 font-medium text-gray-400 text-sm transition-all duration-200 hover:bg-white/8 hover:text-gray-200"
           href="/myAccount"
         >
           <ArrowLeft className="h-4 w-4 shrink-0" />
@@ -142,9 +152,9 @@ export function AdminSidebar() {
 
         {/* User Info / Sign Out */}
         {isSignedIn ? (
-          <div className="mt-2 flex items-center justify-between rounded-md px-3 py-2">
+          <div className="mt-2 flex items-center justify-between rounded-lg bg-white/5 px-3 py-2.5">
             <div className="flex min-w-0 items-center gap-3">
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-primary to-primary/80 shadow-primary/20 shadow-sm">
                 <span className="font-medium text-white text-xs">
                   {userInitials}
                 </span>
@@ -159,7 +169,7 @@ export function AdminSidebar() {
               </div>
             </div>
             <button
-              className="shrink-0 rounded-md p-1.5 text-gray-400 transition-colors hover:bg-white/10 hover:text-white"
+              className="shrink-0 rounded-md p-1.5 text-gray-400 transition-all duration-200 hover:bg-white/10 hover:text-white"
               onClick={() => signOut()}
               title="Sign out"
               type="button"
@@ -189,9 +199,9 @@ export function AdminSidebar() {
       </aside>
 
       {/* Mobile Top Bar */}
-      <div className="admin-sidebar fixed inset-x-0 top-0 z-40 flex h-14 items-center gap-3 px-4 md:hidden">
+      <div className="admin-sidebar fixed inset-x-0 top-0 z-40 flex h-14 items-center gap-3 border-white/5 border-b px-4 shadow-lg md:hidden">
         <button
-          className="rounded-md p-1.5 text-gray-300 hover:bg-white/10 hover:text-white"
+          className="rounded-lg p-1.5 text-gray-300 transition-colors duration-200 hover:bg-white/10 hover:text-white"
           onClick={() => setMobileOpen(true)}
           type="button"
         >

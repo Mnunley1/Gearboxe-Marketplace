@@ -6,7 +6,7 @@ import { action } from "./_generated/server";
 
 const stripeClient = new StripeSubscriptions(components.stripe, {});
 
-function getStripe() {
+export function getStripe() {
   return new Stripe(process.env.STRIPE_SECRET_KEY!, {
     apiVersion: "2024-12-18.acacia",
   });
@@ -84,6 +84,25 @@ export const createEventRegistrationCheckout = action({
       throw new Error("Vehicle not found");
     }
 
+    // Look up org Stripe Connect settings for destination charges
+    const orgSettings = await ctx.runQuery(
+      internal.stripeConnect.getSettingsByOrgId,
+      { clerkOrgId: event.clerkOrgId },
+    );
+
+    if (!orgSettings?.onboardingComplete) {
+      throw new Error(
+        "This organization has not completed Stripe Connect setup. Payment cannot be processed.",
+      );
+    }
+
+    // Calculate application fee
+    const amountInCents = Math.round(args.amount * 100);
+    const applicationFeeAmount =
+      orgSettings.platformFeeType === "percentage"
+        ? Math.round(amountInCents * orgSettings.platformFeeValue / 100)
+        : orgSettings.platformFeeValue;
+
     // Get or create Stripe customer using component
     const customer = await stripeClient.getOrCreateCustomer(ctx, {
       userId: user.externalId, // Use Clerk ID
@@ -106,7 +125,7 @@ export const createEventRegistrationCheckout = action({
               name: `Event Registration - ${event.name}`,
               description: `Registration for ${vehicle.year} ${vehicle.make} ${vehicle.model}`,
             },
-            unit_amount: Math.round(args.amount * 100), // Convert to cents
+            unit_amount: amountInCents,
           },
           quantity: 1,
         },
@@ -121,6 +140,12 @@ export const createEventRegistrationCheckout = action({
         userId: args.userId,
       },
       customer_email: user.email,
+      payment_intent_data: {
+        application_fee_amount: applicationFeeAmount,
+        transfer_data: {
+          destination: orgSettings.stripeAccountId,
+        },
+      },
     });
 
     return {

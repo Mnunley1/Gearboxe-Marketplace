@@ -87,7 +87,7 @@ export default function AdminSignInPage() {
     return (
       <div className="flex min-h-screen items-center justify-center bg-white">
         <div className="text-center">
-          <div className="mx-auto h-32 w-32 animate-spin rounded-full border-primary border-b-2" />
+          <div className="mx-auto h-8 w-8 animate-spin rounded-full border-primary border-b-2" />
           <p className="mt-4 text-gray-600">Loading...</p>
         </div>
       </div>
@@ -98,7 +98,7 @@ export default function AdminSignInPage() {
     return (
       <div className="flex min-h-screen items-center justify-center bg-white">
         <div className="text-center">
-          <div className="mx-auto h-32 w-32 animate-spin rounded-full border-primary border-b-2" />
+          <div className="mx-auto h-8 w-8 animate-spin rounded-full border-primary border-b-2" />
           <p className="mt-4 text-gray-600">Redirecting to admin panel...</p>
         </div>
       </div>

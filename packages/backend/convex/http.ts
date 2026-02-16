@@ -5,6 +5,7 @@ import type Stripe from "stripe";
 import { Webhook } from "svix";
 import { components, internal } from "./_generated/api";
 import { httpAction } from "./_generated/server";
+import { getStripe } from "./payments";
 
 const http = httpRouter();
 
@@ -139,6 +140,44 @@ registerRoutes(http, components.stripe, {
       }
     },
   },
+});
+
+// Stripe Connect webhook for account events
+http.route({
+  path: "/stripe/connect-webhook",
+  method: "POST",
+  handler: httpAction(async (ctx, request) => {
+    const stripe = getStripe();
+    const body = await request.text();
+    const signature = request.headers.get("stripe-signature");
+
+    if (!signature) {
+      return new Response("Missing stripe-signature header", { status: 400 });
+    }
+
+    let event: Stripe.Event;
+    try {
+      event = stripe.webhooks.constructEvent(
+        body,
+        signature,
+        process.env.STRIPE_CONNECT_WEBHOOK_SECRET!,
+      );
+    } catch (err) {
+      console.error("Stripe Connect webhook signature verification failed:", err);
+      return new Response("Webhook signature verification failed", { status: 400 });
+    }
+
+    if (event.type === "account.updated") {
+      const account = event.data.object as Stripe.Account;
+      await ctx.runMutation(internal.stripeConnect.handleAccountUpdated, {
+        stripeAccountId: account.id,
+        chargesEnabled: account.charges_enabled ?? false,
+        payoutsEnabled: account.payouts_enabled ?? false,
+      });
+    }
+
+    return new Response(null, { status: 200 });
+  }),
 });
 
 async function validateRequest(req: Request): Promise<WebhookEvent | null> {

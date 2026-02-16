@@ -131,8 +131,8 @@ export function MessageThread({
   }
 
   return (
-    <Card className="flex h-[600px] flex-col">
-      <CardHeader className="border-gray-200 border-b pb-3">
+    <Card className="flex h-[600px] flex-col border-gray-200/60">
+      <CardHeader className="border-gray-200/60 border-b pb-3">
         <CardTitle className="flex items-center space-x-2 text-lg">
           <MessageCircle className="h-5 w-5 text-primary" />
           <span>Messages {recipientName && `with ${recipientName}`}</span>

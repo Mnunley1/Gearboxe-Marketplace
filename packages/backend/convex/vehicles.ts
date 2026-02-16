@@ -413,16 +413,14 @@ export const deleteVehicle = mutation({
 export const approveVehicle = mutation({
   args: { id: v.id("vehicles") },
   handler: async (ctx, args) => {
-    const { cityId } = await requireOrgAdmin(ctx);
-    if (cityId) {
-      const vehicle = await ctx.db.get(args.id);
-      if (!vehicle?.eventId) {
-        throw new Error("Vehicle has no associated event");
-      }
-      const event = await ctx.db.get(vehicle.eventId);
-      if (!event || event.cityId !== cityId) {
-        throw new Error("Unauthorized: vehicle does not belong to your city");
-      }
+    const { orgId } = await requireOrgAdmin(ctx);
+    const vehicle = await ctx.db.get(args.id);
+    if (!vehicle?.eventId) {
+      throw new Error("Vehicle has no associated event");
+    }
+    const event = await ctx.db.get(vehicle.eventId);
+    if (!event || event.clerkOrgId !== orgId) {
+      throw new Error("Unauthorized: vehicle does not belong to your organization");
     }
     await ctx.db.patch(args.id, { status: "approved" });
   },
@@ -431,16 +429,14 @@ export const approveVehicle = mutation({
 export const rejectVehicle = mutation({
   args: { id: v.id("vehicles") },
   handler: async (ctx, args) => {
-    const { cityId } = await requireOrgAdmin(ctx);
-    if (cityId) {
-      const vehicle = await ctx.db.get(args.id);
-      if (!vehicle?.eventId) {
-        throw new Error("Vehicle has no associated event");
-      }
-      const event = await ctx.db.get(vehicle.eventId);
-      if (!event || event.cityId !== cityId) {
-        throw new Error("Unauthorized: vehicle does not belong to your city");
-      }
+    const { orgId } = await requireOrgAdmin(ctx);
+    const vehicle = await ctx.db.get(args.id);
+    if (!vehicle?.eventId) {
+      throw new Error("Vehicle has no associated event");
+    }
+    const event = await ctx.db.get(vehicle.eventId);
+    if (!event || event.clerkOrgId !== orgId) {
+      throw new Error("Unauthorized: vehicle does not belong to your organization");
     }
     await ctx.db.patch(args.id, { status: "rejected" });
   },

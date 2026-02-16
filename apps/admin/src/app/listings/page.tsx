@@ -38,7 +38,7 @@ export default function AdminListingsPage() {
     );
   }
 
-  const filteredVehicles = allVehicles.filter((vehicle) => {
+  const filteredVehicles = allVehicles.filter((vehicle: any) => {
     if (statusFilter === "all") return true;
     return vehicle.status === statusFilter;
   });
@@ -77,7 +77,7 @@ export default function AdminListingsPage() {
 
   const selectedVehicleId = searchParams.get("vehicle");
   const _selectedVehicle = selectedVehicleId
-    ? allVehicles.find((v) => v._id === selectedVehicleId)
+    ? allVehicles.find((v: any) => v._id === selectedVehicleId)
     : null;
 
   return (
@@ -86,9 +86,11 @@ export default function AdminListingsPage() {
       <div className="mb-8">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="font-bold font-heading text-3xl text-gray-900">
+            <h1 className="mb-1 font-bold font-heading text-3xl text-gray-900">
               Manage Listings
             </h1>
+            <p className="text-gray-500">Review and approve vehicle listings</p>
+            <div className="mt-3 h-1 w-12 rounded-full bg-primary" />
           </div>
         </div>
       </div>
@@ -122,31 +124,31 @@ export default function AdminListingsPage() {
         <div className="lg:col-span-2">
           {filteredVehicles.length > 0 ? (
             <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-              {filteredVehicles.map((vehicle) => (
+              {filteredVehicles.map((vehicle: any) => (
                 <Card
-                  className="overflow-hidden transition-all duration-300 hover:border-gray-300/80 hover:shadow-lg"
+                  className="group hover:-translate-y-0.5 overflow-hidden border-gray-200/60 bg-white transition-all duration-300 hover:border-gray-300/80 hover:shadow-gray-200/50 hover:shadow-xl"
                   key={vehicle._id}
                 >
-                  <div className="relative">
+                  <div className="relative overflow-hidden">
                     {vehicle.photos.length > 0 ? (
                       <Image
                         alt={vehicle.title}
-                        className="h-48 w-full object-cover"
+                        className="h-48 w-full object-cover transition-transform duration-500 group-hover:scale-105"
                         height={192}
                         src={vehicle.photos[0]}
                         unoptimized
                         width={384}
                       />
                     ) : (
-                      <div className="flex h-48 w-full items-center justify-center bg-gray-200">
-                        <span className="text-gray-500">No Image</span>
+                      <div className="flex h-48 w-full items-center justify-center bg-gray-100">
+                        <Car className="h-8 w-8 text-gray-300" />
                       </div>
                     )}
 
                     {/* Status Badge */}
                     <div className="absolute top-2 left-2">
                       <span
-                        className={`rounded-full px-2 py-1 text-xs capitalize ${getStatusColor(vehicle.status)}`}
+                        className={`rounded-full px-2.5 py-1 font-medium text-xs capitalize shadow-sm ${getStatusColor(vehicle.status)}`}
                       >
                         {vehicle.status}
                       </span>
@@ -230,7 +232,7 @@ export default function AdminListingsPage() {
         {/* Sidebar */}
         <div className="space-y-6">
           {/* Stats */}
-          <Card>
+          <Card className="border-gray-200/60 transition-all duration-300 hover:shadow-md">
             <CardHeader>
               <CardTitle className="font-heading">Listing Statistics</CardTitle>
             </CardHeader>
@@ -242,19 +244,19 @@ export default function AdminListingsPage() {
               <div className="flex justify-between">
                 <span className="text-gray-600 text-sm">Pending</span>
                 <span className="font-medium text-yellow-600">
-                  {allVehicles.filter((v) => v.status === "pending").length}
+                  {allVehicles.filter((v: any) => v.status === "pending").length}
                 </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600 text-sm">Approved</span>
                 <span className="font-medium text-green-600">
-                  {allVehicles.filter((v) => v.status === "approved").length}
+                  {allVehicles.filter((v: any) => v.status === "approved").length}
                 </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-600 text-sm">Rejected</span>
                 <span className="font-medium text-red-600">
-                  {allVehicles.filter((v) => v.status === "rejected").length}
+                  {allVehicles.filter((v: any) => v.status === "rejected").length}
                 </span>
               </div>
             </CardContent>

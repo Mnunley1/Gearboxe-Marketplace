@@ -12,22 +12,21 @@ import { Input } from "@gearboxe-market/ui/input";
 import { Label } from "@gearboxe-market/ui/label";
 import { Textarea } from "@gearboxe-market/ui/textarea";
 import { useMutation, useQuery } from "convex/react";
-import { Calendar, MapPin, Plus, Trash2, Users } from "lucide-react";
+import { AlertTriangle, Calendar, MapPin, Plus, Trash2, Users } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useAdminAuth } from "../../../lib/admin-auth-context";
 
 export default function AdminEventsPage() {
-  const { city } = useAdminAuth();
+  const { orgId } = useAdminAuth();
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
 
   const allEvents = useQuery(api.admin.getAllEvents);
-  const cities = useQuery(api.cities.getCities);
   const deleteEvent = useMutation(api.events.deleteEvent);
 
-  if (!(allEvents && cities)) {
+  if (!allEvents) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-white">
         <div className="text-center">
@@ -51,8 +50,8 @@ export default function AdminEventsPage() {
     <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
       {/* Delete confirmation */}
       {pendingDeleteId && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <Card className="mx-4 max-w-sm">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+          <Card className="mx-4 max-w-sm border-gray-200/60 shadow-xl">
             <CardContent className="p-6 text-center">
               <p className="mb-4 text-gray-900">
                 Are you sure you want to delete this event?
@@ -80,9 +79,11 @@ export default function AdminEventsPage() {
       <div className="mb-8">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="font-bold font-heading text-3xl text-gray-900">
+            <h1 className="mb-1 font-bold font-heading text-3xl text-gray-900">
               Manage Events
             </h1>
+            <p className="text-gray-500">Create and manage Gearboxe Market events</p>
+            <div className="mt-3 h-1 w-12 rounded-full bg-primary" />
           </div>
           <Button onClick={() => setShowCreateForm(!showCreateForm)}>
             <Plus className="h-5 w-5" />
@@ -93,18 +94,17 @@ export default function AdminEventsPage() {
 
       {/* Create Event Form */}
       {showCreateForm && (
-        <Card className="mb-8">
+        <Card className="mb-8 border-gray-200/60">
           <CardHeader>
             <CardTitle className="font-heading">Create New Event</CardTitle>
           </CardHeader>
           <CardContent>
             <EventCreateForm
-              cities={cities}
+              orgId={orgId}
               onSuccess={() => {
                 setShowCreateForm(false);
                 window.location.reload();
               }}
-              orgCityId={city?._id ?? null}
             />
           </CardContent>
         </Card>
@@ -113,9 +113,9 @@ export default function AdminEventsPage() {
       {/* Events Grid */}
       {allEvents.length > 0 ? (
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {allEvents.map((event) => (
+          {allEvents.map((event: any) => (
             <Card
-              className="overflow-hidden transition-all duration-300 hover:border-gray-300/80 hover:shadow-lg"
+              className="group hover:-translate-y-0.5 overflow-hidden border-gray-200/60 bg-white transition-all duration-300 hover:border-gray-300/80 hover:shadow-gray-200/50 hover:shadow-xl"
               key={event._id}
             >
               <CardContent className="p-6">
@@ -124,11 +124,6 @@ export default function AdminEventsPage() {
                     <h3 className="line-clamp-1 font-semibold text-xl">
                       {event.name}
                     </h3>
-                    {event.city && (
-                      <p className="text-gray-600 text-sm">
-                        {event.city.name}, {event.city.state}
-                      </p>
-                    )}
                   </div>
 
                   <div className="space-y-2">
@@ -201,16 +196,13 @@ export default function AdminEventsPage() {
 
 // Event Create Form Component
 function EventCreateForm({
-  cities,
-  orgCityId,
+  orgId,
   onSuccess,
 }: {
-  cities: any[];
-  orgCityId: string | null;
+  orgId: string | null;
   onSuccess: () => void;
 }) {
   const [formData, setFormData] = useState({
-    cityId: orgCityId ?? "",
     name: "",
     date: "",
     location: "",
@@ -221,12 +213,14 @@ function EventCreateForm({
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const createEvent = useMutation(api.events.createEvent);
+  const stripeSettings = useQuery(api.stripeConnect.getOrgStripeSettings);
+  const stripeNotReady = !stripeSettings?.onboardingComplete;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (
       !(
-        formData.cityId &&
+        orgId &&
         formData.name &&
         formData.date &&
         formData.location &&
@@ -243,13 +237,14 @@ function EventCreateForm({
     setIsSubmitting(true);
     try {
       await createEvent({
-        cityId: formData.cityId as any,
+        clerkOrgId: orgId,
         name: formData.name,
         date: new Date(formData.date).getTime(),
         location: formData.location,
         address: formData.address,
         capacity: Number.parseInt(formData.capacity, 10),
         description: formData.description,
+        vendorPrice: 50,
       });
       toast.success("Event Created", {
         description: "The event has been created successfully.",
@@ -269,28 +264,23 @@ function EventCreateForm({
 
   return (
     <form className="space-y-6" onSubmit={handleSubmit}>
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-        <div className="space-y-2">
-          <Label htmlFor="city-select">City *</Label>
-          <select
-            className="flex h-11 w-full rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-gray-900 text-sm shadow-sm transition-all duration-200 hover:border-gray-300 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 disabled:cursor-not-allowed disabled:bg-gray-50 disabled:opacity-50"
-            disabled={!!orgCityId}
-            id="city-select"
-            onChange={(e) =>
-              setFormData((prev) => ({ ...prev, cityId: e.target.value }))
-            }
-            required
-            value={formData.cityId}
-          >
-            <option value="">Select a city</option>
-            {cities.map((city) => (
-              <option key={city._id} value={city._id}>
-                {city.name}, {city.state}
-              </option>
-            ))}
-          </select>
+      {stripeNotReady && (
+        <div className="flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 p-4">
+          <AlertTriangle className="mt-0.5 h-5 w-5 shrink-0 text-amber-600" />
+          <div>
+            <p className="font-medium text-amber-800 text-sm">
+              Stripe account not connected
+            </p>
+            <p className="mt-1 text-amber-700 text-sm">
+              You must connect a Stripe account before creating paid events.{" "}
+              <Link className="font-medium underline" href="/settings/stripe">
+                Connect Stripe
+              </Link>
+            </p>
+          </div>
         </div>
-
+      )}
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         <div className="space-y-2">
           <Label htmlFor="event-name">Event Name *</Label>
           <Input
@@ -345,7 +335,7 @@ function EventCreateForm({
           />
         </div>
 
-        <div className="space-y-2">
+        <div className="space-y-2 md:col-span-2">
           <Label htmlFor="event-address">Address *</Label>
           <Input
             id="event-address"
@@ -376,7 +366,6 @@ function EventCreateForm({
         <Button
           onClick={() => {
             setFormData({
-              cityId: "",
               name: "",
               date: "",
               location: "",

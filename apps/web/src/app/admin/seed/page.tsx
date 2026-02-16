@@ -194,7 +194,6 @@ export default function SeedPage() {
                 <li>
                   • {seedResult.users} fake users (sellers, buyers, admin)
                 </li>
-                <li>• {seedResult.cities} cities for events</li>
                 <li>• {seedResult.vehicles} vehicles with realistic data</li>
                 <li>• {seedResult.events} upcoming events</li>
                 <li>• {seedResult.registrations} event registrations</li>

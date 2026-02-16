@@ -23,7 +23,8 @@
   },
   "devDependencies": {
     "@biomejs/biome": "2.3.1",
-    "ultracite": "6.0.3",
-    "typescript": "^5"
+    "@types/qrcode": "^1.5.5",
+    "typescript": "^5",
+    "ultracite": "6.0.3"
   }
 }

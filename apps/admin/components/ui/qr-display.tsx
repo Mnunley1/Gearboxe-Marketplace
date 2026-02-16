@@ -74,7 +74,7 @@ export function QRDisplay({
   };
 
   return (
-    <Card className="mx-auto w-full max-w-sm">
+    <Card className="mx-auto w-full max-w-sm border-gray-200/60">
       <CardHeader className="text-center">
         <CardTitle className="text-lg">{title}</CardTitle>
         {description && <p className="text-gray-600 text-sm">{description}</p>}

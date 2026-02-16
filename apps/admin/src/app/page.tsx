@@ -8,13 +8,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@gearboxe-market/ui/card";
+import { useOrganization } from "@clerk/nextjs";
 import { useQuery } from "convex/react";
 import { Calendar, Car, CheckCircle, Clock, Database } from "lucide-react";
 import Link from "next/link";
-import { useAdminAuth } from "../../lib/admin-auth-context";
 
 export default function AdminDashboardPage() {
-  const { city } = useAdminAuth();
+  const { organization } = useOrganization();
 
   const adminStats = useQuery(api.admin.getAdminStats);
   const pendingVehicles = useQuery(api.admin.getAllVehicles);
@@ -32,33 +32,34 @@ export default function AdminDashboardPage() {
   }
 
   const pendingVehiclesList = pendingVehicles.filter(
-    (v) => v.status === "pending"
+    (v: any) => v.status === "pending"
   );
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="mb-2 font-bold font-heading text-3xl text-gray-900">
+        <h1 className="mb-1 font-bold font-heading text-3xl text-gray-900">
           Admin Dashboard
         </h1>
-        <p className="text-gray-600">
-          {city
-            ? `Managing ${city.name}, ${city.state}`
-            : "Global view (all cities)"}
+        <p className="text-gray-500">
+          {organization
+            ? `Managing ${organization.name}`
+            : "Organization Dashboard"}
         </p>
+        <div className="mt-3 h-1 w-12 rounded-full bg-primary" />
       </div>
 
       {/* Stats Grid */}
       <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
-        <Card className="transition-all duration-300 hover:shadow-md">
+        <Card className="group hover:-translate-y-0.5 border-gray-200/60 bg-white transition-all duration-300 hover:border-gray-300/80 hover:shadow-gray-200/50 hover:shadow-lg">
           <CardContent className="p-6">
             <div className="flex items-center">
-              <div className="rounded-lg bg-primary/10 p-2">
+              <div className="rounded-xl bg-primary/10 p-3 transition-colors duration-300 group-hover:bg-primary/15">
                 <Car className="h-6 w-6 text-primary" />
               </div>
               <div className="ml-4">
-                <p className="font-medium text-gray-600 text-sm">
+                <p className="font-medium text-gray-500 text-sm">
                   Total Vehicles
                 </p>
                 <p className="font-bold text-2xl text-gray-900">
@@ -69,14 +70,14 @@ export default function AdminDashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className="transition-all duration-300 hover:shadow-md">
+        <Card className="group hover:-translate-y-0.5 border-gray-200/60 bg-white transition-all duration-300 hover:border-gray-300/80 hover:shadow-gray-200/50 hover:shadow-lg">
           <CardContent className="p-6">
             <div className="flex items-center">
-              <div className="rounded-lg bg-yellow-100 p-2">
+              <div className="rounded-xl bg-yellow-50 p-3 transition-colors duration-300 group-hover:bg-yellow-100">
                 <Clock className="h-6 w-6 text-yellow-600" />
               </div>
               <div className="ml-4">
-                <p className="font-medium text-gray-600 text-sm">
+                <p className="font-medium text-gray-500 text-sm">
                   Pending Approval
                 </p>
                 <p className="font-bold text-2xl text-gray-900">
@@ -87,14 +88,14 @@ export default function AdminDashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className="transition-all duration-300 hover:shadow-md">
+        <Card className="group hover:-translate-y-0.5 border-gray-200/60 bg-white transition-all duration-300 hover:border-gray-300/80 hover:shadow-gray-200/50 hover:shadow-lg">
           <CardContent className="p-6">
             <div className="flex items-center">
-              <div className="rounded-lg bg-green-100 p-2">
+              <div className="rounded-xl bg-green-50 p-3 transition-colors duration-300 group-hover:bg-green-100">
                 <CheckCircle className="h-6 w-6 text-green-600" />
               </div>
               <div className="ml-4">
-                <p className="font-medium text-gray-600 text-sm">Approved</p>
+                <p className="font-medium text-gray-500 text-sm">Approved</p>
                 <p className="font-bold text-2xl text-gray-900">
                   {adminStats.approvedVehicles}
                 </p>
@@ -103,14 +104,14 @@ export default function AdminDashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className="transition-all duration-300 hover:shadow-md">
+        <Card className="group hover:-translate-y-0.5 border-gray-200/60 bg-white transition-all duration-300 hover:border-gray-300/80 hover:shadow-gray-200/50 hover:shadow-lg">
           <CardContent className="p-6">
             <div className="flex items-center">
-              <div className="rounded-lg bg-primary-100 p-2">
+              <div className="rounded-xl bg-primary-50 p-3 transition-colors duration-300 group-hover:bg-primary-100">
                 <Calendar className="h-6 w-6 text-primary" />
               </div>
               <div className="ml-4">
-                <p className="font-medium text-gray-600 text-sm">
+                <p className="font-medium text-gray-500 text-sm">
                   Upcoming Events
                 </p>
                 <p className="font-bold text-2xl text-gray-900">
@@ -126,7 +127,7 @@ export default function AdminDashboardPage() {
         {/* Main Content */}
         <div className="space-y-8 lg:col-span-2">
           {/* Quick Actions */}
-          <Card>
+          <Card className="border-gray-200/60 transition-all duration-300 hover:shadow-md">
             <CardHeader>
               <CardTitle className="font-heading">Quick Actions</CardTitle>
             </CardHeader>
@@ -161,7 +162,7 @@ export default function AdminDashboardPage() {
           </Card>
 
           {/* Pending Approvals */}
-          <Card>
+          <Card className="border-gray-200/60 transition-all duration-300 hover:shadow-md">
             <CardHeader>
               <CardTitle className="font-heading">
                 Pending Approvals ({pendingVehiclesList.length})
@@ -170,7 +171,7 @@ export default function AdminDashboardPage() {
             <CardContent>
               {pendingVehiclesList.length > 0 ? (
                 <div className="space-y-4">
-                  {pendingVehiclesList.slice(0, 5).map((vehicle) => (
+                  {pendingVehiclesList.slice(0, 5).map((vehicle: any) => (
                     <div
                       className="flex items-center justify-between rounded-lg border border-gray-200 p-4 transition-colors duration-200 hover:bg-gray-50"
                       key={vehicle._id}
@@ -217,14 +218,14 @@ export default function AdminDashboardPage() {
         {/* Sidebar */}
         <div className="space-y-6">
           {/* Upcoming Events */}
-          <Card>
+          <Card className="border-gray-200/60 transition-all duration-300 hover:shadow-md">
             <CardHeader>
               <CardTitle className="font-heading">Upcoming Events</CardTitle>
             </CardHeader>
             <CardContent>
               {upcomingEvents && upcomingEvents.length > 0 ? (
                 <div className="space-y-3">
-                  {upcomingEvents.slice(0, 3).map((event) => (
+                  {upcomingEvents.slice(0, 3).map((event: any) => (
                     <div
                       className="rounded-lg border border-gray-200 p-3 transition-colors duration-200 hover:bg-gray-50"
                       key={event._id}

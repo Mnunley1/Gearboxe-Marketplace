@@ -189,16 +189,6 @@ export async function getActiveOrg(ctx: QueryCtx) {
   return { orgId, orgRole: orgRole ?? "org:member" };
 }
 
-export async function getActiveCityFromOrg(ctx: QueryCtx) {
-  const org = await getActiveOrg(ctx);
-  if (!org) return null;
-  const city = await ctx.db
-    .query("cities")
-    .withIndex("by_clerkOrgId", (q) => q.eq("clerkOrgId", org.orgId))
-    .first();
-  return city;
-}
-
 export async function requireOrgAdmin(ctx: QueryCtx) {
   const user = await getCurrentUserOrThrow(ctx);
 
@@ -208,11 +198,9 @@ export async function requireOrgAdmin(ctx: QueryCtx) {
     throw new Error("Unauthorized: no active organization selected");
   }
 
-  const city = await getActiveCityFromOrg(ctx);
-
   return {
     user,
-    cityId: city?._id ?? null,
+    orgId: org.orgId,
   };
 }
 
@@ -223,11 +211,10 @@ export const getOrgContext = query({
     if (!user) return null;
 
     const org = await getActiveOrg(ctx);
-    const city = await getActiveCityFromOrg(ctx);
 
     return {
       user: { _id: user._id, name: user.name, role: user.role },
-      city: city ? { _id: city._id, name: city.name, state: city.state } : null,
+      orgId: org?.orgId ?? null,
       orgRole: org?.orgRole ?? null,
     };
   },

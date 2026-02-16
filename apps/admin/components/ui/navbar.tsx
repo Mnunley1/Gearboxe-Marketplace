@@ -18,15 +18,15 @@ export function Navbar() {
   // Show loading state while auth is being determined
   if (!authLoaded) {
     return (
-      <nav className="border-gray-200 border-b bg-white shadow-sm">
+      <nav className="border-gray-200/80 border-b bg-white shadow-sm">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between">
             {/* Logo */}
-            <Link className="flex items-center space-x-2" href="/">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
+            <Link className="group flex items-center space-x-2" href="/">
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-primary/80 shadow-md shadow-primary/20 transition-transform duration-200 group-hover:scale-105">
                 <span className="font-bold text-sm text-white">G</span>
               </div>
-              <span className="font-bold font-heading text-gray-900 text-xl uppercase">
+              <span className="font-bold font-heading text-gray-900 text-xl uppercase tracking-tight">
                 Gearboxe Market
               </span>
             </Link>
@@ -43,16 +43,16 @@ export function Navbar() {
   }
 
   return (
-    <nav className="border-gray-200 border-b bg-white shadow-sm">
+    <nav className="border-gray-200/80 border-b bg-white shadow-sm">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
           {/* Logo and Navigation Links */}
           <div className="flex items-center space-x-8">
-            <Link className="flex items-center space-x-2" href="/">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
+            <Link className="group flex items-center space-x-2" href="/">
+              <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-primary/80 shadow-md shadow-primary/20 transition-transform duration-200 group-hover:scale-105">
                 <span className="font-bold text-sm text-white">G</span>
               </div>
-              <span className="font-bold font-heading text-gray-900 text-xl uppercase">
+              <span className="font-bold font-heading text-gray-900 text-xl uppercase tracking-tight">
                 Gearboxe Market
               </span>
             </Link>
@@ -60,16 +60,16 @@ export function Navbar() {
             {/* Navigation Links */}
             <div className="hidden items-center space-x-6 md:flex">
               <Link
-                className={`font-medium text-sm transition-colors hover:text-primary ${
-                  pathname === "/vehicles" ? "text-primary" : "text-gray-700"
+                className={`relative rounded-lg px-4 py-2 font-medium text-sm transition-colors duration-200 ${
+                  pathname === "/vehicles" ? "bg-primary/5 text-primary" : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
                 }`}
                 href="/vehicles"
               >
                 Browse Vehicles
               </Link>
               <Link
-                className={`font-medium text-sm transition-colors hover:text-primary ${
-                  pathname === "/events" ? "text-primary" : "text-gray-700"
+                className={`relative rounded-lg px-4 py-2 font-medium text-sm transition-colors duration-200 ${
+                  pathname === "/events" ? "bg-primary/5 text-primary" : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
                 }`}
                 href="/events"
               >

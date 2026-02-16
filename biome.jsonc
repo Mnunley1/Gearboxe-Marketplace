@@ -28,5 +28,17 @@
   },
   "formatter": {
     "enabled": true
-  }
+  },
+  "overrides": [
+    {
+      "includes": ["packages/backend/convex/**"],
+      "linter": {
+        "rules": {
+          "style": {
+            "useFilenamingConvention": "off"
+          }
+        }
+      }
+    }
+  ]
 }

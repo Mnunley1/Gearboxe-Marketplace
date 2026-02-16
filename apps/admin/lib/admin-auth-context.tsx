@@ -4,7 +4,7 @@ import { createContext, useContext } from "react";
 
 export type AdminAuthContextValue = {
   user: { _id: string; name: string; role: string };
-  city: { _id: string; name: string; state: string } | null;
+  orgId: string | null;
   orgRole: string | null;
 };
 

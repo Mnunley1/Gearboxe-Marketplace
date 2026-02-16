@@ -76,7 +76,9 @@ export const isAdmin = query({
   args: {},
   handler: async (ctx) => {
     const user = await getCurrentUser(ctx);
-    return user?.role === "admin" || user?.role === "superAdmin";
+    if (!user) return false;
+    const org = await getActiveOrg(ctx);
+    return !!org;
   },
 });
 
@@ -199,30 +201,18 @@ export async function getActiveCityFromOrg(ctx: QueryCtx) {
 
 export async function requireOrgAdmin(ctx: QueryCtx) {
   const user = await getCurrentUserOrThrow(ctx);
-  const isSuperAdmin = user.role === "superAdmin";
 
-  if (isSuperAdmin) {
-    const city = await getActiveCityFromOrg(ctx);
-    return {
-      user,
-      cityId: city?._id ?? null,
-      isSuperAdmin: true,
-    };
-  }
-
-  if (user.role !== "admin") {
-    throw new Error("Unauthorized: admin access required");
-  }
-
-  const city = await getActiveCityFromOrg(ctx);
-  if (!city) {
+  // Check if user is part of a Clerk organization (from JWT)
+  const org = await getActiveOrg(ctx);
+  if (!org) {
     throw new Error("Unauthorized: no active organization selected");
   }
 
+  const city = await getActiveCityFromOrg(ctx);
+
   return {
     user,
-    cityId: city._id,
-    isSuperAdmin: false,
+    cityId: city?._id ?? null,
   };
 }
 

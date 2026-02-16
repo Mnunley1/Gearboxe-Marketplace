@@ -1,6 +1,6 @@
 import { v } from "convex/values";
 import { mutation } from "./_generated/server";
-import { requireSuperAdmin } from "./users";
+import { requireOrgAdmin } from "./users";
 
 export const linkCityToOrg = mutation({
   args: {
@@ -8,7 +8,7 @@ export const linkCityToOrg = mutation({
     clerkOrgId: v.string(),
   },
   handler: async (ctx, args) => {
-    await requireSuperAdmin(ctx);
+    await requireOrgAdmin(ctx);
 
     const city = await ctx.db.get(args.cityId);
     if (!city) {

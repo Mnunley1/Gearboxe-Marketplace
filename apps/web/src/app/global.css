@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "@gearboxe-market/ui/theme";
+@source "../../../../packages/ui/src";
 
 @theme {
   --animate-slide-down: slide-down 0.3s ease-out;

@@ -1,6 +1,5 @@
 "use client";
 
-import { useUser } from "@clerk/nextjs";
 import { api } from "@gearboxe-market/convex/_generated/api";
 import { Button } from "@gearboxe-market/ui/button";
 import {
@@ -9,50 +8,31 @@ import {
   CardHeader,
   CardTitle,
 } from "@gearboxe-market/ui/card";
-import { useConvexAuth, useMutation, useQuery } from "convex/react";
-import { ArrowLeft, Calendar, MapPin, Plus, Trash2, Users } from "lucide-react";
+import { Input } from "@gearboxe-market/ui/input";
+import { Label } from "@gearboxe-market/ui/label";
+import { Textarea } from "@gearboxe-market/ui/textarea";
+import { useMutation, useQuery } from "convex/react";
+import { Calendar, MapPin, Plus, Trash2, Users } from "lucide-react";
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
+import { useAdminAuth } from "../../../lib/admin-auth-context";
 
 export default function AdminEventsPage() {
-  const { isLoading } = useConvexAuth();
-  const { user } = useUser();
+  const { city } = useAdminAuth();
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
 
-  const isAdmin = useQuery(api.users.isAdmin);
-  const orgContext = useQuery(api.users.getOrgContext);
   const allEvents = useQuery(api.admin.getAllEvents);
   const cities = useQuery(api.cities.getCities);
   const deleteEvent = useMutation(api.events.deleteEvent);
 
-  if (isLoading) {
+  if (!(allEvents && cities)) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-white">
         <div className="text-center">
-          <div className="mx-auto h-32 w-32 animate-spin rounded-full border-primary border-b-2" />
-          <p className="mt-4 text-gray-600">Loading...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!user) {
-    redirect("/sign-in");
-  }
-
-  if (isAdmin === false) {
-    redirect("/myAccount");
-  }
-
-  if (isAdmin === undefined || !allEvents || !cities) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-white">
-        <div className="text-center">
-          <div className="mx-auto h-32 w-32 animate-spin rounded-full border-primary border-b-2" />
-          <p className="mt-4 text-gray-600">Loading admin data...</p>
+          <div className="mx-auto h-8 w-8 animate-spin rounded-full border-primary border-b-2" />
+          <p className="mt-4 text-gray-600 text-sm">Loading...</p>
         </div>
       </div>
     );
@@ -98,23 +78,14 @@ export default function AdminEventsPage() {
 
       {/* Header */}
       <div className="mb-8">
-        <div className="mb-4 flex items-center space-x-4">
-          <Button asChild size="sm" variant="ghost">
-            <Link href="/admin">
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Admin Dashboard
-            </Link>
-          </Button>
-        </div>
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="font-bold text-3xl text-gray-900">Manage Events</h1>
-            <p className="text-gray-600">
-              Create and manage Gearboxe Market events
-            </p>
+            <h1 className="font-bold font-heading text-3xl text-gray-900">
+              Manage Events
+            </h1>
           </div>
           <Button onClick={() => setShowCreateForm(!showCreateForm)}>
-            <Plus className="mr-2 h-5 w-5" />
+            <Plus className="h-5 w-5" />
             New Event
           </Button>
         </div>
@@ -124,17 +95,16 @@ export default function AdminEventsPage() {
       {showCreateForm && (
         <Card className="mb-8">
           <CardHeader>
-            <CardTitle>Create New Event</CardTitle>
+            <CardTitle className="font-heading">Create New Event</CardTitle>
           </CardHeader>
           <CardContent>
             <EventCreateForm
               cities={cities}
               onSuccess={() => {
                 setShowCreateForm(false);
-                // Refresh the page to show new event
                 window.location.reload();
               }}
-              orgCityId={orgContext?.city?._id ?? null}
+              orgCityId={city?._id ?? null}
             />
           </CardContent>
         </Card>
@@ -144,7 +114,10 @@ export default function AdminEventsPage() {
       {allEvents.length > 0 ? (
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
           {allEvents.map((event) => (
-            <Card className="overflow-hidden" key={event._id}>
+            <Card
+              className="overflow-hidden transition-all duration-300 hover:border-gray-300/80 hover:shadow-lg"
+              key={event._id}
+            >
               <CardContent className="p-6">
                 <div className="space-y-4">
                   <div>
@@ -187,7 +160,7 @@ export default function AdminEventsPage() {
                       variant="outline"
                     >
                       <Link href={`/events/${event._id}`}>
-                        <Calendar className="mr-1 h-4 w-4" />
+                        <Calendar className="h-4 w-4" />
                         View
                       </Link>
                     </Button>
@@ -216,7 +189,7 @@ export default function AdminEventsPage() {
               Create your first Gearboxe Market event to get started.
             </p>
             <Button onClick={() => setShowCreateForm(true)}>
-              <Plus className="mr-2 h-5 w-5" />
+              <Plus className="h-5 w-5" />
               Create First Event
             </Button>
           </CardContent>
@@ -298,14 +271,9 @@ function EventCreateForm({
     <form className="space-y-6" onSubmit={handleSubmit}>
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         <div className="space-y-2">
-          <label
-            className="font-medium text-gray-700 text-sm"
-            htmlFor="city-select"
-          >
-            City *
-          </label>
+          <Label htmlFor="city-select">City *</Label>
           <select
-            className="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-primary disabled:cursor-not-allowed disabled:bg-gray-100"
+            className="flex h-11 w-full rounded-lg border border-gray-200 bg-white px-4 py-2.5 text-gray-900 text-sm shadow-sm transition-all duration-200 hover:border-gray-300 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 disabled:cursor-not-allowed disabled:bg-gray-50 disabled:opacity-50"
             disabled={!!orgCityId}
             id="city-select"
             onChange={(e) =>
@@ -324,34 +292,21 @@ function EventCreateForm({
         </div>
 
         <div className="space-y-2">
-          <label
-            className="font-medium text-gray-700 text-sm"
-            htmlFor="event-name"
-          >
-            Event Name *
-          </label>
-          <input
-            className="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-primary"
+          <Label htmlFor="event-name">Event Name *</Label>
+          <Input
             id="event-name"
             onChange={(e) =>
               setFormData((prev) => ({ ...prev, name: e.target.value }))
             }
             placeholder="e.g., Raleigh Gearboxe Market - March 2024"
             required
-            type="text"
             value={formData.name}
           />
         </div>
 
         <div className="space-y-2">
-          <label
-            className="font-medium text-gray-700 text-sm"
-            htmlFor="event-date"
-          >
-            Date *
-          </label>
-          <input
-            className="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-primary"
+          <Label htmlFor="event-date">Date *</Label>
+          <Input
             id="event-date"
             onChange={(e) =>
               setFormData((prev) => ({ ...prev, date: e.target.value }))
@@ -363,14 +318,8 @@ function EventCreateForm({
         </div>
 
         <div className="space-y-2">
-          <label
-            className="font-medium text-gray-700 text-sm"
-            htmlFor="event-capacity"
-          >
-            Capacity *
-          </label>
-          <input
-            className="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-primary"
+          <Label htmlFor="event-capacity">Capacity *</Label>
+          <Input
             id="event-capacity"
             min="1"
             onChange={(e) =>
@@ -384,55 +333,35 @@ function EventCreateForm({
         </div>
 
         <div className="space-y-2">
-          <label
-            className="font-medium text-gray-700 text-sm"
-            htmlFor="event-location"
-          >
-            Location *
-          </label>
-          <input
-            className="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-primary"
+          <Label htmlFor="event-location">Location *</Label>
+          <Input
             id="event-location"
             onChange={(e) =>
               setFormData((prev) => ({ ...prev, location: e.target.value }))
             }
             placeholder="e.g., Raleigh Convention Center"
             required
-            type="text"
             value={formData.location}
           />
         </div>
 
         <div className="space-y-2">
-          <label
-            className="font-medium text-gray-700 text-sm"
-            htmlFor="event-address"
-          >
-            Address *
-          </label>
-          <input
-            className="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-primary"
+          <Label htmlFor="event-address">Address *</Label>
+          <Input
             id="event-address"
             onChange={(e) =>
               setFormData((prev) => ({ ...prev, address: e.target.value }))
             }
             placeholder="e.g., 500 S Salisbury St, Raleigh, NC 27601"
             required
-            type="text"
             value={formData.address}
           />
         </div>
       </div>
 
       <div className="space-y-2">
-        <label
-          className="font-medium text-gray-700 text-sm"
-          htmlFor="event-description"
-        >
-          Description
-        </label>
-        <textarea
-          className="w-full rounded-md border border-gray-300 px-3 py-2 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-primary"
+        <Label htmlFor="event-description">Description</Label>
+        <Textarea
           id="event-description"
           onChange={(e) =>
             setFormData((prev) => ({ ...prev, description: e.target.value }))
@@ -443,7 +372,7 @@ function EventCreateForm({
         />
       </div>
 
-      <div className="flex justify-end space-x-4">
+      <div className="flex justify-end gap-3">
         <Button
           onClick={() => {
             setFormData({

@@ -1,6 +1,5 @@
 "use client";
 
-import { useAuth, useUser } from "@clerk/nextjs";
 import { api } from "@gearboxe-market/convex/_generated/api";
 import { Button } from "@gearboxe-market/ui/button";
 import {
@@ -9,64 +8,24 @@ import {
   CardHeader,
   CardTitle,
 } from "@gearboxe-market/ui/card";
-import { useConvexAuth, useQuery } from "convex/react";
-import {
-  Calendar,
-  Car,
-  CheckCircle,
-  Clock,
-  Database,
-  Users,
-} from "lucide-react";
+import { useQuery } from "convex/react";
+import { Calendar, Car, CheckCircle, Clock, Database } from "lucide-react";
 import Link from "next/link";
-import { redirect } from "next/navigation";
+import { useAdminAuth } from "../../lib/admin-auth-context";
 
 export default function AdminDashboardPage() {
-  const { isLoading } = useConvexAuth();
-  const { isSignedIn, isLoaded: authLoaded } = useAuth();
-  const { user } = useUser();
+  const { city } = useAdminAuth();
 
-  // Call all hooks at the top level (Rules of Hooks)
-  const isAdmin = useQuery(api.users.isAdmin);
-  const isSuperAdmin = useQuery(api.users.isSuperAdmin);
-  const orgContext = useQuery(api.users.getOrgContext);
   const adminStats = useQuery(api.admin.getAdminStats);
   const pendingVehicles = useQuery(api.admin.getAllVehicles);
   const upcomingEvents = useQuery(api.events.getUpcomingEvents);
 
-  // Show loading while auth is being determined
-  if (!authLoaded || isLoading) {
+  if (!(adminStats && pendingVehicles)) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-white">
         <div className="text-center">
-          <div className="mx-auto h-32 w-32 animate-spin rounded-full border-primary border-b-2" />
-          <p className="mt-4 text-gray-600">Loading admin dashboard...</p>
-        </div>
-      </div>
-    );
-  }
-
-  // Only redirect if Clerk auth is not loaded or user is not signed in
-  if (!(isSignedIn && user)) {
-    redirect("/sign-in");
-  }
-
-  if (isAdmin === false) {
-    redirect("/");
-  }
-
-  if (
-    isAdmin === null ||
-    isAdmin === undefined ||
-    !adminStats ||
-    !pendingVehicles ||
-    !user
-  ) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-white">
-        <div className="text-center">
-          <div className="mx-auto h-32 w-32 animate-spin rounded-full border-primary border-b-2" />
-          <p className="mt-4 text-gray-600">Loading admin data...</p>
+          <div className="mx-auto h-8 w-8 animate-spin rounded-full border-primary border-b-2" />
+          <p className="mt-4 text-gray-600 text-sm">Loading...</p>
         </div>
       </div>
     );
@@ -80,19 +39,19 @@ export default function AdminDashboardPage() {
     <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="mb-2 font-bold text-3xl text-gray-900">
+        <h1 className="mb-2 font-bold font-heading text-3xl text-gray-900">
           Admin Dashboard
         </h1>
         <p className="text-gray-600">
-          {orgContext?.city
-            ? `Managing ${orgContext.city.name}, ${orgContext.city.state}`
+          {city
+            ? `Managing ${city.name}, ${city.state}`
             : "Global view (all cities)"}
         </p>
       </div>
 
       {/* Stats Grid */}
       <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
-        <Card className="admin-stat-card">
+        <Card className="transition-all duration-300 hover:shadow-md">
           <CardContent className="p-6">
             <div className="flex items-center">
               <div className="rounded-lg bg-primary/10 p-2">
@@ -110,7 +69,7 @@ export default function AdminDashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className="admin-stat-card">
+        <Card className="transition-all duration-300 hover:shadow-md">
           <CardContent className="p-6">
             <div className="flex items-center">
               <div className="rounded-lg bg-yellow-100 p-2">
@@ -128,7 +87,7 @@ export default function AdminDashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className="admin-stat-card">
+        <Card className="transition-all duration-300 hover:shadow-md">
           <CardContent className="p-6">
             <div className="flex items-center">
               <div className="rounded-lg bg-green-100 p-2">
@@ -144,7 +103,7 @@ export default function AdminDashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className="admin-stat-card">
+        <Card className="transition-all duration-300 hover:shadow-md">
           <CardContent className="p-6">
             <div className="flex items-center">
               <div className="rounded-lg bg-primary-100 p-2">
@@ -169,39 +128,31 @@ export default function AdminDashboardPage() {
           {/* Quick Actions */}
           <Card>
             <CardHeader>
-              <CardTitle>Quick Actions</CardTitle>
+              <CardTitle className="font-heading">Quick Actions</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
                 <Button asChild className="text-white">
                   <Link href="/listings">
-                    <Car className="mr-2 h-5 w-5" />
+                    <Car className="h-5 w-5" />
                     Manage Listings
                   </Link>
                 </Button>
                 <Button asChild variant="outline">
                   <Link href="/events">
-                    <Calendar className="mr-2 h-5 w-5" />
+                    <Calendar className="h-5 w-5" />
                     Manage Events
                   </Link>
                 </Button>
                 <Button asChild variant="outline">
                   <Link href="/checkin">
-                    <CheckCircle className="mr-2 h-5 w-5" />
+                    <CheckCircle className="h-5 w-5" />
                     Event Check-in
                   </Link>
                 </Button>
-                {isSuperAdmin === true && (
-                  <Button asChild variant="outline">
-                    <Link href="/users">
-                      <Users className="mr-2 h-5 w-5" />
-                      Manage Users
-                    </Link>
-                  </Button>
-                )}
                 <Button asChild variant="outline">
                   <Link href="/seed">
-                    <Database className="mr-2 h-5 w-5" />
+                    <Database className="h-5 w-5" />
                     Seed Database
                   </Link>
                 </Button>
@@ -212,7 +163,7 @@ export default function AdminDashboardPage() {
           {/* Pending Approvals */}
           <Card>
             <CardHeader>
-              <CardTitle>
+              <CardTitle className="font-heading">
                 Pending Approvals ({pendingVehiclesList.length})
               </CardTitle>
             </CardHeader>
@@ -221,7 +172,7 @@ export default function AdminDashboardPage() {
                 <div className="space-y-4">
                   {pendingVehiclesList.slice(0, 5).map((vehicle) => (
                     <div
-                      className="flex items-center justify-between rounded-lg border p-4"
+                      className="flex items-center justify-between rounded-lg border border-gray-200 p-4 transition-colors duration-200 hover:bg-gray-50"
                       key={vehicle._id}
                     >
                       <div className="flex-1">
@@ -268,13 +219,16 @@ export default function AdminDashboardPage() {
           {/* Upcoming Events */}
           <Card>
             <CardHeader>
-              <CardTitle>Upcoming Events</CardTitle>
+              <CardTitle className="font-heading">Upcoming Events</CardTitle>
             </CardHeader>
             <CardContent>
               {upcomingEvents && upcomingEvents.length > 0 ? (
                 <div className="space-y-3">
                   {upcomingEvents.slice(0, 3).map((event) => (
-                    <div className="rounded-lg border p-3" key={event._id}>
+                    <div
+                      className="rounded-lg border border-gray-200 p-3 transition-colors duration-200 hover:bg-gray-50"
+                      key={event._id}
+                    >
                       <h4 className="font-medium text-sm">{event.name}</h4>
                       <p className="text-gray-600 text-xs">
                         {new Date(event.date).toLocaleDateString()}
@@ -300,44 +254,6 @@ export default function AdminDashboardPage() {
                 <Button asChild className="w-full" variant="outline">
                   <Link href="/events">Manage Events</Link>
                 </Button>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Recent Activity */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Recent Activity</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                <div className="flex items-center space-x-3">
-                  <div className="h-2 w-2 rounded-full bg-green-500" />
-                  <div className="flex-1">
-                    <p className="text-gray-900 text-sm">
-                      New vehicle listing submitted
-                    </p>
-                    <p className="text-gray-500 text-xs">2 minutes ago</p>
-                  </div>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <div className="h-2 w-2 rounded-full bg-primary" />
-                  <div className="flex-1">
-                    <p className="text-gray-900 text-sm">
-                      Event registration completed
-                    </p>
-                    <p className="text-gray-500 text-xs">15 minutes ago</p>
-                  </div>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <div className="h-2 w-2 rounded-full bg-yellow-500" />
-                  <div className="flex-1">
-                    <p className="text-gray-900 text-sm">
-                      Vehicle approval pending
-                    </p>
-                    <p className="text-gray-500 text-xs">1 hour ago</p>
-                  </div>
-                </div>
               </div>
             </CardContent>
           </Card>

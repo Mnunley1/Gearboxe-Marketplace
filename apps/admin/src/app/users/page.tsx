@@ -1,52 +1,33 @@
 "use client";
 
 import { api } from "@gearboxe-market/convex/_generated/api";
-import { useUser } from "@clerk/nextjs";
-import { useConvexAuth, useMutation, useQuery } from "convex/react";
-import { ArrowLeft, Crown, Mail, Star, User, Users } from "lucide-react";
-import Link from "next/link";
-import { redirect } from "next/navigation";
-import { useState } from "react";
 import { Button } from "@gearboxe-market/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@gearboxe-market/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@gearboxe-market/ui/card";
+import { useMutation, useQuery } from "convex/react";
+import { Crown, Mail, Star, User, Users } from "lucide-react";
+import { useState } from "react";
+import { useAdminAuth } from "../../../lib/admin-auth-context";
 
 export default function AdminUsersPage() {
-  const { isLoading } = useConvexAuth();
-  const { user } = useUser();
+  useAdminAuth();
   const [roleFilter, setRoleFilter] = useState<
     "all" | "user" | "admin" | "superAdmin"
   >("all");
 
-  const isAdmin = useQuery(api.users.isAdmin);
-  const isSuperAdmin = useQuery(api.users.isSuperAdmin);
   const allUsers = useQuery(api.admin.getAllUsers);
   const updateUserRole = useMutation(api.admin.updateUserRole);
 
-  if (isLoading) {
+  if (!allUsers) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-white">
         <div className="text-center">
-          <div className="mx-auto h-32 w-32 animate-spin rounded-full border-primary border-b-2" />
-          <p className="mt-4 text-gray-600">Loading...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!user) {
-    redirect("/sign-in");
-  }
-
-  if (isAdmin === false) {
-    redirect("/myAccount");
-  }
-
-  if (isAdmin === undefined || !allUsers) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-white">
-        <div className="text-center">
-          <div className="mx-auto h-32 w-32 animate-spin rounded-full border-primary border-b-2" />
-          <p className="mt-4 text-gray-600">Loading admin data...</p>
+          <div className="mx-auto h-8 w-8 animate-spin rounded-full border-primary border-b-2" />
+          <p className="mt-4 text-gray-600 text-sm">Loading...</p>
         </div>
       </div>
     );
@@ -61,12 +42,6 @@ export default function AdminUsersPage() {
     userId: string,
     newRole: "user" | "admin" | "superAdmin"
   ) => {
-    // Only superAdmin can promote to superAdmin
-    if (newRole === "superAdmin" && isSuperAdmin !== true) {
-      // TODO: Replace with proper toast notification
-      return;
-    }
-
     try {
       await updateUserRole({ userId: userId as any, role: newRole });
     } catch (error) {
@@ -104,20 +79,12 @@ export default function AdminUsersPage() {
     <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
       {/* Header */}
       <div className="mb-8">
-        <div className="mb-4 flex items-center space-x-4">
-          <Button asChild size="sm" variant="ghost">
-            <Link href="/admin">
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Admin Dashboard
-            </Link>
-          </Button>
-        </div>
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="font-bold text-3xl text-gray-900">
+            <h1 className="font-bold font-heading text-3xl text-gray-900">
               User Management
             </h1>
-            <p className="text-gray-600">Manage user roles and permissions</p>
+            <p className="text-gray-600">Manage user roles</p>
           </div>
         </div>
       </div>
@@ -152,7 +119,10 @@ export default function AdminUsersPage() {
           {filteredUsers.length > 0 ? (
             <div className="space-y-4">
               {filteredUsers.map((user) => (
-                <Card className="overflow-hidden" key={user._id}>
+                <Card
+                  className="overflow-hidden transition-all duration-300 hover:border-gray-300/80 hover:shadow-lg"
+                  key={user._id}
+                >
                   <CardContent className="p-6">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-4">
@@ -180,10 +150,7 @@ export default function AdminUsersPage() {
                         </span>
 
                         <select
-                          className="rounded-md border border-gray-300 px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-                          disabled={
-                            user.role === "superAdmin" && isSuperAdmin !== true
-                          }
+                          className="rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-sm shadow-sm transition-all duration-200 hover:border-gray-300 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
                           onChange={(e) =>
                             handleRoleChange(user._id, e.target.value as any)
                           }
@@ -191,12 +158,7 @@ export default function AdminUsersPage() {
                         >
                           <option value="user">User</option>
                           <option value="admin">Admin</option>
-                          <option
-                            disabled={isSuperAdmin !== true}
-                            value="superAdmin"
-                          >
-                            Super Admin
-                          </option>
+                          <option value="superAdmin">Super Admin</option>
                         </select>
                       </div>
                     </div>
@@ -226,7 +188,7 @@ export default function AdminUsersPage() {
           {/* User Statistics */}
           <Card>
             <CardHeader>
-              <CardTitle>User Statistics</CardTitle>
+              <CardTitle className="font-heading">User Statistics</CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
               <div className="flex justify-between">
@@ -251,68 +213,6 @@ export default function AdminUsersPage() {
                   {allUsers.filter((u) => u.role === "user").length}
                 </span>
               </div>
-            </CardContent>
-          </Card>
-
-          {/* Role Permissions */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Role Permissions</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <div className="mb-2 flex items-center space-x-2">
-                  <Star className="h-4 w-4 text-purple-600" />
-                  <span className="font-medium text-purple-800">
-                    Super Admin
-                  </span>
-                </div>
-                <ul className="space-y-1 text-gray-600 text-sm">
-                  <li>• Full system access</li>
-                  <li>• User role management</li>
-                  <li>• System settings</li>
-                </ul>
-              </div>
-              <div>
-                <div className="mb-2 flex items-center space-x-2">
-                  <Crown className="h-4 w-4 text-yellow-600" />
-                  <span className="font-medium text-yellow-800">Admin</span>
-                </div>
-                <ul className="space-y-1 text-gray-600 text-sm">
-                  <li>• Manage listings</li>
-                  <li>• Manage events</li>
-                  <li>• Event check-in</li>
-                </ul>
-              </div>
-              <div>
-                <div className="mb-2 flex items-center space-x-2">
-                  <User className="h-4 w-4 text-primary" />
-                  <span className="font-medium text-primary-800">User</span>
-                </div>
-                <ul className="space-y-1 text-gray-600 text-sm">
-                  <li>• Buy vehicles</li>
-                  <li>• Sell vehicles</li>
-                  <li>• Register for events</li>
-                </ul>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Quick Actions */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Quick Actions</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-3">
-              <Button asChild className="w-full" variant="outline">
-                <Link href="/admin/listings">Manage Listings</Link>
-              </Button>
-              <Button asChild className="w-full" variant="outline">
-                <Link href="/admin/events">Manage Events</Link>
-              </Button>
-              <Button asChild className="w-full" variant="outline">
-                <Link href="/admin">Admin Dashboard</Link>
-              </Button>
             </CardContent>
           </Card>
         </div>

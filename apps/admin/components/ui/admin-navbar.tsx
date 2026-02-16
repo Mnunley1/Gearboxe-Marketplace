@@ -1,9 +1,7 @@
 "use client";
 
-import { OrganizationSwitcher, useAuth, useUser } from "@clerk/nextjs";
-import { api } from "@gearboxe-market/convex/_generated/api";
+import { OrganizationSwitcher, useAuth } from "@clerk/nextjs";
 import { Button } from "@gearboxe-market/ui/button";
-import { useConvexAuth, useQuery } from "convex/react";
 import {
   ArrowLeft,
   Calendar,
@@ -13,54 +11,19 @@ import {
   Menu,
   Settings,
   Shield,
-  Users,
   X,
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 import { UserDropdown } from "@/components/ui/user-dropdown";
+import { useAdminAuth } from "../../lib/admin-auth-context";
 
 export function AdminNavbar() {
-  const { isAuthenticated } = useConvexAuth();
-  const { isSignedIn, isLoaded: authLoaded } = useAuth();
-  const { user } = useUser();
+  const { isSignedIn } = useAuth();
+  useAdminAuth();
   const pathname = usePathname();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
-  const isAdmin = useQuery(api.users.isAdmin);
-  const isSuperAdmin = useQuery(api.users.isSuperAdmin);
-
-  // Show loading state while auth is being determined
-  if (!authLoaded) {
-    return (
-      <nav className="bg-gray-900 text-white shadow-lg">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="flex h-16 items-center justify-between">
-            {/* Logo */}
-            <div className="flex items-center space-x-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
-                <Shield className="h-5 w-5 text-white" />
-              </div>
-              <span className="font-bold font-heading text-xl uppercase">
-                Admin Panel
-              </span>
-            </div>
-
-            {/* Loading state */}
-            <div className="flex items-center space-x-4">
-              <div className="h-8 w-16 animate-pulse rounded bg-gray-700" />
-              <div className="h-8 w-16 animate-pulse rounded bg-gray-700" />
-            </div>
-          </div>
-        </div>
-      </nav>
-    );
-  }
-
-  if (!(isSignedIn && user) || isAdmin === false) {
-    return null;
-  }
 
   const adminNavItems = [
     {
@@ -88,19 +51,12 @@ export function AdminNavbar() {
       active: pathname.startsWith("/admin/checkin"),
     },
     {
-      href: "/admin/users",
-      label: "Users",
-      icon: Users,
-      active: pathname.startsWith("/admin/users"),
-      show: isSuperAdmin === true, // Only show for superAdmin
-    },
-    {
       href: "/admin/seed",
       label: "Database",
       icon: Database,
       active: pathname.startsWith("/admin/seed"),
     },
-  ].filter((item) => item.show !== false); // Filter out items that shouldn't be shown
+  ];
 
   return (
     <nav className="admin-navbar relative text-white shadow-lg">
@@ -137,7 +93,7 @@ export function AdminNavbar() {
           {/* Org Switcher + User Actions */}
           <div className="flex items-center space-x-4">
             <OrganizationSwitcher
-              afterSelectOrganizationUrl="/admin"
+              afterSelectOrganizationUrl="/"
               appearance={{
                 elements: {
                   rootBox: "flex items-center",
@@ -160,7 +116,7 @@ export function AdminNavbar() {
               </Link>
             </Button>
 
-            {isAuthenticated || isSignedIn ? (
+            {isSignedIn ? (
               <UserDropdown afterSignOutUrl="/" />
             ) : (
               <div className="flex items-center space-x-2">

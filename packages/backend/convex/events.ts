@@ -14,8 +14,8 @@ export const createEvent = mutation({
     vendorPrice: v.number(),
   },
   handler: async (ctx, args) => {
-    const { cityId, isSuperAdmin } = await requireOrgAdmin(ctx);
-    if (!isSuperAdmin && cityId && args.cityId !== cityId) {
+    const { cityId } = await requireOrgAdmin(ctx);
+    if (cityId && args.cityId !== cityId) {
       throw new Error("Unauthorized: cannot create events for another city");
     }
     return await ctx.db.insert("events", {
@@ -115,8 +115,8 @@ export const updateEvent = mutation({
     vendorPrice: v.optional(v.number()),
   },
   handler: async (ctx, args) => {
-    const { cityId, isSuperAdmin } = await requireOrgAdmin(ctx);
-    if (!isSuperAdmin && cityId) {
+    const { cityId } = await requireOrgAdmin(ctx);
+    if (cityId) {
       const event = await ctx.db.get(args.id);
       if (!event || event.cityId !== cityId) {
         throw new Error("Unauthorized: event does not belong to your city");
@@ -174,8 +174,8 @@ export const getEventCapacity = query({
 export const deleteEvent = mutation({
   args: { id: v.id("events") },
   handler: async (ctx, args) => {
-    const { cityId, isSuperAdmin } = await requireOrgAdmin(ctx);
-    if (!isSuperAdmin && cityId) {
+    const { cityId } = await requireOrgAdmin(ctx);
+    if (cityId) {
       const event = await ctx.db.get(args.id);
       if (!event || event.cityId !== cityId) {
         throw new Error("Unauthorized: event does not belong to your city");

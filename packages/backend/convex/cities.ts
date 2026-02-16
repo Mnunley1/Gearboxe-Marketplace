@@ -1,6 +1,6 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
-import { requireOrgAdmin, requireSuperAdmin } from "./users";
+import { requireOrgAdmin } from "./users";
 
 export const createCity = mutation({
   args: {
@@ -9,7 +9,7 @@ export const createCity = mutation({
     slug: v.string(),
   },
   handler: async (ctx, args) => {
-    await requireSuperAdmin(ctx);
+    await requireOrgAdmin(ctx);
     return await ctx.db.insert("cities", {
       ...args,
       active: true,
@@ -44,8 +44,8 @@ export const updateCity = mutation({
     active: v.optional(v.boolean()),
   },
   handler: async (ctx, args) => {
-    const { cityId, isSuperAdmin } = await requireOrgAdmin(ctx);
-    if (!isSuperAdmin && cityId && args.id !== cityId) {
+    const { cityId } = await requireOrgAdmin(ctx);
+    if (cityId && args.id !== cityId) {
       throw new Error("Unauthorized: cannot update another city");
     }
     const { id, ...updates } = args;

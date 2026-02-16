@@ -413,8 +413,8 @@ export const deleteVehicle = mutation({
 export const approveVehicle = mutation({
   args: { id: v.id("vehicles") },
   handler: async (ctx, args) => {
-    const { cityId, isSuperAdmin } = await requireOrgAdmin(ctx);
-    if (!isSuperAdmin && cityId) {
+    const { cityId } = await requireOrgAdmin(ctx);
+    if (cityId) {
       const vehicle = await ctx.db.get(args.id);
       if (!vehicle?.eventId) {
         throw new Error("Vehicle has no associated event");
@@ -431,8 +431,8 @@ export const approveVehicle = mutation({
 export const rejectVehicle = mutation({
   args: { id: v.id("vehicles") },
   handler: async (ctx, args) => {
-    const { cityId, isSuperAdmin } = await requireOrgAdmin(ctx);
-    if (!isSuperAdmin && cityId) {
+    const { cityId } = await requireOrgAdmin(ctx);
+    if (cityId) {
       const vehicle = await ctx.db.get(args.id);
       if (!vehicle?.eventId) {
         throw new Error("Vehicle has no associated event");

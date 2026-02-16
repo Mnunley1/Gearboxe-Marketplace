@@ -1,22 +1,13 @@
 "use client";
 
 import { api } from "@gearboxe-market/convex/_generated/api";
-import { useUser } from "@clerk/nextjs";
-import { useConvex, useConvexAuth, useMutation, useQuery } from "convex/react";
-import {
-  ArrowLeft,
-  Calendar,
-  Car,
-  CheckCircle,
-  Download,
-  Users,
-} from "lucide-react";
-import Link from "next/link";
-import { redirect } from "next/navigation";
-import { useCallback, useState } from "react";
-import { toast } from "sonner";
 import { Button } from "@gearboxe-market/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@gearboxe-market/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@gearboxe-market/ui/card";
 import {
   Dialog,
   DialogContent,
@@ -25,7 +16,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@gearboxe-market/ui/dialog";
+import { useConvex, useMutation, useQuery } from "convex/react";
+import { Calendar, Car, CheckCircle, Download, Users } from "lucide-react";
+import { useCallback, useState } from "react";
+import { toast } from "sonner";
 import { QRScannerComponent } from "@/components/ui/qr-scanner";
+import { useAdminAuth } from "../../../lib/admin-auth-context";
 
 type ScanResult = {
   status: "loading" | "not_found" | "already_checked_in" | "found";
@@ -41,15 +37,13 @@ type ScanResult = {
 };
 
 export default function AdminCheckinPage() {
-  const { isAuthenticated, isLoading } = useConvexAuth();
-  const { user } = useUser();
+  useAdminAuth();
   const convex = useConvex();
   const [selectedEvent, setSelectedEvent] = useState<string | null>(null);
   const [scanResult, setScanResult] = useState<ScanResult | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [checkingIn, setCheckingIn] = useState(false);
 
-  const isAdmin = useQuery(api.users.isAdmin);
   const upcomingEvents = useQuery(api.events.getUpcomingEvents);
   const eventRegistrations = useQuery(
     api.registrations.getRegistrationsByEvent,
@@ -165,7 +159,7 @@ export default function AdminCheckinPage() {
       "QR Code",
     ];
 
-    const escape = (val: string) => {
+    const escapeCsv = (val: string) => {
       if (val.includes(",") || val.includes('"') || val.includes("\n")) {
         return `"${val.replace(/"/g, '""')}"`;
       }
@@ -174,18 +168,18 @@ export default function AdminCheckinPage() {
 
     const csvRows = [
       headers.join(","),
-      ...sheetData.rows.map((row: typeof sheetData.rows[number]) =>
+      ...sheetData.rows.map((row: (typeof sheetData.rows)[number]) =>
         [
-          escape(row.sellerName),
-          escape(row.sellerEmail),
-          escape(row.sellerPhone),
-          escape(row.vehicleTitle),
+          escapeCsv(row.sellerName),
+          escapeCsv(row.sellerEmail),
+          escapeCsv(row.sellerPhone),
+          escapeCsv(row.vehicleTitle),
           String(row.vehicleYear),
-          escape(row.vehicleMake),
-          escape(row.vehicleModel),
-          escape(row.vin),
+          escapeCsv(row.vehicleMake),
+          escapeCsv(row.vehicleModel),
+          escapeCsv(row.vin),
           row.checkedIn ? "Yes" : "No",
-          escape(row.qrCodeData),
+          escapeCsv(row.qrCodeData),
         ].join(",")
       ),
     ];
@@ -199,31 +193,12 @@ export default function AdminCheckinPage() {
     URL.revokeObjectURL(url);
   }, [sheetData]);
 
-  if (isLoading) {
+  if (!upcomingEvents) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-white">
         <div className="text-center">
-          <div className="mx-auto h-32 w-32 animate-spin rounded-full border-primary border-b-2" />
-          <p className="mt-4 text-gray-600">Loading...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!(isAuthenticated && user)) {
-    redirect("/sign-in");
-  }
-
-  if (isAdmin === false) {
-    redirect("/myAccount");
-  }
-
-  if (isAdmin === undefined || !upcomingEvents) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-white">
-        <div className="text-center">
-          <div className="mx-auto h-32 w-32 animate-spin rounded-full border-primary border-b-2" />
-          <p className="mt-4 text-gray-600">Loading admin data...</p>
+          <div className="mx-auto h-8 w-8 animate-spin rounded-full border-primary border-b-2" />
+          <p className="mt-4 text-gray-600 text-sm">Loading...</p>
         </div>
       </div>
     );
@@ -237,18 +212,9 @@ export default function AdminCheckinPage() {
     <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
       {/* Header */}
       <div className="mb-8">
-        <div className="mb-4 flex items-center space-x-4">
-          <Button asChild size="sm" variant="ghost">
-            <Link href="/admin">
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Back to Admin Dashboard
-            </Link>
-          </Button>
-        </div>
-        <h1 className="font-bold text-3xl text-gray-900">Event Check-in</h1>
-        <p className="text-gray-600">
-          Scan QR codes or manually check in vendors
-        </p>
+        <h1 className="font-bold font-heading text-3xl text-gray-900">
+          Event Check-in
+        </h1>
       </div>
 
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
@@ -256,20 +222,21 @@ export default function AdminCheckinPage() {
         <div className="lg:col-span-1">
           <Card>
             <CardHeader>
-              <CardTitle>Select Event</CardTitle>
+              <CardTitle className="font-heading">Select Event</CardTitle>
             </CardHeader>
             <CardContent>
               {upcomingEvents.length > 0 ? (
                 <div className="space-y-3">
                   {upcomingEvents.map((event) => (
                     <button
-                      className={`w-full rounded-lg border p-3 text-left transition-colors ${
+                      className={`w-full rounded-lg border border-gray-200 p-3 text-left transition-colors ${
                         selectedEvent === event._id
                           ? "border-primary bg-primary/5"
-                          : "border-gray-200 hover:bg-gray-50"
+                          : "hover:bg-gray-50"
                       }`}
                       key={event._id}
                       onClick={() => setSelectedEvent(event._id)}
+                      type="button"
                     >
                       <div>
                         <h4 className="font-medium text-gray-900">
@@ -298,7 +265,7 @@ export default function AdminCheckinPage() {
           {selectedEvent && (
             <Card className="mt-6">
               <CardHeader>
-                <CardTitle>QR Code Scanner</CardTitle>
+                <CardTitle className="font-heading">QR Code Scanner</CardTitle>
               </CardHeader>
               <CardContent>
                 <QRScannerComponent
@@ -316,7 +283,7 @@ export default function AdminCheckinPage() {
             <Card>
               <CardHeader>
                 <div className="flex items-center justify-between">
-                  <CardTitle>
+                  <CardTitle className="font-heading">
                     Registrations for {selectedEventData?.name}
                     {eventRegistrations && (
                       <span className="ml-2 font-normal text-gray-600 text-sm">
@@ -330,7 +297,7 @@ export default function AdminCheckinPage() {
                       size="sm"
                       variant="outline"
                     >
-                      <Download className="mr-1 h-4 w-4" />
+                      <Download className="h-4 w-4" />
                       Download Sheet
                     </Button>
                   )}
@@ -341,7 +308,7 @@ export default function AdminCheckinPage() {
                   <div className="space-y-4">
                     {eventRegistrations.map((registration) => (
                       <div
-                        className="flex items-center justify-between rounded-lg border p-4"
+                        className="flex items-center justify-between rounded-lg border border-gray-200 p-4"
                         key={registration._id}
                       >
                         <div className="flex-1">
@@ -386,7 +353,7 @@ export default function AdminCheckinPage() {
                               }
                               size="sm"
                             >
-                              <CheckCircle className="mr-1 h-4 w-4" />
+                              <CheckCircle className="h-4 w-4" />
                               Check In
                             </Button>
                           )}
@@ -421,7 +388,7 @@ export default function AdminCheckinPage() {
       </div>
 
       {/* QR Scan Confirmation Dialog */}
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+      <Dialog onOpenChange={setDialogOpen} open={dialogOpen}>
         <DialogContent>
           {scanResult?.status === "loading" && (
             <>
@@ -450,11 +417,11 @@ export default function AdminCheckinPage() {
               </DialogHeader>
               <DialogFooter>
                 <Button
-                  variant="outline"
                   onClick={() => {
                     setDialogOpen(false);
                     setScanResult(null);
                   }}
+                  variant="outline"
                 >
                   Close
                 </Button>
@@ -489,11 +456,11 @@ export default function AdminCheckinPage() {
               </div>
               <DialogFooter>
                 <Button
-                  variant="outline"
                   onClick={() => {
                     setDialogOpen(false);
                     setScanResult(null);
                   }}
+                  variant="outline"
                 >
                   Close
                 </Button>
@@ -526,11 +493,11 @@ export default function AdminCheckinPage() {
               </div>
               <DialogFooter>
                 <Button
-                  variant="outline"
                   onClick={() => {
                     setDialogOpen(false);
                     setScanResult(null);
                   }}
+                  variant="outline"
                 >
                   Cancel
                 </Button>

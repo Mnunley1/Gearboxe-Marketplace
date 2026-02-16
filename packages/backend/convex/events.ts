@@ -16,21 +16,9 @@ export const createEvent = mutation({
   handler: async (ctx, args) => {
     const { orgId } = await requireOrgAdmin(ctx);
     if (args.clerkOrgId !== orgId) {
-      throw new Error("Unauthorized: cannot create events for another organization");
-    }
-
-    // If event has a vendor fee, require Stripe Connect to be set up
-    if (args.vendorPrice > 0) {
-      const stripeSettings = await ctx.db
-        .query("orgStripeSettings")
-        .withIndex("by_org", (q) => q.eq("clerkOrgId", orgId))
-        .unique();
-
-      if (!stripeSettings?.onboardingComplete) {
-        throw new Error(
-          "Your organization must connect a Stripe account before creating paid events. Go to Settings → Stripe to connect.",
-        );
-      }
+      throw new Error(
+        "Unauthorized: cannot create events for another organization"
+      );
     }
 
     return await ctx.db.insert("events", {
@@ -133,7 +121,9 @@ export const updateEvent = mutation({
     const { orgId } = await requireOrgAdmin(ctx);
     const event = await ctx.db.get(args.id);
     if (!event || event.clerkOrgId !== orgId) {
-      throw new Error("Unauthorized: event does not belong to your organization");
+      throw new Error(
+        "Unauthorized: event does not belong to your organization"
+      );
     }
     const { id, ...updates } = args;
     await ctx.db.patch(id, updates);
@@ -190,7 +180,9 @@ export const deleteEvent = mutation({
     const { orgId } = await requireOrgAdmin(ctx);
     const event = await ctx.db.get(args.id);
     if (!event || event.clerkOrgId !== orgId) {
-      throw new Error("Unauthorized: event does not belong to your organization");
+      throw new Error(
+        "Unauthorized: event does not belong to your organization"
+      );
     }
     await ctx.db.delete(args.id);
   },

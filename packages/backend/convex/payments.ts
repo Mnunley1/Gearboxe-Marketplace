@@ -87,21 +87,10 @@ export const createEventRegistrationCheckout = action({
     // Look up org Stripe Connect settings for destination charges
     const orgSettings = await ctx.runQuery(
       internal.stripeConnect.getSettingsByOrgId,
-      { clerkOrgId: event.clerkOrgId },
+      { clerkOrgId: event.clerkOrgId }
     );
 
-    if (!orgSettings?.onboardingComplete) {
-      throw new Error(
-        "This organization has not completed Stripe Connect setup. Payment cannot be processed.",
-      );
-    }
-
-    // Calculate application fee
     const amountInCents = Math.round(args.amount * 100);
-    const applicationFeeAmount =
-      orgSettings.platformFeeType === "percentage"
-        ? Math.round(amountInCents * orgSettings.platformFeeValue / 100)
-        : orgSettings.platformFeeValue;
 
     // Get or create Stripe customer using component
     const customer = await stripeClient.getOrCreateCustomer(ctx, {
@@ -113,6 +102,22 @@ export const createEventRegistrationCheckout = action({
     // Create checkout session using Stripe SDK directly for dynamic pricing
     const successUrl = `${process.env.NEXT_PUBLIC_APP_URL}/myAccount/payment/success?session_id={CHECKOUT_SESSION_ID}`;
     const cancelUrl = `${process.env.NEXT_PUBLIC_APP_URL}/myAccount/payment?registrationId=${args.registrationId}`;
+
+    // Build payment_intent_data: use destination charges only when org has completed Stripe Connect
+    const paymentIntentData: Stripe.Checkout.SessionCreateParams["payment_intent_data"] =
+      orgSettings?.onboardingComplete
+        ? {
+            application_fee_amount:
+              orgSettings.platformFeeType === "percentage"
+                ? Math.round(
+                    (amountInCents * orgSettings.platformFeeValue) / 100
+                  )
+                : orgSettings.platformFeeValue,
+            transfer_data: {
+              destination: orgSettings.stripeAccountId,
+            },
+          }
+        : undefined;
 
     const session = await getStripe().checkout.sessions.create({
       customer: customer.customerId,
@@ -140,12 +145,7 @@ export const createEventRegistrationCheckout = action({
         userId: args.userId,
       },
       customer_email: user.email,
-      payment_intent_data: {
-        application_fee_amount: applicationFeeAmount,
-        transfer_data: {
-          destination: orgSettings.stripeAccountId,
-        },
-      },
+      ...(paymentIntentData && { payment_intent_data: paymentIntentData }),
     });
 
     return {

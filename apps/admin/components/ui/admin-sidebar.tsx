@@ -1,6 +1,8 @@
 "use client";
 
 import { useAuth, useUser } from "@clerk/nextjs";
+import { api } from "@gearboxe-market/convex/_generated/api";
+import { useQuery } from "convex/react";
 import {
   ArrowLeft,
   Calendar,
@@ -10,6 +12,7 @@ import {
   Database,
   LogOut,
   Menu,
+  MessageCircle,
   Settings,
   X,
 } from "lucide-react";
@@ -22,8 +25,11 @@ import { OrgSwitcher } from "./org-switcher";
 export function AdminSidebar() {
   const { isSignedIn, signOut } = useAuth();
   const { user } = useUser();
-  useAdminAuth();
+  const { orgId } = useAdminAuth();
   const pathname = usePathname();
+  const inboxUnread = useQuery(
+    orgId ? api.orgInbox.getAdminUnreadCount : "skip"
+  );
   const [mobileOpen, setMobileOpen] = useState(false);
   const prevPathname = useRef(pathname);
 
@@ -71,6 +77,13 @@ export function AdminSidebar() {
       label: "Check-in",
       icon: CheckCircle,
       active: pathname.startsWith("/checkin"),
+    },
+    {
+      href: "/messages",
+      label: "Messages",
+      icon: MessageCircle,
+      active: pathname.startsWith("/messages"),
+      badge: inboxUnread && inboxUnread > 0 ? inboxUnread : undefined,
     },
     {
       href: "/seed",
@@ -130,11 +143,25 @@ export function AdminSidebar() {
             href={item.href}
             key={item.href}
           >
-            <item.icon className={`h-4 w-4 shrink-0 transition-colors duration-200 ${item.active ? "text-primary-300" : "group-hover:text-gray-300"}`} />
+            <item.icon
+              className={`h-4 w-4 shrink-0 transition-colors duration-200 ${item.active ? "text-primary-300" : "group-hover:text-gray-300"}`}
+            />
             <span>{item.label}</span>
-            {item.active && (
-              <span className="ml-auto h-1.5 w-1.5 rounded-full bg-primary-300" />
-            )}
+            {(() => {
+              if ("badge" in item && item.badge) {
+                return (
+                  <span className="ml-auto inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1.5 font-medium text-[10px] text-white">
+                    {item.badge}
+                  </span>
+                );
+              }
+              if (item.active) {
+                return (
+                  <span className="ml-auto h-1.5 w-1.5 rounded-full bg-primary-300" />
+                );
+              }
+              return null;
+            })()}
           </Link>
         ))}
       </nav>

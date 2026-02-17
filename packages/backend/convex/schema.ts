@@ -146,6 +146,46 @@ export default defineSchema({
     shares: v.number(),
   }).index("by_vehicle", ["vehicleId"]),
 
+  orgConversations: defineTable({
+    clerkOrgId: v.string(),
+    eventId: v.id("events"),
+    userId: v.id("users"),
+    lastMessageAt: v.number(),
+    createdAt: v.number(),
+  })
+    .index("by_org", ["clerkOrgId"])
+    .index("by_org_event", ["clerkOrgId", "eventId"])
+    .index("by_user", ["userId"])
+    .index("by_event_user", ["eventId", "userId"]),
+
+  orgMessages: defineTable({
+    conversationId: v.id("orgConversations"),
+    senderId: v.id("users"),
+    senderRole: v.union(v.literal("admin"), v.literal("vendor")),
+    content: v.string(),
+    read: v.boolean(),
+    createdAt: v.number(),
+  }).index("by_conversation", ["conversationId"]),
+
+  eventAnnouncements: defineTable({
+    clerkOrgId: v.string(),
+    eventId: v.id("events"),
+    authorId: v.id("users"),
+    title: v.string(),
+    content: v.string(),
+    createdAt: v.number(),
+  })
+    .index("by_event", ["eventId"])
+    .index("by_org", ["clerkOrgId"]),
+
+  announcementReads: defineTable({
+    userId: v.id("users"),
+    announcementId: v.id("eventAnnouncements"),
+    createdAt: v.number(),
+  })
+    .index("by_user", ["userId"])
+    .index("by_user_announcement", ["userId", "announcementId"]),
+
   orgStripeSettings: defineTable({
     clerkOrgId: v.string(),
     stripeAccountId: v.string(),

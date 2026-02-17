@@ -1,10 +1,11 @@
 "use client";
 
+import { useAuth, useUser } from "@clerk/nextjs";
 import { api } from "@gearboxe-market/convex/_generated/api";
 import { Button } from "@gearboxe-market/ui/button";
-import { useAuth, useUser } from "@clerk/nextjs";
 import { useQuery } from "convex/react";
 import {
+  Bell,
   Car,
   ChevronDown,
   Heart,
@@ -23,7 +24,9 @@ type UserDropdownProps = {
   afterSignOutUrl?: string;
 };
 
-export function UserDropdown({ afterSignOutUrl = "/" }: UserDropdownProps) {
+export function UserDropdown({
+  afterSignOutUrl: _afterSignOutUrl = "/",
+}: UserDropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const { signOut } = useAuth();
@@ -31,6 +34,13 @@ export function UserDropdown({ afterSignOutUrl = "/" }: UserDropdownProps) {
   const { isAuthenticated } = useCurrentUser();
   const pathname = usePathname();
   const isAdmin = useQuery(api.users.isAdmin);
+  const orgInboxUnread = useQuery(
+    isAuthenticated ? api.orgInbox.getUserUnreadCount : "skip"
+  );
+  const announcementUnread = useQuery(
+    isAuthenticated ? api.announcements.getUnreadCount : "skip"
+  );
+  const notificationCount = (orgInboxUnread ?? 0) + (announcementUnread ?? 0);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -88,6 +98,13 @@ export function UserDropdown({ afterSignOutUrl = "/" }: UserDropdownProps) {
       href: "/myAccount/messages",
       icon: MessageCircle,
       active: pathname === "/myAccount/messages",
+    },
+    {
+      label: "Notifications",
+      href: "/myAccount/notifications",
+      icon: Bell,
+      active: pathname.startsWith("/myAccount/notifications"),
+      badge: notificationCount > 0 ? notificationCount : undefined,
     },
     {
       label: "Favorites",
@@ -175,7 +192,12 @@ export function UserDropdown({ afterSignOutUrl = "/" }: UserDropdownProps) {
                   onClick={() => setIsOpen(false)}
                 >
                   <Icon className="h-4 w-4" />
-                  <span>{item.label}</span>
+                  <span className="flex-1">{item.label}</span>
+                  {"badge" in item && item.badge ? (
+                    <span className="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-primary px-1.5 font-medium text-[10px] text-white">
+                      {item.badge}
+                    </span>
+                  ) : null}
                 </Link>
               );
             })}
@@ -183,33 +205,31 @@ export function UserDropdown({ afterSignOutUrl = "/" }: UserDropdownProps) {
 
           {/* Admin Section */}
           {isAdmin && (
-            <>
-              <div className="border-gray-100 border-t pt-2">
-                <div className="px-4 py-2">
-                  <div className="font-semibold text-gray-500 text-xs uppercase tracking-wider">
-                    Admin
-                  </div>
+            <div className="border-gray-100 border-t pt-2">
+              <div className="px-4 py-2">
+                <div className="font-semibold text-gray-500 text-xs uppercase tracking-wider">
+                  Admin
                 </div>
-                {adminItems.map((item) => {
-                  const Icon = item.icon;
-                  return (
-                    <Link
-                      className={`flex items-center space-x-3 px-4 py-2 text-sm transition-colors hover:bg-gray-50 ${
-                        item.active
-                          ? "border-primary border-r-2 bg-primary/5 text-primary"
-                          : "text-gray-700"
-                      }`}
-                      href={item.href}
-                      key={item.href}
-                      onClick={() => setIsOpen(false)}
-                    >
-                      <Icon className="h-4 w-4" />
-                      <span>{item.label}</span>
-                    </Link>
-                  );
-                })}
               </div>
-            </>
+              {adminItems.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <Link
+                    className={`flex items-center space-x-3 px-4 py-2 text-sm transition-colors hover:bg-gray-50 ${
+                      item.active
+                        ? "border-primary border-r-2 bg-primary/5 text-primary"
+                        : "text-gray-700"
+                    }`}
+                    href={item.href}
+                    key={item.href}
+                    onClick={() => setIsOpen(false)}
+                  >
+                    <Icon className="h-4 w-4" />
+                    <span>{item.label}</span>
+                  </Link>
+                );
+              })}
+            </div>
           )}
 
           {/* Sign Out */}
@@ -217,6 +237,7 @@ export function UserDropdown({ afterSignOutUrl = "/" }: UserDropdownProps) {
             <button
               className="flex w-full items-center space-x-3 px-4 py-2 text-red-600 text-sm transition-colors hover:bg-red-50"
               onClick={handleSignOut}
+              type="button"
             >
               <LogOut className="h-4 w-4" />
               <span>Sign Out</span>
